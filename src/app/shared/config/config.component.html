@@ -1,0 +1,21 @@
+<button class="layout-config-button p-link" type="button" (click)="onConfigButtonClick()">
+    <i class="pi pi-cog"></i>
+</button>
+
+<p-sidebar [(visible)]="visible" position="right" [transitionOptions]="'.3s cubic-bezier(0, 0, 0.2, 1)'" styleClass="layout-config-sidebar w-20rem">
+
+    <ng-container *ngIf="!minimal">
+        <h5>Theme Style</h5>
+        <div class="flex">
+            <div class="field-radiobutton flex-1">
+                <p-radioButton name="inputStyle" value="outlined" (click)="changeTheme('bootstrap4-dark-blue', 'dark')"></p-radioButton>
+                <label for="outlined_input">Dark</label>
+            </div>
+            <div class="field-radiobutton flex-1">
+                <p-radioButton name="inputStyle" value="outlined" (click)="changeTheme('bootstrap4-light-blue', 'light')"></p-radioButton>
+                <label for="filled_input">Light</label>
+            </div>
+        </div>
+    </ng-container>
+   
+</p-sidebar>

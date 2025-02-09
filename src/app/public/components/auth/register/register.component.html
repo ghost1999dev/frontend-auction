@@ -1,0 +1,85 @@
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
+    <div class="flex flex-column align-items-center justify-content-center">
+        <img [routerLink]="['/auth/login']" src="assets/layout/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0">        
+        <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+                <div class="text-center mb-5">
+                    <div class="text-900 text-3xl font-medium mb-3">Welcome to Register User</div>
+                    <span class="text-600 font-medium">Select one of the Options</span>
+                </div>
+
+                <div class="flex justify-content-center gap-5 mb-5">
+                    <!-- Card for Developer -->
+                    <p-card class="cursor-pointer" (click)="selectUserType('developer')" [ngClass]="{'selected-card': userType === 'developer'}">
+                        <div class="flex flex-column align-items-center pd-all">
+                            <i class="pi pi-user text-6xl mb-3"></i>
+                            <span class="text-900 text-xl font-medium">Developer</span>
+                        </div>
+                    </p-card>
+
+                    <!-- Card for Company -->
+                    <p-card class="cursor-pointer" (click)="selectUserType('company')" [ngClass]="{'selected-card': userType === 'company'}">
+                        <div class="flex flex-column align-items-center pd-all">
+                            <i class="pi pi-building text-6xl mb-3"></i>
+                            <span class="text-900 text-xl font-medium">Company</span>
+                        </div>
+                    </p-card>
+                </div>
+
+                <!-- Developer Form -->
+                <div *ngIf="userType === 'developer'">
+                    <form>
+                        <div class="field">
+                            <label for="devName" class="block text-900 font-medium mb-2">Developer Name</label>
+                            <input id="devName" type="text" pInputText class="w-full mb-3">
+                        </div>
+                        <div class="field">
+                            <label for="devEmail" class="block text-900 font-medium mb-2">Email</label>
+                            <input id="devEmail" type="email" pInputText class="w-full mb-3">
+                        </div>
+                        <div class="field">
+                            <label for="devPassword" class="block text-900 font-medium mb-2">Password</label>
+                            <input id="devPassword" type="password" pInputText class="w-full mb-3">
+                        </div>
+                        <div class="field">
+                            <label for="devImage" class="block text-900 font-medium mb-2">Image of Profile</label>
+                            <input id="devImage" type="file" accept="image/*" (change)="onFileSelectProfilePhoto($event)" class="w-full mb-3">
+                        </div>
+                        <button pButton type="submit" label="Register as Developer" class="w-full"></button>
+                    </form>
+                </div>
+
+                <!-- Company Form -->
+                <div *ngIf="userType === 'company'">
+                    <form>
+                        <div class="field">
+                            <label for="companyUserName" class="block text-900 font-medium mb-2">User Name</label>
+                            <input id="companyUserName" type="text" pInputText class="w-full mb-3">
+                        </div>
+                        <div class="field">
+                            <label for="companyName" class="block text-900 font-medium mb-2">Company Name</label>
+                            <input id="companyName" type="text" pInputText class="w-full mb-3">
+                        </div>
+                        <div class="field">
+                            <label for="companyEmail" class="block text-900 font-medium mb-2">Email</label>
+                            <input id="companyEmail" type="email" pInputText class="w-full mb-3">
+                        </div>
+                        <div class="field">
+                            <label for="companyPassword" class="block text-900 font-medium mb-2">Password</label>
+                            <input id="companyPassword" type="password" pInputText class="w-full mb-3">
+                        </div>
+                        <div class="field">
+                            <label for="companyImage" class="block text-900 font-medium mb-2">Image of profile User</label>
+                            <input id="companyImage" type="file" accept="image/*" (change)="onFileSelectProfilePhotoCompany($event)" class="w-full mb-3">
+                        </div>
+                        <div class="field">
+                            <label for="companyLogo" class="block text-900 font-medium mb-2">Logo of Company</label>
+                            <input id="companyLogo" type="file" accept="image/*" (change)="onFileSelectProfilePhotoLogo($event)" class="w-full mb-3">
+                        </div>
+                        <button pButton type="submit" label="Register as Company" class="w-full"></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
