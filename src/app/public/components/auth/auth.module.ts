@@ -7,13 +7,15 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FileUploadModule } from 'primeng/fileupload';
+import { ActivateAccountComponent } from './activate-account/activate-account.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 const routes: Routes = [
   {
@@ -36,6 +38,14 @@ const routes: Routes = [
       {
         path: 'forgot-password',
         component: ForgotPasswordComponent
+      },
+      {
+        path: 'activate-account',
+        component: ActivateAccountComponent
+      },
+      {
+        path: 'reset-password',
+        component: ResetPasswordComponent
       }
     ]
   },
@@ -46,7 +56,9 @@ const routes: Routes = [
     AuthComponent,
     LoginComponent,
     RegisterComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    ActivateAccountComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     CommonModule,
@@ -55,12 +67,14 @@ const routes: Routes = [
     ButtonModule,
     CheckboxModule,
     InputTextModule,
-    FormsModule,
     PasswordModule,
 
     RadioButtonModule,
     FileUploadModule,
     
+    ReactiveFormsModule,
+    FormsModule,
+
     RouterModule.forChild(routes)
   ],
   providers: [
