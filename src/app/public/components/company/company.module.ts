@@ -1,6 +1,5 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ViewComponent } from './view.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { RouterModule, Routes } from '@angular/router';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -9,23 +8,39 @@ import { ChartModule } from 'primeng/chart';
 import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { LandingComponent } from './landing/landing.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { CompanyComponent } from './company.component';
+import { AboutUsComponent } from './about-us/about-us.component';
+import { ContactComponent } from './contact/contact.component';
+import { UserGuideComponent } from './user-guide/user-guide.component';
+import { DocumentationComponent } from './documentation/documentation.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: ViewComponent,
+    component: CompanyComponent,
     children: [
       {
         path: '',
-        redirectTo: 'landing',
+        redirectTo: 'about-us',
         pathMatch: 'full'
       },
       {
-        path: 'landing',
-        component: LandingComponent,
+        path: 'about-us',
+        component: AboutUsComponent,
+      },
+      {
+        path: 'contact',
+        component: ContactComponent
+      },
+      {
+        path: 'user-guide',
+        component: UserGuideComponent
+      },
+      {
+        path: 'documentation',
+        component: DocumentationComponent
       }
     ]
   },
@@ -33,8 +48,11 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    ViewComponent,
-    LandingComponent,
+    CompanyComponent,
+    AboutUsComponent,
+    ContactComponent,
+    UserGuideComponent,
+    DocumentationComponent
   ],
   imports: [
     CommonModule,
@@ -52,4 +70,4 @@ const routes: Routes = [
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] // Add this line
 })
-export class ViewModule { }
+export class CompanyModule { }

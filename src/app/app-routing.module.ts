@@ -18,6 +18,7 @@ const routes: Routes = [
       'desc': 'Oopps!! The page you were looking for doesn\'t exist.'
     }
   },
+  {path: 'company', loadChildren: () => import('./public/components/company/company.module').then(m => m.CompanyModule)},
   {path: 'auth', loadChildren: () => import('./public/components/auth/auth.module').then(m => m.AuthModule)},
   {path: '**', redirectTo: 'error', pathMatch: 'full' }
 
