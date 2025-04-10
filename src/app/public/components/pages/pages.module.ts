@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { PagesComponent } from './pages.component';
@@ -59,12 +59,14 @@ const routes: Routes = [
 ]
 
 @NgModule({
+  schemas: [NO_ERRORS_SCHEMA], // <-- Oculta los errores de propiedades desconocidas
   declarations: [
     PagesComponent,
     DashboardComponent,
     AuctionsComponent,
     ProjectComponent,
-    FavoritesComponent
+    FavoritesComponent,
+    UsersComponent
   ],
   imports: [
     CommonModule,

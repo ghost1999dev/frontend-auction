@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -18,6 +18,7 @@ import { IconService } from './core/services/icon.service';
 import { NodeService } from './core/services/node.service';
 import { PhotoService } from './core/services/photo.service';
 import { ProductService } from './core/services/product.service';
+import { UserService } from './core/services/user.service';
 
 @NgModule({
   declarations: [
@@ -33,13 +34,14 @@ import { ProductService } from './core/services/product.service';
     PublicModule,
     SharedModule
   ],
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   providers: [
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     AuthGuard,
     OutletContext,
 
     CountryService, CustomerService, EventService, IconService, NodeService,
-        PhotoService, ProductService
+        PhotoService, ProductService, UserService
   ],
   bootstrap: [AppComponent]
 })

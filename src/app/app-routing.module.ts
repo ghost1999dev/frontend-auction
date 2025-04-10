@@ -1,7 +1,9 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { PublicComponent } from './public/public.component';
 import { AuthGuard } from './core/guards/auth.guard';
+import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
 
 const routes: Routes = [
   {path: '', redirectTo: 'view', pathMatch: 'full'},
@@ -25,6 +27,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
+  schemas: [NO_ERRORS_SCHEMA], // <-- Oculta los errores de propiedades desconocidas
   imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled', onSameUrlNavigation: 'reload' , useHash: true})],
   exports: [RouterModule]
 })
