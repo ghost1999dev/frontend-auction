@@ -31,41 +31,60 @@
                     <form [formGroup]="developerForm" (ngSubmit)="onSubmitDeveloper()">
                     <!-- Developer Name -->
                     <div class="field">
-                        <label for="devName" class="block text-900 font-medium mb-2 mt-3">Developer Name</label>
-                        <input id="devName" type="text" pInputText class="w-full" formControlName="devName" [ngClass]="{ 'is-invalid': submitted && developerForm.get('devName')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('devName')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('devName')?.errors?.['required']">Developer Name is required</div>
+                        <label for="name" class="block text-900 font-medium mb-2 mt-3">Developer Name</label>
+                        <input id="name" type="text" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && developerForm.get('name')?.errors }">
+                        <div *ngIf="submitted && developerForm.get('name')?.errors" class="invalid-feedback mt-1">
+                        <div *ngIf="developerForm.get('name')?.errors?.['required']">Developer Name is required</div>
                         </div>
                     </div>
                 
                     <!-- Email -->
                     <div class="field">
-                        <label for="devEmail" class="block text-900 font-medium mb-2 mt-3">Email</label>
-                        <input id="devEmail" type="email" pInputText class="w-full" formControlName="devEmail" [ngClass]="{ 'is-invalid': submitted && developerForm.get('devEmail')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('devEmail')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('devEmail')?.errors?.['required']">Email is required</div>
-                        <div *ngIf="developerForm.get('devEmail')?.errors?.['email']">Invalid email format</div>
+                        <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
+                        <input id="email" type="email" pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && developerForm.get('email')?.errors }">
+                        <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
+                        <div *ngIf="developerForm.get('email')?.errors?.['required']">Email is required</div>
+                        <div *ngIf="developerForm.get('email')?.errors?.['email']">Invalid email format</div>
                         </div>
                     </div>
                 
                     <!-- Password -->
                     <div class="field">
-                        <label for="devPassword" class="block text-900 font-medium mb-2 mt-3">Password</label>
-                        <input id="devPassword" type="password" pInputText class="w-full" formControlName="devPassword" [ngClass]="{ 'is-invalid': submitted && developerForm.get('devPassword')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('devPassword')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('devPassword')?.errors?.['required']">Password is required</div>
-                        <div *ngIf="developerForm.get('devPassword')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                        <label for="password" class="block text-900 font-medium mb-2 mt-3">Password</label>
+                        <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && developerForm.get('password')?.errors }">
+                        <div *ngIf="submitted && developerForm.get('password')?.errors" class="invalid-feedback mt-1">
+                        <div *ngIf="developerForm.get('password')?.errors?.['required']">Password is required</div>
+                        <div *ngIf="developerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
                         </div>
                     </div>
-                
-                    <!-- Image of Profile -->
+
+                    <!-- Adress -->
                     <div class="field">
-                        <label for="devImage" class="block text-900 font-medium mb-2 mt-3">Image of Profile</label>
-                        <input id="devImage" type="file" accept="image/*" (change)="onFileSelectProfilePhoto($event)" class="w-full" [ngClass]="{ 'is-invalid': submitted && developerForm.get('devImage')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('devImage')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('devImage')?.errors?.['required']">Profile image is required</div>
+                        <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
+                        <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && developerForm.get('address')?.errors }">
+                        <div *ngIf="submitted && developerForm.get('address')?.errors" class="invalid-feedback mt-1">
+                        <div *ngIf="developerForm.get('address')?.errors?.['required']">Developer Name is required</div>
                         </div>
                     </div>
+
+                    <!-- Phone -->
+                    <div class="field">
+                        <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
+                        <input id="phone" type="text" pInputText class="w-full" formControlName="phone" [ngClass]="{ 'is-invalid': submitted && developerForm.get('phone')?.errors }">
+                        <div *ngIf="submitted && developerForm.get('phone')?.errors" class="invalid-feedback mt-1">
+                        <div *ngIf="developerForm.get('phone')?.errors?.['required']">Developer Name is required</div>
+                        </div>
+                    </div>
+
+                                    
+                    <!-- Image of Profile -->
+<!--                     <div class="field">
+                        <label for="image" class="block text-900 font-medium mb-2 mt-3">Image of Profile</label>
+                        <input id="image" type="file" accept="image/*" (change)="onFileSelectProfilePhoto($event)" class="w-full" [ngClass]="{ 'is-invalid': submitted && developerForm.get('image')?.errors }">
+                        <div *ngIf="submitted && developerForm.get('image')?.errors" class="invalid-feedback mt-1">
+                        <div *ngIf="developerForm.get('image')?.errors?.['required']">Profile image is required</div>
+                        </div>
+                    </div> -->
                 
                     <!-- Submit Button -->
                     <button pButton type="submit" label="Register as Developer" class="w-full mt-3"></button>

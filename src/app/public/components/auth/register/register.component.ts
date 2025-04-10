@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LayoutService } from 'src/app/core/services/layout.service';
+import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
   selector: 'app-register',
@@ -10,30 +11,31 @@ import { LayoutService } from 'src/app/core/services/layout.service';
 })
 export class RegisterComponent {
 
-  userType: 'developer' | 'company' | null = null; // Tipo de usuario seleccionado
-  developerForm!: FormGroup; // Formulario para Developer
-  companyForm!: FormGroup;   // Formulario para Company
-  submitted: boolean = false; // Indica si el formulario ha sido enviado
+  userType: 'developer' | 'company' | null = null; 
+  developerForm!: FormGroup; 
+  companyForm!: FormGroup;   
+  submitted: boolean = false; 
+  public formData: any = new FormData();
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    public layoutService: LayoutService
+    public layoutService: LayoutService,
+    public UserSrv: UserService
   ) {
     this.initForms();
   }
 
-  // Inicializa los formularios con validaciones
   initForms() {
-    // Formulario para Developer
     this.developerForm = this.fb.group({
-      devName: ['', Validators.required],
-      devEmail: ['', [Validators.required, Validators.email]],
-      devPassword: ['', [Validators.required, Validators.minLength(6)]],
-      devImage: [null, Validators.required]
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      image: [''],
+      address: ['', Validators.required],
+      phone: ['', Validators.required]
     });
 
-    // Formulario para Company
     this.companyForm = this.fb.group({
       companyUserName: ['', Validators.required],
       companyName: ['', Validators.required],
@@ -44,21 +46,18 @@ export class RegisterComponent {
     });
   }
 
-  // Selecciona el tipo de usuario (Developer o Company)
   selectUserType(userType: 'developer' | 'company') {
     this.userType = userType;
-    this.submitted = false; // Reinicia el estado de envío al cambiar el tipo de usuario
+    this.submitted = false; 
   }
 
-  // Maneja la selección de la imagen de perfil para Developer
   onFileSelectProfilePhoto(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.developerForm.get('devImage')?.setValue(file);
+      this.developerForm.get('image')?.setValue(file);
     }
   }
 
-  // Maneja la selección de la imagen de perfil para Company
   onFileSelectProfilePhotoCompany(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -66,7 +65,6 @@ export class RegisterComponent {
     }
   }
 
-  // Maneja la selección del logo de la empresa
   onFileSelectProfilePhotoLogo(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -74,35 +72,52 @@ export class RegisterComponent {
     }
   }
 
-  // Envía el formulario de Developer
   onSubmitDeveloper() {
     this.submitted = true;
 
-    // Detiene el proceso si el formulario es inválido
     if (this.developerForm.invalid) {
       return;
     }
 
-    // Formulario válido, procede con el registro
     const formValue = this.developerForm.value;
-    console.log('Developer Form Submitted:', formValue);
-    // Aquí podrías hacer una solicitud HTTP para registrar al desarrollador
-    this.router.navigate(['/auth/login']); // Redirige al login después del registro
+
+    this.formData.append("email", this.developerForm.get('email')!.value);
+
+    var data: any = {
+      email: this.developerForm.get('email')!.value
+    }
+
+    console.log(data)
+
+    this.UserSrv.validateEmailUser(data)
+      .subscribe((res: any) => {
+        if(res.status === 200){
+          this.saveDeveloperData(formValue);
+          this.router.navigate(['/auth/activate-account']); 
+        }else{
+        }
+      })
+
+
   }
 
-  // Envía el formulario de Company
   onSubmitCompany() {
     this.submitted = true;
 
-    // Detiene el proceso si el formulario es inválido
     if (this.companyForm.invalid) {
       return;
     }
 
-    // Formulario válido, procede con el registro
     const formValue = this.companyForm.value;
-    console.log('Company Form Submitted:', formValue);
-    // Aquí podrías hacer una solicitud HTTP para registrar la empresa
-    this.router.navigate(['/auth/login']); // Redirige al login después del registro
+    this.router.navigate(['/auth/login']);
   }
+
+    private saveDeveloperData(formData: any): void {
+      try {
+        localStorage.setItem('developerFormData', JSON.stringify(formData));
+      } catch (error) {
+        console.error('Error al guardar en localStorage:', error);
+      }
+    }
+
 }

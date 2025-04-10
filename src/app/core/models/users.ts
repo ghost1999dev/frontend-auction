@@ -4,15 +4,17 @@ export interface userResponse{
 }
 
 export interface usersWithImage{
-    id: string;
+    id: number;
+    role_id: number;
     name: string;
     email: string;
-    password: string;
-    role: string;
+    address: string;
+    phone: string
     image: string;
+    account_type: number;
     status: boolean;
-    created_at: string;
-    updated_at: string;
+    last_login: string;
+    updatedAt: string;
 }
 
 export interface activateReq{
@@ -21,9 +23,40 @@ export interface activateReq{
 
 export interface activateRes{
     message: string;
-    status: 200;
+    status: number;
 }
 
-ex
+export interface addUser{
+    role_id: number;
+    name: string;
+    email: string;
+    code: string;
+    password: string;
+    address: string;
+    phone: string
+    image: string;
+    account_type: number;
+}
 
+export interface addUserResponse{
+    message: string
+    user: addUserResUserObject[]
+}
+
+export interface addUserResUserObject{
+    id: number;
+    role_id: number;
+    name: string;
+    email: string;
+    code: string;
+    password: string;
+    address: string;
+    phone: string
+    image: string;
+    account_type: number;
+    status: number;
+    last_login: string;
+    updatedAt: string;
+    createdAt: string;
+}
 
