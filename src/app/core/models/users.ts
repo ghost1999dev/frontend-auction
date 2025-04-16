@@ -17,6 +17,16 @@ export interface usersWithImage{
     updatedAt: string;
 }
 
+export interface UserAuth{
+    email: string;
+    password: string;
+}
+
+export interface UserResponseAuth{
+    token: string;
+    message: string;
+}
+
 export interface activateReq{
     email: string;
 }

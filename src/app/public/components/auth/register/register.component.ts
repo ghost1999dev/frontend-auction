@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LayoutService } from 'src/app/core/services/layout.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
@@ -21,7 +22,9 @@ export class RegisterComponent {
     private fb: FormBuilder,
     private router: Router,
     public layoutService: LayoutService,
-    public UserSrv: UserService
+    public UserSrv: UserService,
+    private notificationServices: NotificationService 
+          
   ) {
     this.initForms();
   }
@@ -87,14 +90,14 @@ export class RegisterComponent {
       email: this.developerForm.get('email')!.value
     }
 
-    console.log(data)
-
     this.UserSrv.validateEmailUser(data)
       .subscribe((res: any) => {
         if(res.status === 200){
           this.saveDeveloperData(formValue);
           this.router.navigate(['/auth/activate-account']); 
+          this.notificationServices.showSuccessCustom("Felicidades, cuenta creado exitosamente")
         }else{
+          this.notificationServices.showErrorCustom("Error, al crear el usuario");
         }
       })
 

@@ -1,5 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpInterceptorModule } from './core/services/http-interceptor.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,6 +20,7 @@ import { NodeService } from './core/services/node.service';
 import { PhotoService } from './core/services/photo.service';
 import { ProductService } from './core/services/product.service';
 import { UserService } from './core/services/user.service';
+import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 
 @NgModule({
   declarations: [
@@ -32,10 +34,13 @@ import { UserService } from './core/services/user.service';
     FormsModule,
     CoreModule,
     PublicModule,
-    SharedModule
+    SharedModule,
+    HttpInterceptorModule
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   providers: [
+    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS }, 
+    JwtHelperService,
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     AuthGuard,
     OutletContext,

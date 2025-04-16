@@ -9,7 +9,7 @@ const routes: Routes = [
   {path: '', redirectTo: 'view', pathMatch: 'full'},
   {path: 'view', loadChildren: () => import('./public/components/view/view.module').then(m => m.ViewModule)},
   {path: 'main', loadChildren: () => import('./public/components/pages/pages.module').then(m => m.PagesModule)
-    //, canActivate: [AuthGuard]
+    , canActivate: [AuthGuard]
   },
   { 
     path: 'error',

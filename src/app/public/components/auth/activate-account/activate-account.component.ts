@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { addUser } from 'src/app/core/models/users';
 import { LayoutService } from 'src/app/core/services/app.layout.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
@@ -19,7 +20,8 @@ export class ActivateAccountComponent {
     public layoutService: LayoutService,
     private fb: FormBuilder,
     private router: Router,
-    private usersService: UserService
+    private usersService: UserService,
+    private notificationServices: NotificationService 
   ) {
     this.loadUserData();
     
@@ -62,9 +64,10 @@ export class ActivateAccountComponent {
       next: (response: any) => {
         localStorage.removeItem('developerFormData');
         this.router.navigate(['/auth/login']);
+        this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta ha sido verificada exitosamente.")
       },
       error: (err: any) => {
-        console.error('Error al crear usuario:', err);
+        this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
       }
     });
   }

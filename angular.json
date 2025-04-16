@@ -25,13 +25,16 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets"            
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/assets/js/noty/noty.css"
             ],
             "scripts": [
-              "node_modules/@lottiefiles/lottie-player/dist/lottie-player.js"
+              "node_modules/@lottiefiles/lottie-player/dist/lottie-player.js",
+              "src/assets/js/noty/noty.js",
+              "src/assets/js/noty/noty.min.js"
             ]
           },
           "configurations": {

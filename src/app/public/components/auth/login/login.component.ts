@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/core/auth/auth.service';
 import { LayoutService } from 'src/app/core/services/layout.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +20,8 @@ export class LoginComponent implements OnInit {
     private router: Router,
     public layoutService: LayoutService,
     private fb: FormBuilder,
+    public notificationServices: NotificationService,
+    public authSvc: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -27,22 +31,29 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  onSubmit() {
-    this.submitted = true;
-    // Stop if the form is invalid
-    if (this.loginForm.invalid) {
-      return;
-    }
-    // Form is valid, proceed with login
-    this.onLoggedin();
+  onLogin(): void {
+    const formValue = this.loginForm.value;
+
+    this.authSvc.login(formValue)
+    .subscribe((res: any) => {
+      if(res){        
+        this.onLoggedin()
+        this.router.navigate(['/main/dashboard']);
+        this.notificationServices.showSuccessCustom('Bienvenido a CodeBind');
+      }
+    },
+    (err: any) => {
+      this.notificationServices.showErrorCustom('Nombre de usuario o contraseña incorrectos');
+    })
+
   }
 
   onLoggedin() {
     localStorage.setItem('isLoggedin', 'true');
-    if (localStorage.getItem('isLoggedin')) {
-      const formValue = this.loginForm.value;
-      console.log(formValue);
-      this.router.navigate(['/main/dashboard']);
-    }
+  }
+
+  loginWithGoogle() {
+    // Redirige al endpoint de autenticación de Google en tu backend
+    window.location.href = 'https://backend-auction-5zdm.onrender.com/auth/google/callback';
   }
 }
