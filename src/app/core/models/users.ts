@@ -49,6 +49,7 @@ export interface addUser{
 }
 
 export interface addUserResponse{
+    id: number;
     message: string
     user: addUserResUserObject[]
 }
@@ -68,5 +69,17 @@ export interface addUserResUserObject{
     last_login: string;
     updatedAt: string;
     createdAt: string;
+}
+
+export interface updateFieldsGoogle{
+    role_id: number, 
+    password: string, 
+    address: string, 
+    phone: string;
+}
+
+export interface updateFieldsGoogleRes{
+    message: string;
+    user: usersWithImage[]
 }
 

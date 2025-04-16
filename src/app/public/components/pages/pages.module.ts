@@ -1,3 +1,5 @@
+import { ReactiveFormsModule } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -23,6 +25,7 @@ import { PanelMenuModule } from 'primeng/panelmenu';
 import { ProjectComponent } from './project/project.component';
 import { FavoritesComponent } from './favorites/favorites.component';
 import { UsersComponent } from './users/users.component';
+import { ButtonModule } from 'primeng/button';
 
 const routes: Routes = [
   {
@@ -66,7 +69,7 @@ const routes: Routes = [
     AuctionsComponent,
     ProjectComponent,
     FavoritesComponent,
-    UsersComponent
+    UsersComponent,
   ],
   imports: [
     CommonModule,
@@ -75,6 +78,8 @@ const routes: Routes = [
     TableModule,
     MenuModule,
     ChartModule,
+    DialogModule,
+    ButtonModule,
 
     StyleClassModule,
     PanelMenuModule,
@@ -85,6 +90,7 @@ const routes: Routes = [
     RadioButtonModule,
     InputSwitchModule,
     RippleModule,
+    ReactiveFormsModule,
 
     RouterModule.forChild(routes)
   ],

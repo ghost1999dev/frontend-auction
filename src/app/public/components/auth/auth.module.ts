@@ -16,6 +16,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ActivateAccountComponent } from './activate-account/activate-account.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { PassportComponent } from './passport/passport.component';
 
 const routes: Routes = [
   {
@@ -34,6 +35,10 @@ const routes: Routes = [
       {
         path: 'register',
         component: RegisterComponent
+      },
+      {
+        path: 'passport',
+        component: PassportComponent
       },
       {
         path: 'forgot-password',
@@ -59,6 +64,7 @@ const routes: Routes = [
     ForgotPasswordComponent,
     ActivateAccountComponent,
     ResetPasswordComponent,
+    PassportComponent,
   ],
   imports: [
     CommonModule,

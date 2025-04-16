@@ -1,14 +1,22 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { Subscription } from 'rxjs';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { MenuItem, MessageService } from 'primeng/api';
+import { forkJoin, Subscription } from 'rxjs';
+import { AuthService } from 'src/app/core/auth/auth.service';
 import { Product } from 'src/app/core/models/product';
 import { LayoutService } from 'src/app/core/services/app.layout.service';
+import { CompaniesService } from 'src/app/core/services/companies.service';
+import { DeveloperService } from 'src/app/core/services/developer.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProductService } from 'src/app/core/services/product.service';
+import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  providers: [MessageService]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
 
@@ -22,21 +30,198 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   subscription!: Subscription;
 
-  constructor(private productService: ProductService, public layoutService: LayoutService) {
+  displayAlert = false; // Control para mostrar el diálogo
+
+  userType: 'developer' | 'company' | null = null;
+  developerForm!: FormGroup;
+  companyForm!: FormGroup;
+  submitted = false
+  clicked = false
+
+
+  constructor(
+    public layoutService: LayoutService,
+    public developerService: DeveloperService,
+    public companyService: CompaniesService,
+    public userRoleService: UserService,
+		private router: Router,
+    private fb: FormBuilder,
+    private authSvc: AuthService,
+    private usersService: UserService,
+    private developerSrv: DeveloperService,
+    private notificationServices: NotificationService,
+    private messageService: MessageService) {
       this.subscription = this.layoutService.configUpdate$.subscribe(() => {
           this.initChart();
       });
-  }
+
+      this.developerForm = this.fb.group({
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        address: ['', Validators.required],
+        phone: ['', Validators.required],
+        bio: [''],
+        linkedin: [''],
+        occupation: [''],
+        portfolio: ['']
+      });
+  
+      this.companyForm = this.fb.group({
+        companyName: ['', Validators.required],
+        companyEmail: ['', [Validators.required, Validators.email]],
+        companyPassword: ['', [Validators.required, Validators.minLength(6)]],
+        nrcNumber: ['', Validators.required],
+        businessType: ['', Validators.required],
+        webSite: [''],
+        nitNumber: ['', Validators.required]
+      });
+  
+  } 
 
   ngOnInit() {
-      this.initChart();
-      this.productService.getProductsSmall().then(data => this.products = data);
+    this.initChart();
+    //this.productService.getProductsSmall().then(data => this.products = data);
+    this.validateUserRole(); // Nueva función para validar developers
 
-      this.items = [
-          { label: 'Add New', icon: 'pi pi-fw pi-plus' },
-          { label: 'Remove', icon: 'pi pi-fw pi-minus' }
-      ];
+    this.items = [
+      { label: 'Add New', icon: 'pi pi-fw pi-plus' },
+      { label: 'Remove', icon: 'pi pi-fw pi-minus' }
+    ];
   }
+
+  validateUserRole() {
+    this.displayAlert = false;
+    const userId = this.getUserInfo();
+    
+    if (!userId) {
+      this.showError('No se pudo identificar al usuario');
+      this.displayAlert = false;
+      return;
+    }
+
+    this.userRoleService.checkUserRoles(userId).subscribe({
+      next: ({ hasRole }) => {
+        if (!hasRole) {
+          this.displayAlert = true;
+          this.showWarning('Complete su registro para acceder a todas las funciones');
+        }
+      },
+      error: (err) => {
+        this.showError('Error al verificar tus permisos');
+        console.error('Error:', err);
+      }
+    });
+  }
+
+  selectUserType(type: 'developer' | 'company') {
+    this.userType = type;
+    this.submitted = false;
+  }
+
+  private showWarning(message: string) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Advertencia',
+      detail: message
+    });
+  }
+
+  private showError(message: string) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: message
+    });
+  }
+
+  onSubmitDeveloper() {
+    this.submitted = true;
+    const password = this.developerForm.get('password')?.value;
+    const address = this.developerForm.get('address')?.value;
+    const phone = this.developerForm.get('phone')?.value;
+    const bio = this.developerForm.get('bio')?.value;
+    const linkedin = this.developerForm.get('linkedin')?.value;
+    const occupation = this.developerForm.get('occupation')?.value;
+    const portfolio = this.developerForm.get('portfolio')?.value;
+
+    const userToCreate: any = {
+      role_id: 2, 
+      password: password,
+      address: address,
+      phone: phone,
+    };
+
+    this.usersService.uopdatedUsersPassport(userToCreate, this.id)
+    .subscribe({
+      next: (response: any) => {
+
+        const developerAdd: any = {
+          bio: bio, 
+          user_id: this.id, 
+          linkedin: linkedin, 
+          occupation: occupation, 
+          portfolio: portfolio
+        }
+
+        this.developerSrv.createDeveloper(developerAdd)
+        .subscribe((next: any) => {
+          if(next){
+            this.displayAlert = false;
+            this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta ha sido actualizada exitosamente.")
+          }else{
+            this.notificationServices.showErrorCustom("Error al Crear el Developer.")
+          }
+        })
+      },
+      error: (err: any) => {
+        this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
+      }
+    });
+  
+  }
+
+  onSubmitCompany() {
+    this.submitted = true;
+    if (this.companyForm.valid) {
+      // Lógica para registrar company
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Éxito', 
+        detail: 'Compañía registrada correctamente'
+      });
+      this.displayAlert = false;
+    }
+  }
+
+    goBack() {
+        if (this.userType) {
+            // Si ya seleccionó un tipo de usuario, volver a la selección
+            this.userType = null;
+        } else {
+            // Si no hay tipo de usuario seleccionado, cerrar el diálogo
+            this.displayAlert = false;
+            this.authSvc.logout();
+        }
+    }
+
+    register() {
+        if (this.userType === 'developer') {
+          if(this.developerForm.valid){
+            this.clicked = true
+            this.onSubmitDeveloper();
+          }
+        } else if (this.userType === 'company') {
+          if(this.companyForm.valid){
+            this.clicked = true
+            this.onSubmitCompany();
+          }
+        } else {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Advertencia',
+                detail: 'Por favor seleccione un tipo de usuario'
+            });
+        }
+    }
 
   initChart() {
       const documentStyle = getComputedStyle(document.documentElement);
@@ -102,5 +287,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.subscription.unsubscribe();
       }
   }
+
+  getUserInfo() {
+    const token = this.getTokens();
+    let payload;
+    if (token) {
+      payload = token.split(".")[1];
+      payload = window.atob(payload);
+      return JSON.parse(payload)['id'];
+    } else {
+      return null;
+    }
+  }
+  
+  getTokens() {
+    return localStorage.getItem("login-token");
+  }
+
+  id: any = this.getUserInfo();
 
 }

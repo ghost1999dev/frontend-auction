@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { addUser } from 'src/app/core/models/users';
 import { LayoutService } from 'src/app/core/services/app.layout.service';
+import { DeveloperService } from 'src/app/core/services/developer.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { UserService } from 'src/app/core/services/user.service';
 
@@ -21,7 +22,8 @@ export class ActivateAccountComponent {
     private fb: FormBuilder,
     private router: Router,
     private usersService: UserService,
-    private notificationServices: NotificationService 
+    private notificationServices: NotificationService,
+    private developerSrv: DeveloperService
   ) {
     this.loadUserData();
     
@@ -49,7 +51,7 @@ export class ActivateAccountComponent {
     }
 
     const userToCreate: any = {
-      role_id: 1, 
+      role_id: this.userData.role_id, 
       name: this.userData.name,
       email: this.userData.email,
       code: this.activateForm.value.code,
@@ -62,9 +64,25 @@ export class ActivateAccountComponent {
 
     this.usersService.createUsers(userToCreate).subscribe({
       next: (response: any) => {
-        localStorage.removeItem('developerFormData');
-        this.router.navigate(['/auth/login']);
-        this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta ha sido verificada exitosamente.")
+
+        const developerAdd: any = {
+          bio: this.userData.bio, 
+          user_id: response.id, 
+          linkedin: this.userData.linkedin, 
+          occupation: this.userData.occupation, 
+          portfolio: this.userData.portfolio
+        }
+
+        this.developerSrv.createDeveloper(developerAdd)
+        .subscribe((next: any) => {
+          if(next){
+            localStorage.removeItem('developerFormData');
+            this.router.navigate(['/auth/login']);
+            this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta developer ha sido verificada exitosamente.")
+          }else{
+            this.notificationServices.showErrorCustom("Error al Crear el Developer.")
+          }
+        })
       },
       error: (err: any) => {
         this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")

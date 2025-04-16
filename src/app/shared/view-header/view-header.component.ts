@@ -56,6 +56,10 @@ replaceThemeLink(href: string, onComplete: Function) {
     }
   }
 
+  navigateTo(route: string) {
+    this.router.navigate([route]);
+    return false; // Previene comportamiento por defecto
+  }
 
 
 }

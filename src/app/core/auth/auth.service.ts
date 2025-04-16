@@ -52,7 +52,7 @@ export class AuthService {
     localStorage.clear();
 
     this.loggedIn.next(false);
-    this.router.navigate(['']);
+    this.router.navigate(['auth/login']);
   }
 
   private checkToken(): void{

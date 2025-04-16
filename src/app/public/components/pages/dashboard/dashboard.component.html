@@ -1,3 +1,255 @@
+<p-dialog header="Complete your registration" [(visible)]="displayAlert" [modal]="true" 
+          [style]="{width: '85vw', maxWidth: '1200px', maxHeight: '90vh'}" [breakpoints]="{'960px': '90vw'}"
+          [draggable]="true" [resizable]="true" [closable]="false"
+          [contentStyle]="{'padding': '0', 'overflow': 'auto'}">
+    <!-- Contenido del diálogo -->
+    
+    <div class="dialog-container">
+        <div class="dialog-content">
+            <img src="assets/layout/images/logo-dark.svg" alt="Logo" class="logo">        
+            <div class="gradient-container">
+                <div class="form-container">
+                    <div class="header-text">
+                        <div class="title">Welcome to CodeBid</div>
+                        <span class="subtitle">Select your registration type</span>
+                    </div>
+
+                    <!-- Selección de tipo de usuario -->
+                    <div *ngIf="!userType" class="card-selection">
+                        <!-- Developer Card -->
+                        <p-card class="role-card" (click)="selectUserType('developer')">
+                            <div class="card-content">
+                                <i class="pi pi-code card-icon"></i>
+                                <span class="card-title">Developer</span>
+                                <span class="card-description">Register as a freelance developer</span>
+                            </div>
+                        </p-card>
+
+                        <!-- Company Card -->
+                        <p-card class="role-card" (click)="selectUserType('company')">
+                            <div class="card-content">
+                                <i class="pi pi-building card-icon"></i>
+                                <span class="card-title">Company</span>
+                                <span class="card-description">Register your business</span>
+                            </div>
+                        </p-card>
+                    </div>
+
+                <!-- Formulario de Developer -->
+                <div *ngIf="userType === 'developer'" class="scrollable-content">
+                    <form [formGroup]="developerForm" >
+                        <div class="form-scrollable">
+                            <div class="form-grid">
+                                <!-- Password -->
+                                <div class="field-container">
+                                    <div class="input-group">
+                                        <label for="password" class="input-label">Password</label>
+                                        <input id="password" type="password" formControlName="password" 
+                                                [toggleMask]="true" [feedback]="false"
+                                                [ngClass]="{'p-invalid': submitted && developerForm.get('password')?.errors}"
+                                                class="centered-input">
+                                        <small *ngIf="submitted && developerForm.get('password')?.errors" class="error-message">
+                                            <span *ngIf="developerForm.get('password')?.errors?.['required']">Password is required</span>
+                                            <span *ngIf="developerForm.get('password')?.errors?.['minlength']">Must be at least 6 characters</span>
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Address -->
+                                <div class="field-container">
+                                    <div class="input-group">
+                                        <label for="address" class="input-label">Address</label>
+                                        <input id="address" type="text" pInputText formControlName="address" 
+                                                class="centered-input"
+                                                [ngClass]="{'p-invalid': submitted && developerForm.get('address')?.errors}">
+                                        <small *ngIf="submitted && developerForm.get('address')?.errors" class="error-message">
+                                            Address is required
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="field-container">
+                                    <div class="input-group">
+                                        <label for="phone" class="input-label">Phone Number</label>
+                                        <input id="phone" type="number" pInputText formControlName="phone" 
+                                                class="centered-input"
+                                                [ngClass]="{'p-invalid': submitted && developerForm.get('phone')?.errors}">
+                                        <small *ngIf="submitted && developerForm.get('phone')?.errors" class="error-message">
+                                            Phone number is required
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Occupation -->
+                                <div class="field-container">
+                                    <div class="input-group">
+                                        <label for="occupation" class="input-label">Occupation/Title</label>
+                                        <input id="occupation" type="text" pInputText formControlName="occupation" 
+                                                class="centered-input"
+                                                placeholder="e.g. Frontend Developer, Full Stack Engineer">
+                                    </div>
+                                </div>
+
+                                <!-- Bio -->
+                                <div class="field-container full-width">
+                                    <div class="input-group">
+                                        <label for="bio" class="input-label">Bio/Description</label>
+                                        <textarea id="bio" pInputTextarea formControlName="bio" 
+                                                class="centered-input" [rows]="3"
+                                                placeholder="Tell us about your skills and experience"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- LinkedIn -->
+                                <div class="field-container">
+                                    <div class="input-group">
+                                        <label for="linkedin" class="input-label">LinkedIn Profile</label>
+                                        <input id="linkedin" type="url" pInputText formControlName="linkedin" 
+                                                class="centered-input"
+                                                placeholder="https://linkedin.com/in/yourprofile">
+                                    </div>
+                                </div>
+
+                                <!-- Portfolio -->
+                                <div class="field-container">
+                                    <div class="input-group">
+                                        <label for="portfolio" class="input-label">Portfolio/GitHub</label>
+                                        <input id="portfolio" type="url" pInputText formControlName="portfolio" 
+                                                class="centered-input"
+                                                placeholder="https://github.com/yourusername or your website">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Formulario de Company con scroll -->
+                <div *ngIf="userType === 'company'" class="scrollable-content">
+                <form [formGroup]="companyForm" (ngSubmit)="onSubmitCompany()">
+                    <!-- Contenedor con scroll -->
+                    <div class="form-scroll-container">
+                        <div class="centered-form-content">
+                            <!-- Company Name -->
+                            <div class="field-container">
+                                <div class="input-group">
+                                    <label for="companyName" class="input-label">Company Name</label>
+                                    <input id="companyName" type="text" pInputText formControlName="companyName" 
+                                            class="centered-input"
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('companyName')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('companyName')?.errors" class="error-message">
+                                        Company name is required
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Company Email -->
+                            <div class="field-container">
+                                <div class="input-group">
+                                    <label for="companyEmail" class="input-label">Email</label>
+                                    <input id="companyEmail" type="email" pInputText formControlName="companyEmail" 
+                                            class="centered-input"
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('companyEmail')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('companyEmail')?.errors" class="error-message">
+                                        <span *ngIf="companyForm.get('companyEmail')?.errors?.['required']">Email is required</span>
+                                        <span *ngIf="companyForm.get('companyEmail')?.errors?.['email']">Invalid email format</span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Company Password -->
+                            <div class="field-container">
+                                <div class="input-group">
+                                    <label for="companyPassword" class="input-label">Password</label>
+                                    <input id="companyPassword" type="password" pInputText formControlName="companyPassword" 
+                                            class="centered-input"
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('companyPassword')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('companyPassword')?.errors" class="error-message">
+                                        <span *ngIf="companyForm.get('companyPassword')?.errors?.['required']">Password is required</span>
+                                        <span *ngIf="companyForm.get('companyPassword')?.errors?.['minlength']">Must be at least 6 characters</span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- NRC Number -->
+                            <div class="field-container">
+                                <div class="input-group">
+                                    <label for="nrcNumber" class="input-label">NRC Number</label>
+                                    <input id="nrcNumber" type="text" pInputText formControlName="nrcNumber" 
+                                            class="centered-input"
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('nrcNumber')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('nrcNumber')?.errors" class="error-message">
+                                        NRC number is required
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Business Type -->
+                            <div class="field-container">
+                                <div class="input-group">
+                                    <label for="businessType" class="input-label">Business Type</label>
+                                    <input id="businessType" type="text" pInputText formControlName="businessType" 
+                                            class="centered-input"
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('businessType')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('businessType')?.errors" class="error-message">
+                                        Business type is required
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Website -->
+                            <div class="field-container">
+                                <div class="input-group">
+                                    <label for="webSite" class="input-label">Website (Optional)</label>
+                                    <input id="webSite" type="url" pInputText formControlName="webSite" 
+                                            class="centered-input"
+                                            placeholder="https://example.com">
+                                </div>
+                            </div>
+
+                            <!-- NIT Number -->
+                            <div class="field-container">
+                                <div class="input-group">
+                                    <label for="nitNumber" class="input-label">NIT Number</label>
+                                    <input id="nitNumber" type="text" pInputText formControlName="nitNumber" 
+                                            class="centered-input"
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('nitNumber')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('nitNumber')?.errors" class="error-message">
+                                        NIT number is required
+                                    </small>
+                                </div>
+                            </div>
+
+                            <button pButton type="submit" label="Register" icon="pi pi-check" 
+                            (click)="register()" 
+                            class="p-button-success"></button>
+
+                        </div>
+                    </div>
+                </form>
+                </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="footer-buttons">
+            <button pButton type="button" label="Go Back" icon="pi pi-arrow-left" 
+                    (click)="goBack()" 
+                    class="p-button-outlined p-button-secondary"></button>
+            <button pButton type="submit" label="Register" icon="pi pi-check" 
+                    (click)="register()" 
+                    class="p-button-success"
+                    [disabled]="clicked"></button>
+                </div>
+    </ng-template>
+</p-dialog>
+
+<p-toast position="top-center"></p-toast>
+
 <div class="grid">
     <div class="col-12 lg:col-6 xl:col-3">
         <div class="card mb-0">

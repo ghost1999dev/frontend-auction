@@ -29,10 +29,11 @@
         <div class="flex align-items-center justify-content-between">
             <!-- Botones de Login y Sign Up -->
             <div class="flex align-items-center">
-              <button pButton pRipple [ngStyle]="{'font-weight': '700;'}" [routerLink]="['/auth/login']" label="Log In"
-                class="p-button-text p-button-rounded border-none font-light line-height-2 text-blue-500"></button>
-              <button pButton pRipple [ngStyle]="{'font-weight': '700 !important;'}" [routerLink]="['/auth/register']" label="Sign Up"
-                class="p-button-rounded border-none ml-5 font-light line-height-2 bg-blue-500 text-white"></button>
+                <button pButton (click)="navigateTo('/auth/login')" label="Log In"
+                class="p-button-text p-button-rounded border-none text-blue-500"></button>
+                
+                <button pButton (click)="navigateTo('/auth/register')" label="Sign Up"
+                class="p-button-rounded border-none ml-5 bg-blue-500 text-white"></button>
             </div>
           
             <!-- Toggle Switch -->

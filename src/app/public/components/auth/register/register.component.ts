@@ -36,7 +36,12 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(6)]],
       image: [''],
       address: ['', Validators.required],
-      phone: ['', Validators.required]
+      phone: ['', Validators.required],
+      bio: [''],
+      linkedin: [''],
+      occupation: [''],
+      portfolio: [''],
+      role_id: [2]
     });
 
     this.companyForm = this.fb.group({
@@ -45,7 +50,8 @@ export class RegisterComponent {
       companyEmail: ['', [Validators.required, Validators.email]],
       companyPassword: ['', [Validators.required, Validators.minLength(6)]],
       companyImage: [null, Validators.required],
-      companyLogo: [null, Validators.required]
+      companyLogo: [null, Validators.required],
+      role_id: [1]
     });
   }
 

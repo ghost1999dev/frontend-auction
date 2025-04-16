@@ -54,6 +54,6 @@ export class LoginComponent implements OnInit {
 
   loginWithGoogle() {
     // Redirige al endpoint de autenticación de Google en tu backend
-    window.location.href = 'https://backend-auction-5zdm.onrender.com/auth/google/callback';
+    window.location.href = 'http://localhost:4000/auth/google/callback';
   }
 }

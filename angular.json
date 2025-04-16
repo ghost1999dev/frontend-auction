@@ -17,6 +17,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "noty"
+            ],
             "outputPath": "dist/online-auctions-admin",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -32,7 +35,6 @@
               "src/assets/js/noty/noty.css"
             ],
             "scripts": [
-              "node_modules/@lottiefiles/lottie-player/dist/lottie-player.js",
               "src/assets/js/noty/noty.js",
               "src/assets/js/noty/noty.min.js"
             ]
