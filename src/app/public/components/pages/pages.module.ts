@@ -26,6 +26,13 @@ import { ProjectComponent } from './project/project.component';
 import { FavoritesComponent } from './favorites/favorites.component';
 import { UsersComponent } from './users/users.component';
 import { ButtonModule } from 'primeng/button';
+import { ProfileComponent } from './profile/profile.component';
+import { AvatarModule } from 'primeng/avatar';
+import { CardModule } from 'primeng/card';
+import { DividerModule } from 'primeng/divider';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonModule } from 'primeng/skeleton';
 
 const routes: Routes = [
   {
@@ -40,6 +47,10 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardComponent,
+      },
+      {
+        path: 'profile',
+        component: ProfileComponent,
       },
       {
         path: 'auctions',
@@ -70,6 +81,7 @@ const routes: Routes = [
     ProjectComponent,
     FavoritesComponent,
     UsersComponent,
+    ProfileComponent,
   ],
   imports: [
     CommonModule,
@@ -91,6 +103,15 @@ const routes: Routes = [
     InputSwitchModule,
     RippleModule,
     ReactiveFormsModule,
+
+    AvatarModule,
+    BadgeModule,
+    ButtonModule,
+    CardModule,
+    DividerModule,
+    TagModule,
+    TooltipModule,
+    SkeletonModule,
 
     RouterModule.forChild(routes)
   ],

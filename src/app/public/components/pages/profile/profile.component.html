@@ -1,0 +1,111 @@
+<div class="profile-container">
+    <!-- Estado de carga -->
+    <p-card *ngIf="loading" class="profile-card">
+      <div class="flex flex-column gap-3">
+        <div class="flex align-items-center gap-3">
+          <p-skeleton shape="circle" size="5rem"></p-skeleton>
+          <div class="flex flex-column gap-2">
+            <p-skeleton width="10rem" height="1.5rem"></p-skeleton>
+            <p-skeleton width="8rem" height="1rem"></p-skeleton>
+          </div>
+        </div>
+        <div class="flex flex-column gap-2">
+          <p-skeleton width="100%" height="1rem"></p-skeleton>
+          <p-skeleton width="100%" height="1rem"></p-skeleton>
+          <p-skeleton width="100%" height="1rem"></p-skeleton>
+          <p-skeleton width="100%" height="1rem"></p-skeleton>
+        </div>
+      </div>
+    </p-card>
+  
+    <!-- Perfil cargado -->
+    <p-card *ngIf="!loading" class="profile-card">
+      <div class="profile-header">
+        <div class="avatar-container">
+          <p-avatar 
+            [image]="user.account_type === 1 ? user.image : ''"
+            [label]="user.account_type !== 1 ? user.name[0] : ''" 
+            size="xlarge" 
+            shape="circle"
+            [style]="{
+              'background-color': user.account_type === 2 ? '#24292e' : 
+                                (user.account_type === 3 ? '#4285F4' : 'var(--primary-color)'),
+              'color': 'white'
+            }"
+            [pt]="{
+              root: { class: 'avatar-shadow' }
+            }">
+            <i *ngIf="user.account_type === 2" class="pi pi-github" style="font-size: 2rem"></i>
+            <i *ngIf="user.account_type === 3" class="pi pi-google" style="font-size: 2rem"></i>
+          </p-avatar>
+          <p-badge 
+            *ngIf="user.status"
+            value="Activo" 
+            severity="success"
+            class="status-badge">
+          </p-badge>
+        </div>
+        
+        <div class="profile-info">
+          <h2>{{ user.name }}</h2>
+          <p-tag [value]="getRoleName(user.role_id)" severity="info"></p-tag>
+        </div>
+      </div>
+  
+      <p-divider></p-divider>
+  
+      <div class="profile-details">
+        <div class="detail-item">
+          <i class="pi pi-envelope"></i>
+          <div>
+            <span class="detail-label">Correo electrónico</span>
+            <span class="detail-value">{{ user.email }}</span>
+          </div>
+        </div>
+  
+        <div class="detail-item">
+          <i class="pi pi-home"></i>
+          <div>
+            <span class="detail-label">Dirección</span>
+            <span class="detail-value">{{ user.address || 'No especificada' }}</span>
+          </div>
+        </div>
+  
+        <div class="detail-item">
+          <i class="pi pi-phone"></i>
+          <div>
+            <span class="detail-label">Teléfono</span>
+            <span class="detail-value">{{ user.phone || 'No especificado' }}</span>
+          </div>
+        </div>
+  
+        <div class="detail-item">
+          <i class="pi pi-clock"></i>
+          <div>
+            <span class="detail-label">Último acceso</span>
+            <span class="detail-value">{{ formatDate(user.last_login) }}</span>
+          </div>
+        </div>
+  
+        <div class="detail-item">
+          <i class="pi pi-calendar"></i>
+          <div>
+            <span class="detail-label">Actualizado</span>
+            <span class="detail-value">{{ formatDate(user.updatedAt) }}</span>
+          </div>
+        </div>
+      </div>
+  
+      <p-divider></p-divider>
+  
+      <div class="profile-actions">
+        <button pButton pRipple icon="pi pi-pencil" label="Editar" class="p-button-outlined"></button>
+        <button 
+          pButton pRipple 
+          [icon]="user.status ? 'pi pi-lock-open' : 'pi pi-lock'" 
+          [label]="user.status ? 'Desactivar' : 'Activar'" 
+          [severity]="user.status ? 'warning' : 'success'"
+          class="ml-2"></button>
+      </div>
+    </p-card>
+  </div>

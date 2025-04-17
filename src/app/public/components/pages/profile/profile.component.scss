@@ -1,0 +1,100 @@
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+  
+    .profile-card {
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+  
+      .profile-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1rem 0;
+  
+        @media (min-width: 768px) {
+          flex-direction: row;
+          align-items: flex-start;
+        }
+  
+        .avatar-container {
+          position: relative;
+          
+          .avatar-shadow {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+  
+          .status-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            transform: translate(25%, 25%);
+          }
+        }
+  
+        .profile-info {
+          flex: 1;
+          text-align: center;
+  
+          @media (min-width: 768px) {
+            text-align: left;
+          }
+  
+          h2 {
+            margin: 0;
+            color: var(--text-color);
+          }
+  
+          .text-secondary {
+            color: var(--text-secondary-color);
+            margin: 0.25rem 0 0;
+          }
+        }
+      }
+  
+      .profile-details {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1rem 0;
+  
+        @media (min-width: 600px) {
+          grid-template-columns: 1fr 1fr;
+        }
+  
+        .detail-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 1rem;
+  
+          i {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-top: 0.25rem;
+          }
+  
+          .detail-label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary-color);
+            margin-bottom: 0.25rem;
+          }
+  
+          .detail-value {
+            display: block;
+            font-weight: 500;
+            color: var(--text-color);
+          }
+        }
+      }
+  
+      .profile-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0.5rem 0;
+      }
+    }
+  }

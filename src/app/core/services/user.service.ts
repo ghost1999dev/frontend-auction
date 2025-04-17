@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { HandlerErrorService } from './handler-error.service';
 import { catchError, forkJoin, map, Observable } from 'rxjs';
-import { activateReq, activateRes, addUser, addUserResponse, updateFieldsGoogle, updateFieldsGoogleRes, userResponse, usersWithImage } from '../models/users';
+import { activateReq, activateRes, addUser, addUserResponse, updateFieldsGoogle, updateFieldsGoogleRes, userResponse, userResponseById, usersWithImage } from '../models/users';
 import { environment } from 'src/environments/environment';
 import { DeveloperService } from './developer.service';
 import { CompaniesService } from './companies.service';
@@ -23,6 +23,13 @@ export class UserService {
     return this.http.get<userResponse>(`${environment.server_url}users/show/all`)
     .pipe(
       map(response => response.usersWithImage)
+    )
+  }
+
+  getUsersById(id: any): Observable<usersWithImage[]> {
+    return this.http.get<userResponseById>(`${environment.server_url}users/show/${id}`)
+    .pipe(
+      map(response => response.user)
     )
   }
 

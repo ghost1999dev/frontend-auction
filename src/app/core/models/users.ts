@@ -3,6 +3,11 @@ export interface userResponse{
     usersWithImage: usersWithImage[]
 }
 
+export interface userResponseById{
+    message: string;
+    user: usersWithImage[]
+}
+
 export interface usersWithImage{
     id: number;
     role_id: number;
