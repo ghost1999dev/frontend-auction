@@ -4,7 +4,7 @@ import { HttpInterceptorModule } from './core/services/http-interceptor.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { OutletContext } from '@angular/router';
+import { OutletContext, RouterModule } from '@angular/router';
 import { CoreModule } from './core/core.module';
 import { PublicModule } from './public/public.module';
 import { SharedModule } from './shared/shared.module';
@@ -35,7 +35,12 @@ import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
     CoreModule,
     PublicModule,
     SharedModule,
-    HttpInterceptorModule
+    HttpInterceptorModule,
+    RouterModule.forRoot([], {
+      // Configuración especial para Angular 18
+      paramsInheritanceStrategy: 'always',
+      enableTracing: false
+    })
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   providers: [
@@ -43,7 +48,6 @@ import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
     JwtHelperService,
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     AuthGuard,
-    OutletContext,
 
     CountryService, CustomerService, EventService, IconService, NodeService,
         PhotoService, ProductService, UserService

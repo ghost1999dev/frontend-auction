@@ -23,7 +23,6 @@ import { BrowserModule } from '@angular/platform-browser';
     AuthModule
   ],
   providers: [
-    OutletContext
   ]
 })
 export class PublicModule { }

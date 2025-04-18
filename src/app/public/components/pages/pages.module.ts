@@ -116,7 +116,6 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
   providers: [
-    OutletContext
   ]
 })
 export class PagesModule { }

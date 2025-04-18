@@ -36,7 +36,8 @@
             ],
             "scripts": [
               "src/assets/js/noty/noty.js",
-              "src/assets/js/noty/noty.min.js"
+              "src/assets/js/noty/noty.min.js",
+              "node_modules/@lottiefiles/lottie-player/dist/lottie-player.js"
             ]
           },
           "configurations": {
