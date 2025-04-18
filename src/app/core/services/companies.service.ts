@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HandlerErrorService } from './handler-error.service';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
-import { companies, getCompaniesResponse } from '../models/companies';
+import { catchError, map, Observable } from 'rxjs';
+import { addCompanies, addCompaniesRes, companies, getCompaniesResponse } from '../models/companies';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -18,5 +18,15 @@ export class CompaniesService {
         map(response => response.companies)
       )
     }
+
+createCompanies(data: addCompanies) : Observable<addCompaniesRes | void>{
+    return this.http.post<addCompaniesRes>(`${environment.server_url}companies/create`, data)
+    .pipe(
+      map((res:addCompaniesRes)=> {
+        return res;
+      }),
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
+    );
+  }
 
 }

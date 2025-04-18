@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { addUser } from 'src/app/core/models/users';
 import { LayoutService } from 'src/app/core/services/app.layout.service';
+import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { UserService } from 'src/app/core/services/user.service';
@@ -16,6 +17,7 @@ export class ActivateAccountComponent {
   activateForm: FormGroup;
   submitted = false;
   userData: any; // Para almacenar datos del localStorage
+  userDataCompanies: any; 
 
   constructor(
     public layoutService: LayoutService,
@@ -23,9 +25,11 @@ export class ActivateAccountComponent {
     private router: Router,
     private usersService: UserService,
     private notificationServices: NotificationService,
-    private developerSrv: DeveloperService
+    private developerSrv: DeveloperService,
+    private companiesSrv: CompaniesService
   ) {
     this.loadUserData();
+    this.loadUserDataCompanies();
     
     this.activateForm = this.fb.group({
       code: ['', Validators.required],
@@ -33,7 +37,18 @@ export class ActivateAccountComponent {
   }
 
   private loadUserData(): void {
-    const savedData = localStorage.getItem('developerFormData');
+    const savedData = localStorage.getItem('FormData');
+    if (savedData) {
+      this.userData = JSON.parse(savedData);
+      console.log('Datos cargados desde localStorage:', this.userData);
+    } else {
+      console.warn('No se encontraron datos de registro en localStorage');
+      this.router.navigate(['/auth/register']);
+    }
+  }
+
+  private loadUserDataCompanies(): void {
+    const savedData = localStorage.getItem('FormDataCompanies');
     if (savedData) {
       this.userData = JSON.parse(savedData);
       console.log('Datos cargados desde localStorage:', this.userData);
@@ -49,44 +64,88 @@ export class ActivateAccountComponent {
     if (this.activateForm.invalid || !this.userData) {
       return;
     }
+    const savedData = localStorage.getItem('FormData');
+    const savedDataCompanies = localStorage.getItem('FormDataCompanies');
 
-    const userToCreate: any = {
-      role_id: this.userData.role_id, 
-      name: this.userData.name,
-      email: this.userData.email,
-      code: this.activateForm.value.code,
-      password: this.userData.password,
-      address: this.userData.address,
-      phone: this.userData.phone,
-      image: '', 
-      account_type: 1
-    };
-
-    this.usersService.createUsers(userToCreate).subscribe({
-      next: (response: any) => {
-
-        const developerAdd: any = {
-          bio: this.userData.bio, 
-          user_id: response.id, 
-          linkedin: this.userData.linkedin, 
-          occupation: this.userData.occupation, 
-          portfolio: this.userData.portfolio
-        }
-
-        this.developerSrv.createDeveloper(developerAdd)
-        .subscribe((next: any) => {
-          if(next){
-            localStorage.removeItem('developerFormData');
-            this.router.navigate(['/auth/login']);
-            this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta developer ha sido verificada exitosamente.")
-          }else{
-            this.notificationServices.showErrorCustom("Error al Crear el Developer.")
+    if(savedData){
+      const userToCreate: any = {
+        role_id: this.userData.role_id, 
+        name: this.userData.name,
+        email: this.userData.email,
+        code: this.activateForm.value.code,
+        password: this.userData.password,
+        address: this.userData.address,
+        phone: this.userData.phone,
+        image: '', 
+        account_type: 1
+      };
+  
+      this.usersService.createUsers(userToCreate).subscribe({
+        next: (response: any) => {
+  
+          const developerAdd: any = {
+            bio: this.userData.bio, 
+            user_id: response.id, 
+            linkedin: this.userData.linkedin, 
+            occupation: this.userData.occupation, 
+            portfolio: this.userData.portfolio
           }
-        })
-      },
-      error: (err: any) => {
-        this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
-      }
-    });
+  
+          this.developerSrv.createDeveloper(developerAdd)
+          .subscribe((next: any) => {
+            if(next){
+              localStorage.removeItem('FormData');
+              this.router.navigate(['/auth/login']);
+              this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta developer ha sido verificada exitosamente.")
+            }else{
+              this.notificationServices.showErrorCustom("Error al Crear el Developer.")
+            }
+          })
+        },
+        error: (err: any) => {
+          this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
+        }
+      });
+    } if(savedDataCompanies){
+      const userToCreate: any = {
+        role_id: this.userDataCompanies.role_id, 
+        name: this.userDataCompanies.name,
+        email: this.userDataCompanies.email,
+        code: this.activateForm.value.code,
+        password: this.userDataCompanies.password,
+        address: this.userDataCompanies.address,
+        phone: this.userDataCompanies.phone,
+        image: '', 
+        account_type: 1
+      };
+  
+      this.usersService.createUsers(userToCreate).subscribe({
+        next: (response: any) => {
+  
+          const companyAdd: any = {
+            user_id: response.id,
+            nrc_number: this.userDataCompanies. nrc_number, 
+            business_type: this.userDataCompanies.business_type, 
+            web_site: this.userDataCompanies.web_site,
+            nit_number: this.userDataCompanies.nit_number
+          }
+  
+          this.companiesSrv.createCompanies(companyAdd)
+          .subscribe((next: any) => {
+            if(next){
+              localStorage.removeItem('FormDataCompanies');
+              this.router.navigate(['/auth/login']);
+              this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta de companies ha sido verificada exitosamente.")
+            }else{
+              this.notificationServices.showErrorCustom("Error al Crear la company.")
+            }
+          })
+        },
+        error: (err: any) => {
+          this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
+        }
+      });
+    }
+    
   }
 }
