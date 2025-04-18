@@ -45,12 +45,16 @@ export class RegisterComponent {
     });
 
     this.companyForm = this.fb.group({
-      companyUserName: ['', Validators.required],
-      companyName: ['', Validators.required],
-      companyEmail: ['', [Validators.required, Validators.email]],
-      companyPassword: ['', [Validators.required, Validators.minLength(6)]],
-      companyImage: [null, Validators.required],
-      companyLogo: [null, Validators.required],
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      image: [''],
+      address: ['', Validators.required],
+      phone: ['', Validators.required],
+      nrc_number: ['', Validators.required],
+      business_type: ['', Validators.required],
+      web_site: ['', Validators.required],
+      nit_number: ['', Validators.required],
       role_id: [1]
     });
   }
@@ -90,8 +94,6 @@ export class RegisterComponent {
 
     const formValue = this.developerForm.value;
 
-    this.formData.append("email", this.developerForm.get('email')!.value);
-
     var data: any = {
       email: this.developerForm.get('email')!.value
     }
@@ -99,7 +101,7 @@ export class RegisterComponent {
     this.UserSrv.validateEmailUser(data)
       .subscribe((res: any) => {
         if(res.status === 200){
-          this.saveDeveloperData(formValue);
+          this.saveData(formValue);
           this.router.navigate(['/auth/activate-account']); 
           this.notificationServices.showSuccessCustom("Felicidades, cuenta creado exitosamente")
         }else{
@@ -118,12 +120,34 @@ export class RegisterComponent {
     }
 
     const formValue = this.companyForm.value;
-    this.router.navigate(['/auth/login']);
+
+
+    var data: any = {
+      email: this.companyForm.get('email')!.value
+    }
+
+    this.UserSrv.validateEmailUser(data)
+      .subscribe((res: any) => {
+        if(res.status === 200){
+          this.saveDataCompanies(formValue);
+          this.router.navigate(['/auth/activate-account']); 
+          this.notificationServices.showSuccessCustom("Felicidades, cuenta creado exitosamente")
+        }else{
+          this.notificationServices.showErrorCustom("Error, al crear la company");
+        }
+      })
   }
 
-    private saveDeveloperData(formData: any): void {
+    private saveData(formData: any): void {
       try {
-        localStorage.setItem('developerFormData', JSON.stringify(formData));
+        localStorage.setItem('FormData', JSON.stringify(formData));
+      } catch (error) {
+        console.error('Error al guardar en localStorage:', error);
+      }
+    }
+    private saveDataCompanies(formData: any): void {
+      try {
+        localStorage.setItem('FormDataCompanies', JSON.stringify(formData));
       } catch (error) {
         console.error('Error al guardar en localStorage:', error);
       }

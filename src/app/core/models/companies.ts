@@ -27,3 +27,15 @@ export interface getUserRelations{
 export interface getUserRoleRelations{
     role_name: string
 }
+ export interface addCompanies {
+    user_id: number,
+    nrc_number: string, 
+    business_type: string,
+    web_site: string,
+    nit_number: string
+ }
+
+ export interface addCompaniesRes {
+    message: string,
+    company: addCompanies[]
+ }
