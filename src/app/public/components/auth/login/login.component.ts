@@ -56,4 +56,9 @@ export class LoginComponent implements OnInit {
     // Redirige al endpoint de autenticación de Google en tu backend
     window.location.href = 'http://localhost:4000/auth/google/callback';
   }
+
+  loginWithGitHub() {
+    // Redirige al endpoint de autenticación de Google en tu backend
+    window.location.href = 'http://localhost:4000/auth/github/callback';
+  }
 }
