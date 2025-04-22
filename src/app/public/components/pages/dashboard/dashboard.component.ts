@@ -50,6 +50,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private usersService: UserService,
     private developerSrv: DeveloperService,
     private notificationServices: NotificationService,
+    private companiesServices: CompaniesService,
     private messageService: MessageService) {
       this.subscription = this.layoutService.configUpdate$.subscribe(() => {
           this.initChart();
@@ -64,15 +65,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
         occupation: [''],
         portfolio: ['']
       });
-  
+
       this.companyForm = this.fb.group({
-        companyName: ['', Validators.required],
-        companyEmail: ['', [Validators.required, Validators.email]],
-        companyPassword: ['', [Validators.required, Validators.minLength(6)]],
-        nrcNumber: ['', Validators.required],
-        businessType: ['', Validators.required],
-        webSite: [''],
-        nitNumber: ['', Validators.required]
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        image: [''],
+        address: ['', Validators.required],
+        phone: ['', Validators.required],
+        business_type: ['', Validators.required],
+        nrc_number: ['', Validators.required],
+        web_site: ['', Validators.required],
+        nit_number: ['', Validators.required],
       });
   
   } 
@@ -150,7 +152,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       phone: phone,
     };
 
-    this.usersService.uopdatedUsersPassport(userToCreate, this.id)
+    this.usersService.updatedUsersPassport(userToCreate, this.id)
     .subscribe({
       next: (response: any) => {
 
@@ -181,15 +183,48 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   onSubmitCompany() {
     this.submitted = true;
-    if (this.companyForm.valid) {
-      // Lógica para registrar company
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Éxito', 
-        detail: 'Compañía registrada correctamente'
-      });
-      this.displayAlert = false;
-    }
+    const password = this.companyForm.get('password')?.value;
+    const address = this.companyForm.get('address')?.value;
+    const phone = this.companyForm.get('phone')?.value;
+    const business_type = this.companyForm.get('business_type')?.value;
+    const nrc_number = this.companyForm.get('nrc_number')?.value;
+    const web_site = this.companyForm.get('web_site')?.value;
+    const nit_number = this.companyForm.get('nit_number')?.value;
+
+    const userToCreate: any = {
+      role_id: 1, 
+      password: password,
+      address: address,
+      phone: phone,
+    };
+
+    this.usersService.updatedUsersPassport(userToCreate, this.id)
+    .subscribe({
+      next: (response: any) => {
+
+        const adminAdd: any = {
+          user_id: this.id, 
+          nrc_number: nrc_number, 
+          business_type: business_type,
+          web_site: web_site, 
+          nit_number: nit_number
+        }
+
+        this.companiesServices.createCompanies(adminAdd)
+        .subscribe((next: any) => {
+          if(next){
+            this.displayAlert = false;
+            this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta ha sido actualizada exitosamente.")
+          }else{
+            this.notificationServices.showErrorCustom("Error al Crear el Developer.")
+          }
+        })
+      },
+      error: (err: any) => {
+        this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
+      }
+    });
+
   }
 
     goBack() {

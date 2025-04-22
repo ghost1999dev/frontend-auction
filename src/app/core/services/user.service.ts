@@ -43,7 +43,7 @@ export class UserService {
     );
   }
 
-  uopdatedUsersPassport(data: updateFieldsGoogle, id: any) : Observable<updateFieldsGoogleRes | void>{
+  updatedUsersPassport(data: updateFieldsGoogle, id: any) : Observable<updateFieldsGoogleRes | void>{
     return this.http.patch<updateFieldsGoogleRes>(`${environment.server_url}users/update-fields/${id}`, data)
     .pipe(
       map((res:updateFieldsGoogleRes)=> {

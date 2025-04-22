@@ -131,56 +131,43 @@
                     <!-- Contenedor con scroll -->
                     <div class="form-scroll-container">
                         <div class="centered-form-content">
-                            <!-- Company Name -->
+                            <!-- Password -->
                             <div class="field-container">
                                 <div class="input-group">
-                                    <label for="companyName" class="input-label">Company Name</label>
-                                    <input id="companyName" type="text" pInputText formControlName="companyName" 
-                                            class="centered-input"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('companyName')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('companyName')?.errors" class="error-message">
-                                        Company name is required
+                                    <label for="password" class="input-label">Password</label>
+                                    <input id="password" type="password" formControlName="password" 
+                                            [toggleMask]="true" [feedback]="false"
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('password')?.errors}"
+                                            class="centered-input">
+                                    <small *ngIf="submitted && companyForm.get('password')?.errors" class="error-message">
+                                        <span *ngIf="companyForm.get('password')?.errors?.['required']">Password is required</span>
+                                        <span *ngIf="companyForm.get('password')?.errors?.['minlength']">Must be at least 6 characters</span>
                                     </small>
                                 </div>
                             </div>
 
-                            <!-- Company Email -->
+                            <!-- Address -->
                             <div class="field-container">
                                 <div class="input-group">
-                                    <label for="companyEmail" class="input-label">Email</label>
-                                    <input id="companyEmail" type="email" pInputText formControlName="companyEmail" 
+                                    <label for="address" class="input-label">Address</label>
+                                    <input id="address" type="text" pInputText formControlName="address" 
                                             class="centered-input"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('companyEmail')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('companyEmail')?.errors" class="error-message">
-                                        <span *ngIf="companyForm.get('companyEmail')?.errors?.['required']">Email is required</span>
-                                        <span *ngIf="companyForm.get('companyEmail')?.errors?.['email']">Invalid email format</span>
+                                            [ngClass]="{'p-invalid': submitted &&  companyForm.get('address')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('address')?.errors" class="error-message">
+                                        Address is required
                                     </small>
                                 </div>
                             </div>
 
-                            <!-- Company Password -->
+                            <!-- Phone -->
                             <div class="field-container">
                                 <div class="input-group">
-                                    <label for="companyPassword" class="input-label">Password</label>
-                                    <input id="companyPassword" type="password" pInputText formControlName="companyPassword" 
+                                    <label for="phone" class="input-label">Phone Number</label>
+                                    <input id="phone" type="number" pInputText formControlName="phone" 
                                             class="centered-input"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('companyPassword')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('companyPassword')?.errors" class="error-message">
-                                        <span *ngIf="companyForm.get('companyPassword')?.errors?.['required']">Password is required</span>
-                                        <span *ngIf="companyForm.get('companyPassword')?.errors?.['minlength']">Must be at least 6 characters</span>
-                                    </small>
-                                </div>
-                            </div>
-
-                            <!-- NRC Number -->
-                            <div class="field-container">
-                                <div class="input-group">
-                                    <label for="nrcNumber" class="input-label">NRC Number</label>
-                                    <input id="nrcNumber" type="text" pInputText formControlName="nrcNumber" 
-                                            class="centered-input"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('nrcNumber')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('nrcNumber')?.errors" class="error-message">
-                                        NRC number is required
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('phone')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('phone')?.errors" class="error-message">
+                                        Phone number is required
                                     </small>
                                 </div>
                             </div>
@@ -188,12 +175,25 @@
                             <!-- Business Type -->
                             <div class="field-container">
                                 <div class="input-group">
-                                    <label for="businessType" class="input-label">Business Type</label>
-                                    <input id="businessType" type="text" pInputText formControlName="businessType" 
+                                    <label for="business_type" class="input-label">Business Type</label>
+                                    <input id="business_type" type="text" pInputText formControlName="business_type" 
                                             class="centered-input"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('businessType')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('businessType')?.errors" class="error-message">
-                                        Business type is required
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('business_type')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('business_type')?.errors" class="error-message">
+                                        Business Type is required
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- NRC Number -->
+                            <div class="field-container">
+                                <div class="input-group">
+                                    <label for="nrc_number" class="input-label">NRC Number</label>
+                                    <input id="nrc_number" type="text" pInputText formControlName="nrc_number" 
+                                            class="centered-input"
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('nrc_number')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="error-message">
+                                        NRC Number is required
                                     </small>
                                 </div>
                             </div>
@@ -201,25 +201,29 @@
                             <!-- Website -->
                             <div class="field-container">
                                 <div class="input-group">
-                                    <label for="webSite" class="input-label">Website (Optional)</label>
-                                    <input id="webSite" type="url" pInputText formControlName="webSite" 
+                                    <label for="web_site" class="input-label">Website</label>
+                                    <input id="web_site" type="url" pInputText formControlName="web_site" 
                                             class="centered-input"
-                                            placeholder="https://example.com">
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('web_site')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('web_site')?.errors" class="error-message">
+                                        Website is required
+                                    </small>
                                 </div>
                             </div>
 
                             <!-- NIT Number -->
                             <div class="field-container">
                                 <div class="input-group">
-                                    <label for="nitNumber" class="input-label">NIT Number</label>
-                                    <input id="nitNumber" type="text" pInputText formControlName="nitNumber" 
+                                    <label for="nit_number" class="input-label">NIT Number</label>
+                                    <input id="nit_number" type="text" pInputText formControlName="nit_number" 
                                             class="centered-input"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('nitNumber')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('nitNumber')?.errors" class="error-message">
-                                        NIT number is required
+                                            [ngClass]="{'p-invalid': submitted && companyForm.get('nit_number')?.errors}">
+                                    <small *ngIf="submitted && companyForm.get('nit_number')?.errors" class="error-message">
+                                        NIT Number is required
                                     </small>
                                 </div>
                             </div>
+
 
                         </div>
                     </div>
