@@ -180,14 +180,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe((next: any) => {
           if(next){
             this.displayAlert = false;
-            this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta ha sido actualizada exitosamente.")
+            this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")
           }else{
-            this.notificationServices.showErrorCustom("Error al Crear el Developer.")
+            this.notificationServices.showErrorCustom("Error Creating Developer.")
           }
         })
       },
       error: (err: any) => {
-        this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
+        this.notificationServices.showErrorCustom("Error verifying your account")
       }
     });
   
@@ -226,14 +226,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe((next: any) => {
           if(next){
             this.displayAlert = false;
-            this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta ha sido actualizada exitosamente.")
+            this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")
           }else{
-            this.notificationServices.showErrorCustom("Error al Crear el Developer.")
+            this.notificationServices.showErrorCustom("Error Creating Developer.")
           }
         })
       },
       error: (err: any) => {
-        this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
+        this.notificationServices.showErrorCustom("Error verifying your account")
       }
     });
 

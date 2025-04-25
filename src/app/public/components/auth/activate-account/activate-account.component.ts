@@ -87,14 +87,14 @@ export class ActivateAccountComponent {
             if(next){
               localStorage.removeItem('FormData');
               this.router.navigate(['/auth/login']);
-              this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta developer ha sido verificada exitosamente.")
+              this.notificationServices.showSuccessCustom("Congratulations! Your developer account has been successfully verified.")
             }else{
-              this.notificationServices.showErrorCustom("Error al Crear el Developer.")
+              this.notificationServices.showErrorCustom("Error Creating Developer.")
             }
           })
         },
         error: (err: any) => {
-          this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
+          this.notificationServices.showErrorCustom("Error verifying your account")
         }
       });
     }else if(savedDataCompanies){
@@ -126,14 +126,14 @@ export class ActivateAccountComponent {
             if(next){
               localStorage.removeItem('FormDataCompanies');
               this.router.navigate(['/auth/login']);
-              this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta de companies ha sido verificada exitosamente.")
+              this.notificationServices.showSuccessCustom("Congratulations! Your Companies account has been successfully verified.")
             }else{
-              this.notificationServices.showErrorCustom("Error al Crear la company.")
+              this.notificationServices.showErrorCustom("Error creating the company.")
             }
           })
         },
         error: (err: any) => {
-          this.notificationServices.showErrorCustom("Error, al verificar tu cuenta")
+          this.notificationServices.showErrorCustom("Error verifying your account")
         }
       });
     }

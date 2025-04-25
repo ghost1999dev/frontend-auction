@@ -104,9 +104,9 @@ export class RegisterComponent {
         if(res.status === 200){
           this.saveData(formValue);
           this.router.navigate(['/auth/activate-account']); 
-          this.notificationServices.showSuccessCustom("Felicidades, cuenta creado exitosamente")
+          this.notificationServices.showSuccessCustom("Congratulations, account created successfully")
         }else{
-          this.notificationServices.showErrorCustom("Error, al crear el usuario");
+          this.notificationServices.showErrorCustom("Error creating user");
         }
       })
 
@@ -132,9 +132,9 @@ export class RegisterComponent {
         if(res.status === 200){
           this.saveDataCompanies(formValue);
           this.router.navigate(['/auth/activate-account']); 
-          this.notificationServices.showSuccessCustom("Felicidades, cuenta creado exitosamente")
+          this.notificationServices.showSuccessCustom("Congratulations, account created successfully")
         }else{
-          this.notificationServices.showErrorCustom("Error, al crear la company");
+          this.notificationServices.showErrorCustom("Error when creating the company");
         }
       })
   }

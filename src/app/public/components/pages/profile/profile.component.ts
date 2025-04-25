@@ -63,11 +63,12 @@ export class ProfileComponent implements OnInit {
   };
 
   constructor(
-    private developerService: DeveloperService,
-    private userService: UserService,
     private notificationServices: NotificationService,
     private authService: AuthService,
-    private companiesService: CompaniesService 
+    private companiesService: CompaniesService,
+    private userService: UserService,
+    private developerService: DeveloperService
+
   ){
 
   }
@@ -189,11 +190,11 @@ export class ProfileComponent implements OnInit {
               this.companiesService.updateCompany(Number(this.company.id), this.companyUpdate).subscribe({
                 next: () => {
                   this.userDialog = false;
-                  this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta ha sido actualizada exitosamente.")
+                  this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")
                 },
                 error: (err) => {
                   this.loading = false;
-                  this.notificationServices.showErrorCustom("Error! Tu cuenta No sido actualizada")
+                  this.notificationServices.showErrorCustom("Error! Your account has not been updated.")
                 }
               });
             }if(this.user.role_id === 2){
@@ -201,11 +202,11 @@ export class ProfileComponent implements OnInit {
               .subscribe({
                 next: (updatedDeveloper) => {
                   this.userDialog = false;
-                  this.notificationServices.showSuccessCustom("¡Felicidades! Tu cuenta ha sido actualizada exitosamente.")              
+                  this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")              
                 },
                 error: (err) => {
                   this.loading = false;
-                  this.notificationServices.showErrorCustom("Error! Tu cuenta No sido actualizada")
+                  this.notificationServices.showErrorCustom("Error! Your account has not been updated.")
                 }
               });
             }
@@ -228,14 +229,12 @@ export class ProfileComponent implements OnInit {
           next: (response: any) => {
             this.passwordDialog = false;
             this.authService.logout();
-            this.notificationServices.showSuccessCustom("Contraseña Actualizada exitosamente.")
-
+            this.notificationServices.showSuccessCustom("Password updated successfully.")
           },
           error: (err) => {
             console.error('Error updating password:', err);
             this.loading = false;
-            this.notificationServices.showErrorCustom("Contraseñas Actual es incorrecta")
-            
+            this.notificationServices.showErrorCustom("Current Password is incorrect")
           }
         });
     }

@@ -37,6 +37,10 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { PasswordModule } from 'primeng/password';
 import { RoleGuard } from 'src/app/core/guards/role.guard';
 import { MessageService } from 'primeng/api';
+import { DropdownModule } from 'primeng/dropdown';
+import { PaginatorModule } from 'primeng/paginator';
+import { ToolbarModule } from 'primeng/toolbar';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 const routes: Routes = [
   {
@@ -70,7 +74,7 @@ const routes: Routes = [
         path: 'projects',
         component: ProjectComponent,
         canActivate: [RoleGuard],
-        data: { allowedRoles: [1] } 
+        data: { allowedRoles: [1, 2] } 
       },
       {
         path: 'favorites',
@@ -109,8 +113,12 @@ const routes: Routes = [
     DialogModule,
     ButtonModule,
     PasswordModule,
+    ToolbarModule,
+    InputTextareaModule,
 
-
+    DropdownModule,
+    PaginatorModule,
+    
     StyleClassModule,
     PanelMenuModule,
 

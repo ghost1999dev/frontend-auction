@@ -12,6 +12,9 @@ import { FormsModule } from '@angular/forms';
 import { LandingComponent } from './landing/landing.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { DropdownModule } from 'primeng/dropdown';
+import { PaginatorModule } from 'primeng/paginator';
+import { RippleModule } from 'primeng/ripple';
 
 const routes: Routes = [
   {
@@ -48,6 +51,9 @@ const routes: Routes = [
     FormsModule,
     InputTextModule,
     InputTextareaModule,
+    DropdownModule,
+    PaginatorModule,
+    RippleModule,
     RouterModule.forChild(routes)
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA] // Add this line

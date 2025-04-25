@@ -31,7 +31,7 @@ export class PassportComponent implements OnInit {
     this.saveToken(token);
     this.onLoggedin();
     this.router.navigate(['/main/dashboard']);
-        this.notificationService.showSuccessCustom('Bienvenido a CodeBind');
+        this.notificationService.showSuccessCustom('Welcome to CodeBind');
   }
 
   private saveToken(token: string): void {

@@ -39,11 +39,11 @@ export class LoginComponent implements OnInit {
       if(res){        
         this.onLoggedin()
         this.router.navigate(['/main/dashboard']);
-        this.notificationServices.showSuccessCustom('Bienvenido a CodeBind');
+        this.notificationServices.showSuccessCustom('Welcome to CodeBind');
       }
     },
     (err: any) => {
-      this.notificationServices.showErrorCustom('Nombre de usuario o contraseña incorrectos');
+      this.notificationServices.showErrorCustom('Incorrect username or password');
     })
 
   }

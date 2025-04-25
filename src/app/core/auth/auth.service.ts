@@ -55,7 +55,6 @@ export class AuthService {
   public logout():void{
     localStorage.removeItem('login-token');
     localStorage.removeItem('isLoggedin');
-    localStorage.clear();
     this.userService.clearCache()
     this.developerService.clearDevelopersCache()
     this.companiesService.clearCompaniesCache()
@@ -86,7 +85,7 @@ export class AuthService {
     let errorMessage = 'An errror occured retrienving data';
     if (err) {
       errorMessage = `Error: code ${err.message}`;
-      this.notificationServices.showErrorCustom('Error al iniciar sesion');
+      this.notificationServices.showErrorCustom('Error logging in');
     }
     return throwError('');
   }
