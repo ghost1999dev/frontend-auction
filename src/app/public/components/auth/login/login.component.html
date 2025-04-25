@@ -37,32 +37,36 @@
   
               <!-- Submit Button -->
               <button pButton pRipple label="Sign In" class="w-full p-3 text-xl"></button>
+                            
+              <!-- Divider -->
+              <div class="flex align-items-center justify-content-center my-5">
+                <div class="border-top-1 border-300 flex-grow-1"></div>
+                <span class="px-3 text-600 font-medium">or other method</span>
+                <div class="border-top-1 border-300 flex-grow-1"></div>
+              </div>
 
+              <!-- Google Sign In Button -->
+              <button pButton pRipple 
+                    type="button" 
+                    icon="pi pi-google" 
+                    [label]="layoutService.config.colorScheme === 'light' ? 'Sign in with Google' : 'Sign in with Google'" 
+                    class="w-full p-3 text-xl" 
+                    [style]="layoutService.config.colorScheme === 'light' ? 
+                            'background-color: #DB4437; border-color: #DB4437; color: white;' : 
+                            'background-color: #DB4437; border-color: #DB4437; color: white;'"
+                    (click)="loginWithGoogle()"></button>
 
-                        <!-- Divider -->
-                      <div class="flex align-items-center justify-content-center my-5">
-                          <div class="border-top-1 border-300 flex-grow-1"></div>
-                          <span class="px-3 text-600 font-medium">or other method</span>
-                          <div class="border-top-1 border-300 flex-grow-1"></div>
-                      </div>
+              <!-- GitHub Sign In Button -->
+              <button pButton pRipple 
+                    type="button" 
+                    icon="pi pi-github" 
+                    [label]="layoutService.config.colorScheme === 'light' ? 'Sign in with GitHub' : 'Sign in with GitHub'" 
+                    class="w-full p-3 text-xl mt-6" 
+                    [style]="layoutService.config.colorScheme === 'light' ? 
+                            'background-color: #333; border-color: #333; color: white;' : 
+                            'background-color: #fff; border-color: #fff; color: #333;'"
+                    (click)="loginWithGitHub()"></button>
 
-                      <!-- Google Sign In Button -->
-                      <button pButton pRipple 
-                              type="button" 
-                              icon="pi pi-google" 
-                              label="Sign in with Google" 
-                              class="w-full p-3 text-xl" 
-                              style="background-color: #DB4437; border-color: #DB4437;"
-                              (click)="loginWithGoogle()"></button>
-
-                      <!-- GitHub Sign In Button -->
-                      <button pButton pRipple 
-                              type="button" 
-                              icon="pi pi-github" 
-                              label="Sign in with GitHub" 
-                              class="w-full p-3 text-xl mt-6" 
-                              style="background-color: #333; border-color: #333;"
-                              (click)="loginWithGitHub()"></button>
 
             </form>
           </div>
