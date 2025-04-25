@@ -1,6 +1,6 @@
 <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
     <div class="flex flex-column align-items-center justify-content-center">
-        <img [routerLink]="['/auth/login']" src="assets/layout/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0">        
+        <img [routerLink]="['/auth/login']" src="assets/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0">        
         <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
             <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
                 <div class="text-center mb-5">
@@ -32,7 +32,7 @@
                     <!-- Developer Name -->
                     <div class="field">
                         <label for="name" class="block text-900 font-medium mb-2 mt-3">Developer Name</label>
-                        <input id="name" type="text" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && developerForm.get('name')?.errors }">
+                        <input id="name" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && developerForm.get('name')?.errors }">
                         <div *ngIf="submitted && developerForm.get('name')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="developerForm.get('name')?.errors?.['required']">Developer Name is required</div>
                         </div>
@@ -41,7 +41,7 @@
                     <!-- Email -->
                     <div class="field">
                         <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
-                        <input id="email" type="email" pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && developerForm.get('email')?.errors }">
+                        <input id="email" [pattern]="emailPattern" type="email" pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && developerForm.get('email')?.errors }">
                         <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="developerForm.get('email')?.errors?.['required']">Email is required</div>
                         <div *ngIf="developerForm.get('email')?.errors?.['email']">Invalid email format</div>
@@ -70,7 +70,7 @@
                     <!-- Phone -->
                     <div class="field">
                         <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
-                        <input id="phone" type="text" pInputText class="w-full" formControlName="phone" [ngClass]="{ 'is-invalid': submitted && developerForm.get('phone')?.errors }">
+                        <input id="phone" type="text" [maxlength]="11" onkeydown="return /[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/i.test(event.key)" pInputText class="w-full" formControlName="phone" [ngClass]="{ 'is-invalid': submitted && developerForm.get('phone')?.errors }">
                         <div *ngIf="submitted && developerForm.get('phone')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="developerForm.get('phone')?.errors?.['required']">Phone is required</div>
                         </div>
@@ -97,7 +97,7 @@
                     <!-- occupation -->
                     <div class="field">
                         <label for="occupation" class="block text-900 font-medium mb-2 mt-3">Occupation</label>
-                        <input id="occupation" type="text" pInputText class="w-full" formControlName="occupation" [ngClass]="{ 'is-invalid': submitted && developerForm.get('occupation')?.errors }">
+                        <input id="occupation" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="occupation" [ngClass]="{ 'is-invalid': submitted && developerForm.get('occupation')?.errors }">
                         <div *ngIf="submitted && developerForm.get('occupation')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="developerForm.get('occupation')?.errors?.['required']">Developer occupation required</div>
                         </div>
@@ -132,7 +132,7 @@
                     <!-- Company Name -->
                     <div class="field">
                         <label for="name" class="block text-900 font-medium mb-2 mt-3">Company Name</label>
-                        <input id="name" type="text" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && companyForm.get('name')?.errors }">
+                        <input id="name" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && companyForm.get('name')?.errors }">
                         <div *ngIf="submitted && companyForm.get('name')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="companyForm.get('name')?.errors?.['required']">Company Name is required</div>
                         </div>
@@ -141,7 +141,7 @@
                     <!-- Email -->
                     <div class="field">
                         <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
-                        <input id="email" type="email" pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && companyForm.get('email')?.errors }">
+                        <input id="email" type="email" [pattern]="emailPattern"  pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && companyForm.get('email')?.errors }">
                         <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="companyForm.get('email')?.errors?.['required']">Email is required</div>
                         <div *ngIf="companyForm.get('email')?.errors?.['email']">Invalid email format</div>
@@ -170,7 +170,7 @@
                     <!-- Phone -->
                     <div class="field">
                         <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
-                        <input id="phone" type="text" pInputText class="w-full" formControlName="phone" [ngClass]="{ 'is-invalid': submitted && companyForm.get('phone')?.errors }">
+                        <input id="phone" type="text" [maxlength]="11" onkeydown="return /[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/i.test(event.key)" pInputText class="w-full" formControlName="phone" [ngClass]="{ 'is-invalid': submitted && companyForm.get('phone')?.errors }">
                         <div *ngIf="submitted && companyForm.get('phone')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="companyForm.get('phone')?.errors?.['required']">Phone is required</div>
                         </div>
@@ -179,7 +179,7 @@
                     <!-- nrc_number -->
                         <div class="field">
                         <label for="nrc_number" class="block text-900 font-medium mb-2 mt-3">NRC Number</label>
-                        <input id="nrc_number" type="text" pInputText class="w-full" formControlName="nrc_number" [ngClass]="{ 'is-invalid': submitted && companyForm.get('nrc_number')?.errors }">
+                        <input id="nrc_number" type="text" [maxlength]="14" onkeydown="return /[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/i.test(event.key)" pInputText class="w-full" formControlName="nrc_number" [ngClass]="{ 'is-invalid': submitted && companyForm.get('nrc_number')?.errors }">
                         <div *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="companyForm.get('nrc_number')?.errors?.['required']">NRC Number is required</div>
                         </div>
@@ -188,7 +188,7 @@
                     <!-- business_type -->
                     <div class="field">
                         <label for="business_type" class="block text-900 font-medium mb-2 mt-3">Business Type</label>
-                        <input id="business_type" type="text" pInputText class="w-full" formControlName="business_type" [ngClass]="{ 'is-invalid': submitted && companyForm.get('business_type')?.errors }">
+                        <input id="business_type" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="business_type" [ngClass]="{ 'is-invalid': submitted && companyForm.get('business_type')?.errors }">
                         <div *ngIf="submitted && companyForm.get('business_type')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="companyForm.get('business_type')?.errors?.['required']">Business type is required</div>
                         </div>
@@ -206,7 +206,7 @@
                     <!-- nit_number -->
                     <div class="field">
                         <label for="nit_number" class="block text-900 font-medium mb-2 mt-3">NIT Number</label>
-                        <input id="nit_number" type="text" pInputText class="w-full" formControlName="nit_number" [ngClass]="{ 'is-invalid': submitted && companyForm.get('nit_number')?.errors }">
+                        <input id="nit_number" type="text" [maxlength]="14" onkeydown="return /[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/i.test(event.key)" pInputText class="w-full" formControlName="nit_number" [ngClass]="{ 'is-invalid': submitted && companyForm.get('nit_number')?.errors }">
                         <div *ngIf="submitted && companyForm.get('nit_number')?.errors" class="invalid-feedback mt-1">
                         <div *ngIf="companyForm.get('nit_number')?.errors?.['required']">NIT Number is required</div>
                         </div>

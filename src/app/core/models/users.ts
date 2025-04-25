@@ -53,6 +53,31 @@ export interface addUser{
     account_type: number;
 }
 
+export interface updateUser{
+    name: string, 
+    address: string, 
+    phone: string
+}
+
+export interface updatePasswordUser{
+    currentPassword: string, 
+    Newpassword: string
+}
+
+export interface updatePasswordUserResponse{
+    message: string
+    user: addUserResUserObject[]
+}
+
+export interface updateUserResponse{
+    message: string
+    user: addUserResUserObject[]
+}
+
+export interface updateUserErrorResponse{
+    message: string;
+}
+
 export interface addUserResponse{
     id: number;
     message: string

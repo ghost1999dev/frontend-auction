@@ -12,7 +12,7 @@ import { NotificationService } from 'src/app/core/services/notification.service'
 })
 export class LoginComponent implements OnInit {
   
-  emailPattern: string = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"; // Fixed regex
+  emailPattern = "^[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$";
   loginForm!: FormGroup;
   submitted: boolean = false;
 

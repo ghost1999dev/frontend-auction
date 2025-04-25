@@ -28,6 +28,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   chartOptions: any;
 
+  public user: any;
+
   subscription!: Subscription;
 
   displayAlert = false; // Control para mostrar el diálogo
@@ -83,12 +85,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.initChart();
     //this.productService.getProductsSmall().then(data => this.products = data);
     this.validateUserRole(); // Nueva función para validar developers
-
+    this.getUserById(this.id)
     this.items = [
       { label: 'Add New', icon: 'pi pi-fw pi-plus' },
       { label: 'Remove', icon: 'pi pi-fw pi-minus' }
     ];
   }
+
+  public getUserById(id: any){
+    this.usersService.getUsersById(id)
+    .subscribe((next: any) => {
+      if(next){
+        this.user = next;
+      }
+    })
+  }
+
 
   validateUserRole() {
     this.displayAlert = false;

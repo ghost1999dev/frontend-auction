@@ -1,4 +1,4 @@
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -34,6 +34,10 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
 
+import { PasswordModule } from 'primeng/password';
+import { RoleGuard } from 'src/app/core/guards/role.guard';
+import { MessageService } from 'primeng/api';
+
 const routes: Routes = [
   {
     path: '',
@@ -47,26 +51,38 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1, 2] } 
       },
       {
         path: 'profile',
         component: ProfileComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1, 2] } 
       },
       {
         path: 'auctions',
-        component: AuctionsComponent
+        component: AuctionsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
       },
       {
         path: 'projects',
-        component: ProjectComponent
+        component: ProjectComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
       },
       {
         path: 'favorites',
-        component: FavoritesComponent
+        component: FavoritesComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
       },
       {
         path: 'users',
-        component: UsersComponent
+        component: UsersComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
       }
     ]
   },
@@ -92,6 +108,8 @@ const routes: Routes = [
     ChartModule,
     DialogModule,
     ButtonModule,
+    PasswordModule,
+
 
     StyleClassModule,
     PanelMenuModule,
@@ -112,10 +130,12 @@ const routes: Routes = [
     TagModule,
     TooltipModule,
     SkeletonModule,
+    FormsModule,
 
     RouterModule.forChild(routes)
   ],
   providers: [
+    MessageService, // Add this line
   ]
 })
 export class PagesModule { }

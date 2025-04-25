@@ -61,5 +61,8 @@ replaceThemeLink(href: string, onComplete: Function) {
     return false; // Previene comportamiento por defecto
   }
 
+  getTokens() {
+    return localStorage.getItem("login-token");
+  }
 
 }

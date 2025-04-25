@@ -8,6 +8,9 @@ import { NotificationService } from '../services/notification.service';
 import { HandlerErrorService } from '../services/handler-error.service';
 import { UserAuth, UserResponseAuth } from '../models/users';
 import { environment } from 'src/environments/environment';
+import { UserService } from '../services/user.service';
+import { DeveloperService } from '../services/developer.service';
+import { CompaniesService } from '../services/companies.service';
 
 const helper = new JwtHelperService();
 
@@ -22,6 +25,9 @@ export class AuthService {
   constructor(
     private http: HttpClient, 
     private router: Router, 
+    private userService: UserService,
+    private companiesService: CompaniesService,
+    private developerService: DeveloperService,
     private notificationServices: NotificationService,
     private HandlerErrorSrv: HandlerErrorService,
     ) {
@@ -50,6 +56,9 @@ export class AuthService {
     localStorage.removeItem('login-token');
     localStorage.removeItem('isLoggedin');
     localStorage.clear();
+    this.userService.clearCache()
+    this.developerService.clearDevelopersCache()
+    this.companiesService.clearCompaniesCache()
 
     this.loggedIn.next(false);
     this.router.navigate(['auth/login']);

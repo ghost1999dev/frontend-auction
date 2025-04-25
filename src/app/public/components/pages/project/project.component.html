@@ -1,1 +1,146 @@
-<p>project works!</p>
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                        <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger" 
+                                (click)="deleteProjectsDialog = true" [disabled]="!selectedProjects || !selectedProjects.length"></button>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="right">
+                    <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table #dt [value]="projects" responsiveLayout="scroll" [rows]="10" 
+                    [globalFilterFields]="['project_name','description','status']" [paginator]="true" 
+                    [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+                    [(selection)]="selectedProjects" selectionMode="multiple" [rowHover]="true" dataKey="id">
+                <ng-template pTemplate="caption">
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Manage Projects</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." class="w-full sm:w-auto"/>
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                        </th>
+                        <th pSortableColumn="project_name">Name <p-sortIcon field="project_name"></p-sortIcon></th>
+                        <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                        <th pSortableColumn="budget">Budget <p-sortIcon field="budget"></p-sortIcon></th>
+                        <th pSortableColumn="days_available">Days Available <p-sortIcon field="days_available"></p-sortIcon></th>
+                        <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-project>
+                    <tr>
+                        <td>
+                            <p-tableCheckbox [value]="project"></p-tableCheckbox>
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Name</span>
+                            {{project.project_name}}
+                        </td>
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">Description</span>
+                            {{project.description | slice:0:50}}{{project.description.length > 50 ? '...' : ''}}
+                        </td>
+                        <td style="width:14%; min-width:8rem;">
+                            <span class="p-column-title">Budget</span>
+                            {{project.budget | currency:'USD'}}
+                        </td>
+                        <td style="width:14%; min-width:8rem;">
+                            <span class="p-column-title">Days Available</span>
+                            {{project.days_available}}
+                        </td>
+                        <td style="width:14%; min-width: 10rem;">
+                            <span class="p-column-title">Status</span>
+                            <span [class]="'project-badge status-' + (project.status === 1 ? 'active' : 'inactive')">
+                                {{project.status === 1 ? 'Active' : 'Inactive'}}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
+                                        (click)="editProject(project)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" 
+                                        (click)="deleteProject(project)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog [(visible)]="projectDialog" [style]="{width: '450px'}" header="Project Details" [modal]="true" class="p-fluid">
+            <ng-template pTemplate="content">
+                <div class="field">
+                    <label for="project_name">Project Name</label>
+                    <input type="text" pInputText id="project_name" [(ngModel)]="project.project_name" required autofocus 
+                           [ngClass]="{'ng-invalid ng-dirty' : submitted && !project.project_name}"/>
+                    <small class="ng-dirty ng-invalid" *ngIf="submitted && !project.project_name">Project name is required.</small>
+                </div>
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea id="description" pInputTextarea [(ngModel)]="project.description" required rows="3" cols="20"></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="status">Status</label>
+                    <p-dropdown id="status" [options]="statuses" optionLabel="label" optionValue="value" 
+                               [(ngModel)]="project.status" placeholder="Select a Status">
+                    </p-dropdown>
+                </div>
+
+                <div class="formgrid grid">
+                    <div class="field col">
+                        <label for="budget">Budget</label>
+                        <p-inputNumber id="budget" [(ngModel)]="project.budget" mode="currency" currency="USD" locale="en-US"></p-inputNumber>
+                    </div>
+                    <div class="field col">
+                        <label for="days_available">Days Available</label>
+                        <p-inputNumber id="days_available" [(ngModel)]="project.days_available"></p-inputNumber>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveProject()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteProjectDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="project">Are you sure you want to deactivate <b>{{project.project_name}}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteProjectDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog [(visible)]="deleteProjectsDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <div class="flex align-items-center justify-content-center">
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span>Are you sure you want to deactivate selected projects?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteProjectsDialog = false"></button>
+                <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDeleteSelected()"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>

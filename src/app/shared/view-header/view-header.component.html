@@ -1,7 +1,7 @@
 <!-- Header -->
  <div class="py-4 px-4 mx-0 md:mx-6 lg:mx-8 lg:px-8 flex align-items-center justify-content-between relative lg:static mb-3">
     <a class="flex align-items-center" href="#">
-        <img src="assets/layout/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="CodeBid Logo" height="50" class="mr-0 lg:mr-2">
+        <img src="assets/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="CodeBid Logo" height="50" class="mr-0 lg:mr-2">
         <span class="text-900 font-medium text-2xl line-height-3 mr-8">CodeBid</span>
     </a>
     <a pRipple class="cursor-pointer block lg:hidden text-700" pStyleClass="@next" enterFromClass="hidden" leaveToClass="hidden" [hideOnOutsideClick]="true">
@@ -22,6 +22,11 @@
             <li>
                 <a (click)="router.navigate(['/view/landing'], {fragment: 'highlights'})" pRipple class="flex m-0 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
                     <span>Benefits</span>
+                </a>
+            </li>
+            <li *ngIf="getTokens()">
+                <a (click)="router.navigate(['/main/dashboard'], {fragment: 'highlights'})" pRipple class="flex m-0 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
+                    <span>Dashboard</span>
                 </a>
             </li>
         </ul>

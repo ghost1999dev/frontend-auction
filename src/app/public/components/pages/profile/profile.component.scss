@@ -98,3 +98,28 @@
       }
     }
   }
+  
+:host ::ng-deep {
+  /* Estilos para el contenedor del input */
+  .p-password .p-password-input {
+    padding-right: 2.5rem;
+  }
+
+  /* Estilos para el botón de toggle */
+  .p-password .p-password-toggle {
+    margin-right: 10px !important;
+    margin-left: 5px !important;
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s;
+    
+    &:hover {
+      color: #495057;
+    }
+  }
+
+  /* Ajuste de posición del ícono */
+  .p-password .p-icon-wrapper {
+    right: 10px;
+  }
+}

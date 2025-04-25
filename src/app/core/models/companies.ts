@@ -1,3 +1,33 @@
+export interface UpdateCompany {
+    nrc_number?: string;
+    business_type?: string;
+    web_site?: string;
+    nit_number?: string;
+  }
+  
+  export interface UpdateCompanyResponse {
+    message: string;
+    company: CompanyWithRelations;
+  }
+  
+export interface CompanyResponseByUserId {
+    message: string;
+    company: CompanyWithRelations;
+  }
+  
+  export interface CompanyWithRelations {
+    id: number;
+    user_id: number;
+    nrc_number: string;
+    business_type: string;
+    web_site: string;
+    nit_number: string;
+    updatedAt?: string;
+    createdAt?: string;
+    user: getUserRelations[];
+  }
+  
+
 export interface getCompaniesResponse{
     message: string,
     companies: companies[]

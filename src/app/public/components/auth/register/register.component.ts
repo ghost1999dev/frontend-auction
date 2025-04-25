@@ -12,6 +12,7 @@ import { UserService } from 'src/app/core/services/user.service';
 })
 export class RegisterComponent {
 
+  emailPattern = "^[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$";
   userType: 'developer' | 'company' | null = null; 
   developerForm!: FormGroup; 
   companyForm!: FormGroup;   

@@ -21,9 +21,11 @@ import { PhotoService } from './core/services/photo.service';
 import { ProductService } from './core/services/product.service';
 import { UserService } from './core/services/user.service';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
+import { SimplePhoneMaskDirective } from './core/directives/number-mask.directive';
 
 @NgModule({
   declarations: [
+    SimplePhoneMaskDirective,
     AppComponent,
   ],
   imports: [

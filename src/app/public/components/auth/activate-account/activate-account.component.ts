@@ -41,9 +41,9 @@ export class ActivateAccountComponent {
 
     if (savedData) {
       this.userData = JSON.parse(savedData);
-    }if (savedDataCompanies) {
+    }else if (savedDataCompanies) {
       this.userDataCompanies = JSON.parse(savedDataCompanies);
-    } else {
+    }else {
       console.warn('No se encontraron datos de registro en localStorage');
       this.router.navigate(['/auth/register']);
     }
