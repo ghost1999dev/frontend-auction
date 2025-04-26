@@ -19,7 +19,7 @@ export class ImageUploadService {
 
   getImageUrl(imagePath: string): string {
     return imagePath 
-      ? `${environment.server_url}${imagePath}` 
-      : 'assets/images/default-user.png'; // Imagen por defecto
+    ? `${environment.server_url}${imagePath}` 
+    : 'assets/images/default-user.png'; // Imagen por defecto
   }
 }
