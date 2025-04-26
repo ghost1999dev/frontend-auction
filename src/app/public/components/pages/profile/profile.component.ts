@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { Observable, of, delay, map } from 'rxjs';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { CompanyWithRelations } from 'src/app/core/models/companies';
 import { DeveloperWithRelations, UpdateDeveloper } from 'src/app/core/models/developer';
@@ -77,6 +79,120 @@ export class ProfileComponent implements OnInit {
     this.getUserById(this.id)
   }
 
+    nrcValidator(control: AbstractControl): Observable<ValidationErrors | null> {
+      return of(control.value).pipe(
+        delay(500), // Simula llamada a API
+        map(value => {
+          return value && value.match(/^\d{6}-\d$/) ? null : { invalidNrc: true };
+        })
+      );
+    }
+  
+    formatNitNumber(event: Event) {
+      const input = event.target as HTMLInputElement;
+      let value = input.value.replace(/[^0-9]/g, '');
+    
+      // Permitir borrado completo
+      if (value.length === 0) {
+        this.companyUpdate.nit_number = '';
+        return;
+      }
+    
+      let formattedValue = '';
+    
+      if (value.length <= 9) {
+        // DUI: 00000000-0
+        formattedValue = value.substring(0, 8);
+        if (value.length > 8) {
+          formattedValue += '-' + value.substring(8, 9);
+        }
+      } else {
+        // NIT: 0000-000000-000-00
+        const a = value.substring(0, 4);   // 4 dígitos
+        const b = value.substring(4, 10);  // 6 dígitos
+        const c = value.substring(10, 13); // 3 dígitos
+        const d = value.substring(13, 15); // 2 dígitos
+    
+        formattedValue = a;
+        if (b) formattedValue += '-' + b;
+        if (c) formattedValue += '-' + c;
+        if (d) formattedValue += '-' + d;
+      }
+    
+      // Actualizar en form y DOM
+      this.companyUpdate.nit_number = formattedValue;
+      input.value = formattedValue;
+    
+      // Posicionar cursor al final
+      requestAnimationFrame(() => {
+        const len = input.value.length;
+        input.setSelectionRange(len, len);
+      });
+    }
+      
+    formatPhone(event: Event) {
+      const input = event.target as HTMLInputElement;
+      let value = input.value.replace(/\D/g, '');
+      
+      // Permitir borrado completo
+      if (value.length === 0) {
+        this.userUpdate.phone = '';
+        return;
+      }
+      
+      // Asegurar que el código de país sea 503
+      const countryCode = '503';
+      let mainNumber = value;
+      
+      // Si el valor comienza con 503, lo usamos
+      if (value.startsWith('503')) {
+        mainNumber = value.substring(3);
+      }
+      // Si no, asumimos que es parte del número principal
+      
+      let formattedValue = `+(${countryCode})`;
+      
+      if (mainNumber.length > 0) {
+        formattedValue += ` ${mainNumber.substring(0, 4)}`;
+        if (mainNumber.length > 4) {
+          formattedValue += `-${mainNumber.substring(4, 8)}`;
+        }
+      }
+
+      this.userUpdate.phone = formattedValue;
+      
+      // Manejo básico del cursor
+      setTimeout(() => {
+        const newCursorPosition = formattedValue.length;
+        input.setSelectionRange(newCursorPosition, newCursorPosition);
+      });
+    }
+  
+    formatNrcNumber(event: Event) {
+      const input = event.target as HTMLInputElement;
+      let value = input.value.replace(/\D/g, '');
+      
+      // Permitir borrado completo
+      if (value.length === 0) {
+        this.companyUpdate.nrc_number = "";
+        return;
+      }
+      
+      // Aplicar formato
+      let formattedValue = value.substring(0, 6);
+      if (value.length > 6) {
+        formattedValue += '-' + value.substring(6, 7);
+      }
+      
+      this.companyUpdate.nrc_number = formattedValue ;
+      
+      // Manejar posición del cursor
+      setTimeout(() => {
+        const newCursorPosition = formattedValue.length;
+        input.setSelectionRange(newCursorPosition, newCursorPosition);
+      });
+    }
+
   loadCompany(userId: number): void {
     this.loading = true;
     this.companiesService.getCompanyByUserId(userId)
@@ -120,10 +236,10 @@ export class ProfileComponent implements OnInit {
         };
       }if(this.company?.user_id === this.id){
         this.companyUpdate = {
-          nrc_number: '',
+          nrc_number: this.company.nrc_number || '',
           business_type: this.company.business_type || '',
           web_site: this.company.web_site || '',
-          nit_number: ''
+          nit_number: this.company.nit_number || ''
         };
       }
   }
@@ -134,6 +250,8 @@ export class ProfileComponent implements OnInit {
     this.submitted = false;
     this.resetForm();
   }
+
+  
 
   resetForm(): void {
     this.passwordData = { currentPassword: '', Newpassword: '' };

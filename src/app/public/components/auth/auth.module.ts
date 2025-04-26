@@ -17,6 +17,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { ActivateAccountComponent } from './activate-account/activate-account.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { PassportComponent } from './passport/passport.component';
+import { InputMaskModule } from 'primeng/inputmask';
 
 const routes: Routes = [
   {
@@ -80,6 +81,7 @@ const routes: Routes = [
     
     ReactiveFormsModule,
     FormsModule,
+    InputMaskModule,
 
     RouterModule.forChild(routes)
   ],

@@ -41,6 +41,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
 import { ToolbarModule } from 'primeng/toolbar';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 
 const routes: Routes = [
   {
@@ -129,7 +130,8 @@ const routes: Routes = [
     InputSwitchModule,
     RippleModule,
     ReactiveFormsModule,
-
+    NgxMaskDirective,
+    NgxMaskPipe,    
     AvatarModule,
     BadgeModule,
     ButtonModule,
@@ -143,6 +145,7 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
   providers: [
+    provideNgxMask(),
     MessageService, // Add this line
   ]
 })

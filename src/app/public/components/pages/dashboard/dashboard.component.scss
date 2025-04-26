@@ -54,15 +54,15 @@
     flex-wrap: wrap;
 }
 
+.role-card ::ng-deep .p-card .p-card-body{
+    padding: 0rem !important;
+}
+
 .role-card {
     cursor: pointer;
     transition: all 0.3s;
     width: 250px;
-    
-    &:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        transform: translateY(-4px);
-    }
+
     
     .card-content {
         display: flex;
