@@ -71,14 +71,14 @@
                                 <!-- Phone -->
                                 <div class="field-container">
                                     <div class="input-group">
-                                        <label for="phone" class="input-label">Phone Number</label>
-                                        <input id="phone" type="text" pInputText formControlName="phone" 
-                                                class="centered-input"
-                                                type="text" [maxlength]="11" onkeydown="return /[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/i.test(event.key)"
-                                                [ngClass]="{'p-invalid': submitted && developerForm.get('phone')?.errors}">
-                                        <small *ngIf="submitted && developerForm.get('phone')?.errors" class="error-message">
-                                            Phone number is required
-                                        </small>
+                                        <label for="phone" class="input-label">Phone</label>
+                                        <input id="phone" type="text" 
+                                        (input)="formatPhone($event)" 
+                                        pInputText class="centered-input"
+                                        formControlName="phone" 
+                                        [ngClass]="{ 'is-invalid': submitted && developerForm.get('phone')?.errors }">  
+                                        <div *ngIf="submitted && developerForm.get('phone')?.errors" class="invalid-feedback mt-1">
+                                        <div *ngIf="developerForm.get('phone')?.errors?.['required']">Phone is required</div> </div>
                                     </div>
                                 </div>
 
@@ -163,14 +163,14 @@
                             <!-- Phone -->
                             <div class="field-container">
                                 <div class="input-group">
-                                    <label for="phone" class="input-label">Phone Number</label>
-                                    <input id="phone" type="number" pInputText formControlName="phone" 
-                                            class="centered-input"
-                                            [maxlength]="14" onkeydown="return /[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/i.test(event.key)"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('phone')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('phone')?.errors" class="error-message">
-                                        Phone number is required
-                                    </small>
+                                    <label for="phone" class="input-label">Phone</label>
+                                    <input id="phone" type="text" 
+                                    (input)="formatPhoneCompany($event)" 
+                                    pInputText class="centered-input"
+                                    formControlName="phone" 
+                                    [ngClass]="{ 'is-invalid': submitted && companyForm.get('phone')?.errors }">  
+                                    <div *ngIf="submitted && companyForm.get('phone')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="companyForm.get('phone')?.errors?.['required']">Phone is required</div> </div>
                                 </div>
                             </div>
 
@@ -188,19 +188,25 @@
                                 </div>
                             </div>
 
-                            <!-- NRC Number -->
                             <div class="field-container">
                                 <div class="input-group">
                                     <label for="nrc_number" class="input-label">NRC Number</label>
-                                    <input id="nrc_number" type="text" pInputText formControlName="nrc_number" 
-                                            class="centered-input"
-                                            [maxlength]="14" onkeydown="return /[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/i.test(event.key)"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('nrc_number')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="error-message">
-                                        NRC Number is required
-                                    </small>
+                                    <input id="nrc_number" type="text" 
+                                        (input)="formatNrcNumber($event)"
+                                        pInputText 
+                                        class="centered-input"
+                                        formControlName="nrc_number" 
+                                        [ngClass]="{ 'is-invalid': submitted && companyForm.get('nrc_number')?.errors }">
+                                    <div *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="invalid-feedback mt-1">
+                                        <div *ngIf="companyForm.get('nrc_number')?.errors?.['required']">NRC Number is required</div>
+                                        <div *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">
+                                            El formato debe ser 123456-7 (6 dígitos, guión, 1 dígito)
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- NRC Number -->
 
                             <!-- Website -->
                             <div class="field-container">
@@ -216,20 +222,30 @@
                             </div>
 
                             <!-- NIT Number -->
+
                             <div class="field-container">
                                 <div class="input-group">
-                                    <label for="nit_number" class="input-label">NIT Number</label>
-                                    <input id="nit_number" type="text" pInputText formControlName="nit_number" 
-                                            class="centered-input"
-                                            [maxlength]="14" onkeydown="return /[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/i.test(event.key)"
-                                            [ngClass]="{'p-invalid': submitted && companyForm.get('nit_number')?.errors}">
-                                    <small *ngIf="submitted && companyForm.get('nit_number')?.errors" class="error-message">
-                                        NIT Number is required
-                                    </small>
+                                    <label for="nit_number" class="input-label" >NIT/DUI Number</label>
+                                <input id="nit_number" type="text" 
+                                       (input)="formatNitNumber($event)"
+                                       (paste)="formatNitNumber($event)" 
+                                       pInputText 
+                                       class="centered-input"
+                                       formControlName="nit_number" 
+                                       [ngClass]="{ 'is-invalid': submitted && companyForm.get('nit_number')?.errors }"
+                                       [maxlength]="19">
+                                <div *ngIf="submitted && companyForm.get('nit_number')?.errors" class="invalid-feedback mt-1">
+                                  <div *ngIf="companyForm.get('nit_number')?.errors?.['required']">Número de NIT/DUI es requerido</div>
+                                  <div *ngIf="companyForm.get('nit_number')?.errors?.['pattern']">
+                                    Formatos válidos:
+                                    <ul class="list-disc pl-5 mt-1">
+                                      <li><span class="font-mono">XXXXXXXX-X</span> (DUI alternativo)</li>
+                                      <li><span class="font-mono">XXXX-XXXXXX-XXX-XX</span> (NIT tradicional)</li>
+                                    </ul>
+                                  </div>
+                                </div>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                 </form>

@@ -395,3 +395,7 @@
 .footer-buttons button .pi {
     margin-right: 0.5rem;
 }
+
+.role-card ::ng-deep .p-card .p-card-body{
+    padding: 0rem !important;
+}

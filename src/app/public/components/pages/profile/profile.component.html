@@ -1,318 +1,288 @@
 <div class="profile-container">
-    <!-- Estado de carga -->
-    <p-card *ngIf="loading" class="profile-card">
-      <div class="flex flex-column gap-3">
-        <div class="flex align-items-center gap-3">
-          <p-skeleton shape="circle" size="5rem"></p-skeleton>
-          <div class="flex flex-column gap-2">
-            <p-skeleton width="10rem" height="1.5rem"></p-skeleton>
-            <p-skeleton width="8rem" height="1rem"></p-skeleton>
-          </div>
-        </div>
+  <!-- Estado de carga -->
+  <p-card *ngIf="loading" class="profile-card">
+    <div class="flex flex-column gap-3">
+      <div class="flex align-items-center gap-3">
+        <p-skeleton shape="circle" size="5rem"></p-skeleton>
         <div class="flex flex-column gap-2">
-          <p-skeleton width="100%" height="1rem"></p-skeleton>
-          <p-skeleton width="100%" height="1rem"></p-skeleton>
-          <p-skeleton width="100%" height="1rem"></p-skeleton>
-          <p-skeleton width="100%" height="1rem"></p-skeleton>
+          <p-skeleton width="10rem" height="1.5rem"></p-skeleton>
+          <p-skeleton width="8rem" height="1rem"></p-skeleton>
         </div>
       </div>
-    </p-card>
-  
-    <!-- Perfil cargado -->
-    <p-card *ngIf="!loading" class="profile-card">
-      <div class="profile-header">
-        <div class="avatar-container">
-          <p-avatar 
-            [image]="user.account_type === 1 ? user.image : ''"
-            [label]="user.account_type !== 1 ? user.name[0] : ''" 
-            size="xlarge" 
-            shape="circle"
-            [style]="{
-              'background-color': user.account_type === 2 ? '#24292e' : 
-                                (user.account_type === 3 ? '#4285F4' : 'var(--primary-color)'),
-              'color': 'white'
-            }"
-            [pt]="{
-              root: { class: 'avatar-shadow' }
-            }">
-            <i *ngIf="user.account_type === 2" class="pi pi-github" style="font-size: 2rem"></i>
-            <i *ngIf="user.account_type === 3" class="pi pi-google" style="font-size: 2rem"></i>
-          </p-avatar>
-          <p-badge 
-            *ngIf="user.status"
-            value="Activo" 
-            severity="success"
-            class="status-badge">
-          </p-badge>
-        </div>
-        
-        <div class="profile-info">
-          <h2>{{ user.name }}</h2>
-          <p-tag [value]="getRoleName(user.role_id)" severity="info"></p-tag>
+      <div class="flex flex-column gap-2">
+        <p-skeleton width="100%" height="1rem"></p-skeleton>
+        <p-skeleton width="100%" height="1rem"></p-skeleton>
+        <p-skeleton width="100%" height="1rem"></p-skeleton>
+        <p-skeleton width="100%" height="1rem"></p-skeleton>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- Perfil cargado -->
+  <p-card *ngIf="!loading" class="profile-card">
+    <div class="profile-header">
+      <div class="avatar-container">
+        <p-avatar 
+          [image]="user.account_type === 1 ? user.image : ''"
+          [label]="user.account_type !== 1 ? user.name[0] : ''" 
+          size="xlarge" 
+          shape="circle"
+          [style]="{
+            'background-color': user.account_type === 2 ? '#24292e' : 
+                              (user.account_type === 3 ? '#4285F4' : 'var(--primary-color)'),
+            'color': 'white'
+          }"
+          [pt]="{
+            root: { class: 'avatar-shadow' }
+          }">
+          <i *ngIf="user.account_type === 2" class="pi pi-github" style="font-size: 2rem"></i>
+          <i *ngIf="user.account_type === 3" class="pi pi-google" style="font-size: 2rem"></i>
+        </p-avatar>
+        <p-badge 
+          *ngIf="user.status"
+          value="Activo" 
+          severity="success"
+          class="status-badge">
+        </p-badge>
+      </div>
+      
+      <div class="profile-info">
+        <h2>{{ user.name }}</h2>
+        <p-tag [value]="getRoleName(user.role_id)" severity="info"></p-tag>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <div class="profile-details">
+      <div class="detail-item">
+        <i class="pi pi-envelope"></i>
+        <div>
+          <span class="detail-label">Correo electrónico</span>
+          <span class="detail-value">{{ user.email }}</span>
         </div>
       </div>
 
-      <p-divider></p-divider>
+      <div class="detail-item">
+        <i class="pi pi-home"></i>
+        <div>
+          <span class="detail-label">Dirección</span>
+          <span class="detail-value">{{ user.address || 'No especificada' }}</span>
+        </div>
+      </div>
 
-      <div class="profile-details">
+      <div class="detail-item">
+        <i class="pi pi-phone"></i>
+        <div>
+          <span class="detail-label">Teléfono</span>
+          <span class="detail-value">{{ user.phone || 'No especificado' }}</span>
+        </div>
+      </div>
+
+      <!-- Developer Specific Information -->
+      <ng-container *ngIf="developer">
         <div class="detail-item">
-          <i class="pi pi-envelope"></i>
+          <i class="pi pi-briefcase"></i>
           <div>
-            <span class="detail-label">Correo electrónico</span>
-            <span class="detail-value">{{ user.email }}</span>
+            <span class="detail-label">Ocupación</span>
+            <span class="detail-value">{{ developer.occupation || 'No especificada' }}</span>
           </div>
         </div>
 
         <div class="detail-item">
-          <i class="pi pi-home"></i>
+          <i class="pi pi-info-circle"></i>
           <div>
-            <span class="detail-label">Dirección</span>
-            <span class="detail-value">{{ user.address || 'No especificada' }}</span>
+            <span class="detail-label">Bio</span>
+            <span class="detail-value">{{ developer.bio || 'No especificada' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item" *ngIf="developer.linkedin">
+          <i class="pi pi-linkedin"></i>
+          <div>
+            <span class="detail-label">LinkedIn</span>
+            <span class="detail-value">
+              <a [href]="developer.linkedin" target="_blank" class="text-primary">Ver perfil</a>
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-item" *ngIf="developer.portfolio">
+          <i class="pi pi-globe"></i>
+          <div>
+            <span class="detail-label">Portafolio</span>
+            <span class="detail-value">
+              <a [href]="developer.portfolio" target="_blank" class="text-primary">Ver portafolio</a>
+            </span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Company Specific Information -->
+      <ng-container *ngIf="company">
+        <div class="detail-item">
+          <i class="pi pi-id-card"></i>
+          <div>
+            <span class="detail-label">NIT</span>
+            <span class="detail-value">{{ company.nit_number || 'No especificado' }}</span>
           </div>
         </div>
 
         <div class="detail-item">
-          <i class="pi pi-phone"></i>
+          <i class="pi pi-file"></i>
           <div>
-            <span class="detail-label">Teléfono</span>
-            <span class="detail-value">{{ user.phone || 'No especificado' }}</span>
+            <span class="detail-label">NRC</span>
+            <span class="detail-value">{{ company.nrc_number || 'No especificado' }}</span>
           </div>
         </div>
 
-        <!-- Developer Specific Information -->
-        <ng-container *ngIf="developer">
-          <div class="detail-item">
-            <i class="pi pi-briefcase"></i>
-            <div>
-              <span class="detail-label">Ocupación</span>
-              <span class="detail-value">{{ developer.occupation || 'No especificada' }}</span>
-            </div>
+        <div class="detail-item">
+          <i class="pi pi-building"></i>
+          <div>
+            <span class="detail-label">Tipo de Negocio</span>
+            <span class="detail-value">{{ company.business_type || 'No especificado' }}</span>
           </div>
-
-          <div class="detail-item">
-            <i class="pi pi-info-circle"></i>
-            <div>
-              <span class="detail-label">Bio</span>
-              <span class="detail-value">{{ developer.bio || 'No especificada' }}</span>
-            </div>
-          </div>
-
-          <div class="detail-item" *ngIf="developer.linkedin">
-            <i class="pi pi-linkedin"></i>
-            <div>
-              <span class="detail-label">LinkedIn</span>
-              <span class="detail-value">
-                <a [href]="developer.linkedin" target="_blank" class="text-primary">Ver perfil</a>
-              </span>
-            </div>
-          </div>
-
-          <div class="detail-item" *ngIf="developer.portfolio">
-            <i class="pi pi-globe"></i>
-            <div>
-              <span class="detail-label">Portafolio</span>
-              <span class="detail-value">
-                <a [href]="developer.portfolio" target="_blank" class="text-primary">Ver portafolio</a>
-              </span>
-            </div>
-          </div>
-        </ng-container>
-
-        <!-- Company Specific Information -->
-        <ng-container *ngIf="company">
-          <div class="detail-item">
-            <i class="pi pi-id-card"></i>
-            <div>
-              <span class="detail-label">NIT</span>
-              <span class="detail-value">{{ company.nit_number || 'No especificado' }}</span>
-            </div>
-          </div>
-
-          <div class="detail-item">
-            <i class="pi pi-file"></i>
-            <div>
-              <span class="detail-label">NRC</span>
-              <span class="detail-value">{{ company.nrc_number || 'No especificado' }}</span>
-            </div>
-          </div>
-
-          <div class="detail-item">
-            <i class="pi pi-building"></i>
-            <div>
-              <span class="detail-label">Tipo de Negocio</span>
-              <span class="detail-value">{{ company.business_type || 'No especificado' }}</span>
-            </div>
-          </div>
-
-          <div class="detail-item" *ngIf="company.web_site">
-            <i class="pi pi-globe"></i>
-            <div>
-              <span class="detail-label">Sitio Web</span>
-              <span class="detail-value">
-                <a [href]="company.web_site" target="_blank" class="text-primary">Visitar sitio</a>
-              </span>
-            </div>
-          </div>
-        </ng-container>
-        
-      </div>
-
-      <p-divider></p-divider>
-
-      <div class="profile-actions">
-        <button pButton pRipple icon="pi pi-pencil" (click)="showDialog()" label="Editar" class="p-button-outlined"></button>
-        <button 
-          pButton pRipple 
-          (click)="showDialogPassword()"
-          [icon]="user.status ? 'pi pi-lock-open' : 'pi pi-lock'" 
-          label="Update Password" 
-          class="ml-2"></button>
-      </div>
-    </p-card>
-  </div>
-
-  <p-dialog [(visible)]="userDialog" [style]="{width: '550px'}" header="Update Profile" [modal]="true" class="p-fluid">
-    <ng-template pTemplate="content">
-        <div *ngIf="loading" class="text-center p-5">
-            <p-progressSpinner></p-progressSpinner>
-            <p>Loading user data...</p>
         </div>
 
-        <div *ngIf="!loading">
-            <!-- Common User Fields -->
-            <div class="field">
-                <label for="name">Name</label>
-                <input type="text" pInputText id="name" [(ngModel)]="userUpdate.name" required 
-                       [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.name}"/>
-                <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.name">Name is required.</small>
-            </div>
-            
-            <div class="field">
-                <label for="address">Address</label>
-                <input type="text" pInputText id="address" [(ngModel)]="userUpdate.address" required 
-                       [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.address}"/>
-                <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.address">Address is required.</small>
-            </div>
+        <div class="detail-item" *ngIf="company.web_site">
+          <i class="pi pi-globe"></i>
+          <div>
+            <span class="detail-label">Sitio Web</span>
+            <span class="detail-value">
+              <a [href]="company.web_site" target="_blank" class="text-primary">Visitar sitio</a>
+            </span>
+          </div>
+        </div>
+      </ng-container>
+      
+    </div>
 
-            <div class="field">
-                <label for="phone">Phone</label>
-                <input type="text" pInputText id="phone" [(ngModel)]="userUpdate.phone" required 
-                       [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.phone}"/>
-                <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.phone">Phone is required.</small>
-            </div>
+    <p-divider></p-divider>
 
-            <!-- Developer Specific Fields -->
-            <ng-container *ngIf="this.developer">
-                <p-divider></p-divider>
-                <h4>Developer Information</h4>
-                
-                <div class="field">
-                    <label for="occupation">Occupation</label>
-                    <input type="text" pInputText id="occupation" [(ngModel)]="developerData.occupation"/>
-                </div>
+    <div class="profile-actions">
+      <button pButton pRipple icon="pi pi-pencil" (click)="showDialog()" label="Editar" class="p-button-outlined"></button>
+      <button 
+        pButton pRipple 
+        (click)="showDialogPassword()"
+        [icon]="user.status ? 'pi pi-lock-open' : 'pi pi-lock'" 
+        label="Update Password" 
+        class="ml-2"></button>
+    </div>
+  </p-card>
+</div>
 
-                <div class="field">
-                    <label for="bio">Bio</label>
-                    <input type="text" pInputText id="bio" [(ngModel)]="developerData.bio" rows="3"/>
-                </div>
+<p-dialog [(visible)]="userDialog" [style]="{width: '550px'}" header="Update Profile" [modal]="true" class="p-fluid">
+  <ng-template pTemplate="content">
+      <div *ngIf="loading" class="text-center p-5">
+          <p-progressSpinner></p-progressSpinner>
+          <p>Loading user data...</p>
+      </div>
 
-                <div class="field">
-                    <label for="linkedin">LinkedIn URL</label>
-                    <input type="url" pInputText id="linkedin" [(ngModel)]="developerData.linkedin"/>
-                    <small *ngIf="submitted && developerData.linkedin"
-                           class="ng-dirty ng-invalid">Please enter a valid URL</small>
-                </div>
+      <div *ngIf="!loading">
+          <!-- Common User Fields -->
+          <div class="field">
+              <label for="name">Name</label>
+              <input type="text" pInputText id="name" [(ngModel)]="userUpdate.name" required 
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.name}"/>
+              <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.name">Name is required.</small>
+          </div>
+          
+          <div class="field">
+              <label for="address">Address</label>
+              <input type="text" pInputText id="address" [(ngModel)]="userUpdate.address" required 
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.address}"/>
+              <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.address">Address is required.</small>
+          </div>
 
-                <div class="field">
-                    <label for="portfolio">Portfolio URL</label>
-                    <input type="url" pInputText id="portfolio" [(ngModel)]="developerData.portfolio"/>
-                    <small *ngIf="submitted && developerData.portfolio" 
-                           class="ng-dirty ng-invalid">Please enter a valid URL</small>
-                </div>
-            </ng-container>
+          <div class="field">
+            <label for="phone">Teléfono</label>
+            <input
+              type="text"
+              (keydown)="onKeyDown($event)"
+              pInputText
+              id="phone"
+              [(ngModel)]="userUpdate.phone"
+              (input)="formatPhone($event)"
+              [maxlength]="16"  
+              required
+              [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.phone}"
+            />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.phone">Teléfono es requerido.</small>
+          </div>
 
-            <!-- Company Specific Fields -->
-            <ng-container *ngIf="this.company">
+          <!-- Developer Specific Fields -->
+          <ng-container *ngIf="this.developer">
               <p-divider></p-divider>
-              <h4>Información de la Empresa</h4>
+              <h4>Developer Information</h4>
               
               <div class="field">
-                  <label for="nit_number">NIT</label>
-                  <input type="text" pInputText id="nit_number" [(ngModel)]="companyUpdate.nit_number" 
-                        required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.nit_number}"/>
-                  <small *ngIf="submitted && !companyUpdate.nit_number" 
-                        class="ng-dirty ng-invalid">El NIT es requerido</small>
+                  <label for="occupation">Occupation</label>
+                  <input type="text" pInputText id="occupation" [(ngModel)]="developerData.occupation"/>
               </div>
 
               <div class="field">
-                  <label for="nrc_number">NRC</label>
-                  <input type="text" pInputText id="nrc_number" [(ngModel)]="companyUpdate.nrc_number" 
-                        required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.nrc_number}"/>
-                  <small *ngIf="submitted && !companyUpdate.nrc_number" 
-                        class="ng-dirty ng-invalid">El NRC es requerido</small>
+                  <label for="bio">Bio</label>
+                  <input type="text" pInputText id="bio" [(ngModel)]="developerData.bio" rows="3"/>
               </div>
 
               <div class="field">
-                  <label for="business_type">Tipo de Negocio</label>
-                  <input type="text" pInputText id="business_type" [(ngModel)]="companyUpdate.business_type" 
-                  required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.business_type}"/>
-                  <small *ngIf="submitted && !companyUpdate.business_type" 
-                        class="ng-dirty ng-invalid">Agregue el tipo de negocio</small>
+                  <label for="linkedin">LinkedIn URL</label>
+                  <input type="url" pInputText id="linkedin" [(ngModel)]="developerData.linkedin"/>
+                  <small *ngIf="submitted && developerData.linkedin"
+                         class="ng-dirty ng-invalid">Please enter a valid URL</small>
               </div>
 
               <div class="field">
-                  <label for="web_site">Sitio Web</label>
-                  <input type="text" pInputText id="web_site" [(ngModel)]="companyUpdate.web_site"
-                        [ngClass]="{'ng-invalid ng-dirty': submitted && companyUpdate.web_site}"/>
-                  <small *ngIf="submitted && companyUpdate.web_site" 
-                        class="ng-dirty ng-invalid">Ingrese una URL válida</small>
+                  <label for="portfolio">Portfolio URL</label>
+                  <input type="url" pInputText id="portfolio" [(ngModel)]="developerData.portfolio"/>
+                  <small *ngIf="submitted && developerData.portfolio" 
+                         class="ng-dirty ng-invalid">Please enter a valid URL</small>
               </div>
-            </ng-container>
-        </div>
-    </ng-template>
+          </ng-container>
 
-    <ng-template pTemplate="footer">
-        <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" 
-                (click)="hideDialog()" [disabled]="loading"></button>
-        <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text" 
-                (click)="updateUser()" [disabled]="loading"></button>
-    </ng-template>
-</p-dialog>
+          <!-- Company Specific Fields -->
+          <ng-container *ngIf="this.company">
+            <p-divider></p-divider>
+            <h4>Información de la Empresa</h4>
+            
+            <div class="field">
+                <label for="nit_number">NIT/DUI Number</label>
+                <input type="text" pInputText id="nit_number" [(ngModel)]="companyUpdate.nit_number" 
+                (input)="formatNitNumber($event)"
+                [maxlength]="18"
+                (keydown)="onKeyDown($event)"
+                required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.nit_number}"/>
+                <small *ngIf="submitted && !companyUpdate.nit_number" 
+                      class="ng-dirty ng-invalid">El NIT es requerido</small>
+            </div>
 
-<p-dialog [(visible)]="passwordDialog" [style]="{width: '450px'}" header="Update Password" [modal]="true" class="p-fluid">
-  <ng-template pTemplate="content">
-      <div class="field">
-          <label for="currentPassword">Current Password</label>
-          <p-password id="currentPassword" [(ngModel)]="passwordData.currentPassword" 
-                     [feedback]="false" required [toggleMask]="true"
-                     class="eye-icons"
-                     [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.currentPassword}">
-          </p-password>
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.currentPassword">
-              Current password is required.
-          </small>
-      </div>
+            <div class="field">
+                <label for="nrc_number">NRC</label>
+                <input type="text" pInputText id="nrc_number" [(ngModel)]="companyUpdate.nrc_number" 
+                (input)="formatNrcNumber($event)"
+                [maxlength]="8" 
+                (keydown)="onKeyDown($event)"
+                required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.nrc_number}"/>
+                <small *ngIf="submitted && !companyUpdate.nrc_number" 
+                      class="ng-dirty ng-invalid">El NRC es requerido</small>
+            </div>
 
-      <div class="field">
-          <label for="newPassword">New Password</label>
-          <p-password id="newPassword" [(ngModel)]="passwordData.Newpassword" 
-                     [feedback]="true" required [toggleMask]="true"
-                     [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.Newpassword}">
-          </p-password>
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.Newpassword">
-              New password is required.
-          </small>
-      </div>
+            <div class="field">
+                <label for="business_type">Tipo de Negocio</label>
+                <input type="text" pInputText id="business_type" [(ngModel)]="companyUpdate.business_type" 
+                required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.business_type}"/>
+                <small *ngIf="submitted && !companyUpdate.business_type" 
+                      class="ng-dirty ng-invalid">Agregue el tipo de negocio</small>
+            </div>
 
-      <div class="field" *ngIf="passwordData.Newpassword && passwordData.currentPassword">
-          <label for="confirmPassword">Confirm New Password</label>
-          <p-password id="confirmPassword" [(ngModel)]="confirmPassword" 
-                     [feedback]="false" required [toggleMask]="true"
-                     [ngClass]="{'ng-invalid ng-dirty': submitted && passwordData.Newpassword !== confirmPassword}">
-          </p-password>
-          <small class="ng-dirty ng-invalid" *ngIf="submitted && passwordData.Newpassword !== confirmPassword">
-              Passwords do not match.
-          </small>
+            <div class="field">
+                <label for="web_site">Sitio Web</label>
+                <input type="text" pInputText id="web_site" [(ngModel)]="companyUpdate.web_site"
+                      [ngClass]="{'ng-invalid ng-dirty': submitted && companyUpdate.web_site}"/>
+                <small *ngIf="submitted && companyUpdate.web_site" 
+                      class="ng-dirty ng-invalid">Ingrese una URL válida</small>
+            </div>
+          </ng-container>
       </div>
   </ng-template>
 
@@ -320,6 +290,51 @@
       <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" 
               (click)="hideDialog()" [disabled]="loading"></button>
       <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text" 
-              (click)="updatePassword()" [disabled]="loading"></button>
+              (click)="updateUser()" [disabled]="loading"></button>
   </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="passwordDialog" [style]="{width: '450px'}" header="Update Password" [modal]="true" class="p-fluid">
+<ng-template pTemplate="content">
+    <div class="field">
+        <label for="currentPassword">Current Password</label>
+        <p-password id="currentPassword" [(ngModel)]="passwordData.currentPassword" 
+                   [feedback]="false" required [toggleMask]="true"
+                   class="eye-icons"
+                   [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.currentPassword}">
+        </p-password>
+        <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.currentPassword">
+            Current password is required.
+        </small>
+    </div>
+
+    <div class="field">
+        <label for="newPassword">New Password</label>
+        <p-password id="newPassword" [(ngModel)]="passwordData.Newpassword" 
+                   [feedback]="true" required [toggleMask]="true"
+                   [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.Newpassword}">
+        </p-password>
+        <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.Newpassword">
+            New password is required.
+        </small>
+    </div>
+
+    <div class="field" *ngIf="passwordData.Newpassword && passwordData.currentPassword">
+        <label for="confirmPassword">Confirm New Password</label>
+        <p-password id="confirmPassword" [(ngModel)]="confirmPassword" 
+                   [feedback]="false" required [toggleMask]="true"
+                   [ngClass]="{'ng-invalid ng-dirty': submitted && passwordData.Newpassword !== confirmPassword}">
+        </p-password>
+        <small class="ng-dirty ng-invalid" *ngIf="submitted && passwordData.Newpassword !== confirmPassword">
+            Passwords do not match.
+        </small>
+    </div>
+</ng-template>
+
+<ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" 
+            (click)="hideDialog()" [disabled]="loading"></button>
+    <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text" 
+            (click)="updatePassword()" [disabled]="loading"></button>
+</ng-template>
 </p-dialog>
