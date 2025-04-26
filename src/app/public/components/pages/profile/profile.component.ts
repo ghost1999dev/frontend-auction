@@ -88,6 +88,21 @@ export class ProfileComponent implements OnInit {
       );
     }
   
+    onKeyDown(event: KeyboardEvent) {
+      // Permitir teclas de control (backspace, delete, flechas, etc.)
+      if (event.ctrlKey || event.altKey || 
+          [8, 9, 13, 16, 17, 18, 20, 27, 35, 36, 37, 38, 39, 40, 45, 46, 91, 93].includes(event.keyCode)) {
+        return;
+      }
+      
+      // Permitir solo números
+      if (event.keyCode < 48 || event.keyCode > 57) {
+        if (event.keyCode < 96 || event.keyCode > 105) {
+          event.preventDefault();
+        }
+      }
+    }
+    
     formatNitNumber(event: Event) {
       const input = event.target as HTMLInputElement;
       let value = input.value.replace(/[^0-9]/g, '');

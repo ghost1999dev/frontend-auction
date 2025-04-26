@@ -45,7 +45,7 @@ export class RegisterComponent {
       portfolio: [''],
       role_id: [2]
     });
-
+  
     this.companyForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
