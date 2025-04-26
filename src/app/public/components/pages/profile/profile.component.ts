@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Observable, of, delay, map } from 'rxjs';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { CompanyWithRelations } from 'src/app/core/models/companies';
@@ -7,6 +8,7 @@ import { DeveloperWithRelations, UpdateDeveloper } from 'src/app/core/models/dev
 import { updatePasswordUser, updatePasswordUserResponse, updateUser, usersWithImage } from 'src/app/core/models/users';
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
+import { ImageUploadService } from 'src/app/core/services/image-upload.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { UserService } from 'src/app/core/services/user.service';
 
@@ -21,6 +23,11 @@ export class ProfileComponent implements OnInit {
   public developer: any;
   public company: any;
   public user: any;
+
+  showImageUploadDialog: boolean = false;
+  imagePreview: string | null = null;
+  selectedImageFile: File | null = null;
+  uploadingImage: boolean = false;
 
   roleNames: { [key: number]: string } = {
     1: 'Company',
@@ -69,7 +76,9 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private companiesService: CompaniesService,
     private userService: UserService,
-    private developerService: DeveloperService
+    private developerService: DeveloperService,
+    private sanitizer: DomSanitizer,
+    private imageUploadService: ImageUploadService,
 
   ){
 
@@ -259,6 +268,8 @@ export class ProfileComponent implements OnInit {
       }
   }
 
+  
+
   hideDialog(): void {
     this.userDialog = false;
     this.passwordDialog = false;
@@ -266,7 +277,71 @@ export class ProfileComponent implements OnInit {
     this.resetForm();
   }
 
-  
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validar tipo de archivo
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        this.notificationServices.showErrorCustom('Only JPEG, PNG or GIF images are allowed.')
+        return;
+      }
+
+      // Validar tamaño (ejemplo: máximo 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        this.notificationServices.showErrorCustom('The image cannot exceed 2MB')
+        return;
+      }
+
+      this.selectedImageFile = file;
+      
+      // Crear vista previa
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.imagePreview = e.target.result;
+        this.showImageUploadDialog = true;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  cancelImageUpload(): void {
+    this.showImageUploadDialog = false;
+    this.imagePreview = null;
+    this.selectedImageFile = null;
+    // Resetear el input de archivo
+    const fileInput = document.getElementById('avatarUpload') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
+  uploadImage(): void {
+    if (!this.selectedImageFile || !this.user?.id) {
+      this.cancelImageUpload();
+      return;
+    }
+
+    this.uploadingImage = true;
+    
+    this.imageUploadService.uploadUserImage(this.user.id, this.selectedImageFile).subscribe({
+      next: (response: any) => {
+        this.notificationServices.showSuccessCustom('Profile picture updated successfully')
+
+        // Actualizar la imagen del usuario localmente
+        if (this.user) {
+          this.user.image = response.imagePath;
+        }
+        
+        this.cancelImageUpload();
+      },
+      error: (error) => {
+        console.error('Error uploading image:', error);
+        this.notificationServices.showErrorCustom('The image could not be uploaded. Please try again.')
+      },
+      complete: () => {
+        this.uploadingImage = false;
+      }
+    });
+  }
 
   resetForm(): void {
     this.passwordData = { currentPassword: '', Newpassword: '' };
