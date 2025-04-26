@@ -38,6 +38,7 @@
           <i *ngIf="user.account_type === 2" class="pi pi-github" style="font-size: 2rem"></i>
           <i *ngIf="user.account_type === 3" class="pi pi-google" style="font-size: 2rem"></i>
         </p-avatar>
+        
         <p-badge 
           *ngIf="user.status"
           value="Activo" 
@@ -157,26 +158,17 @@
       
     </div>
 
-<<<<<<< HEAD
-            <div class="field">
-              <label for="phone">Teléfono</label>
-              <input
-                type="text"
-                pInputText
-                id="phone"
-                [(ngModel)]="userUpdate.phone"
-                (input)="formatPhone($event)"
-                [maxlength]="16"  
-                required
-                [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.phone}"
-              />
-              <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.phone">Teléfono es requerido.</small>
-            </div>
-=======
-    <p-divider></p-divider>
->>>>>>> f5cbf2020e0313f25ba6d0f8e5521f832340252f
-
     <div class="profile-actions">
+      <div *ngIf="user.account_type === 1" class="image-upload-action mr-2">
+        <input 
+          type="file" 
+          id="avatarUpload"
+          accept="image/*"
+          (change)="onFileSelected($event)"
+          style="display: none;"
+        >
+        <label for="avatarUpload" pButton pRipple icon="pi pi-image" label="Cambiar foto" class="p-button-outlined ml-2"></label>
+      </div>
       <button pButton pRipple icon="pi pi-pencil" (click)="showDialog()" label="Editar" class="p-button-outlined"></button>
       <button 
         pButton pRipple 
@@ -371,4 +363,20 @@
     <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text" 
             (click)="updatePassword()" [disabled]="loading"></button>
 </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="showImageUploadDialog" [style]="{width: '400px'}" header="Confirmar subida de imagen" [modal]="true">
+  <ng-template pTemplate="content">
+    <div class="image-preview-dialog">
+      <img [src]="imagePreview || user.image" alt="Vista previa" class="preview-image">
+      <p>¿Deseas actualizar tu imagen de perfil?</p>
+    </div>
+  </ng-template>
+  
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" 
+            (click)="cancelImageUpload()"></button>
+    <button pButton pRipple label="Subir imagen" icon="pi pi-check" 
+            (click)="uploadImage()" [loading]="uploadingImage"></button>
+  </ng-template>
 </p-dialog>

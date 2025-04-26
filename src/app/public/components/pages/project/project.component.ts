@@ -5,6 +5,7 @@ import { forkJoin } from 'rxjs';
 import { CreateProject, Project, UpdateProject } from 'src/app/core/models/projects';
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { UserService } from 'src/app/core/services/user.service';
 
@@ -65,6 +66,7 @@ export class ProjectComponent implements OnInit {
     private messageService: MessageService,
     private companiesService: CompaniesService,
     private userService: UserService,
+    private notificationServices: NotificationService,
     private developerService: DeveloperService
   ) { }
 
@@ -170,23 +172,13 @@ export class ProjectComponent implements OnInit {
     this.projectsService.deactivateProject(this.project.id)
     .subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Project Deactivated',
-          life: 3000
-        });
+        this.notificationServices.showSuccessCustom('Project Deactivated')
         this.loadProjects(this.company.id);
         this.deleteProjectDialog = false;
         this.project = {} as Project;
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to deactivate project',
-          life: 3000
-        });
+        this.notificationServices.showErrorCustom('Failed to deactivate project')
       }
     });
   }
@@ -214,23 +206,13 @@ export class ProjectComponent implements OnInit {
 
         this.projectsService.updateProject(this.project.id, updateData).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'Project Updated',
-              life: 3000
-            });
+            this.notificationServices.showSuccessCustom('Project Updated')
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
           },
           error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to update project',
-              life: 3000
-            });
+            this.notificationServices.showErrorCustom('Failed to update project')
           }
         });
       } else {
@@ -250,23 +232,13 @@ export class ProjectComponent implements OnInit {
         this.projectsService.createProject(newProject)
         .subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'Project Created',
-              life: 3000
-            });
+            this.notificationServices.showSuccessCustom('Project Created')
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
           },
           error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to create project',
-              life: 3000
-            });
+            this.notificationServices.showErrorCustom('Failed to create project')
           }
         });
       }
@@ -279,14 +251,8 @@ export class ProjectComponent implements OnInit {
 
   confirmDeleteSelected(): void {
     this.deleteProjectsDialog = false;
-    
     if (!this.selectedProjects || this.selectedProjects.length === 0) {
-      this.messageService.add({
-        severity: 'warn', 
-        summary: 'Warning',
-        detail: 'No projects selected',
-        life: 3000
-      });
+      this.notificationServices.showErrorCustom('No projects selected')
       return;
     }
   
@@ -298,22 +264,12 @@ export class ProjectComponent implements OnInit {
     // Execute all delete operations in parallel
     forkJoin(deleteOperations).subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: `${this.selectedProjects.length} projects deactivated`,
-          life: 3000
-        });
+        this.notificationServices.showSuccessCustom(`${this.selectedProjects.length} projects deactivated`)
         this.loadProjects(this.company.id);
         this.selectedProjects = [];
       },
       error: (error: any) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to deactivate some projects',
-          life: 3000
-        });
+        this.notificationServices.showErrorCustom('Failed to deactivate some projects')
       }
     });
   }
