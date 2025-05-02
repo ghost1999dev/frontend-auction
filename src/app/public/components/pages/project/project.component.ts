@@ -197,6 +197,7 @@ export class ProjectComponent implements OnInit {
         // Update existing project
         const updateData: UpdateProject = {
           company_id: Number(id),
+          category_id: 1,
           project_name: this.project.project_name,
           description: this.project.description,
           budget: this.project.budget,
@@ -204,14 +205,19 @@ export class ProjectComponent implements OnInit {
           status: this.project.status
         };
 
+        console.log(updateData)
         this.projectsService.updateProject(this.project.id, updateData).subscribe({
-          next: () => {
+          next: (data: any) => {
+
+            console.log(data)
+
             this.notificationServices.showSuccessCustom('Project Updated')
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
           },
           error: (error) => {
+            console.log(error)
             this.notificationServices.showErrorCustom('Failed to update project')
           }
         });
