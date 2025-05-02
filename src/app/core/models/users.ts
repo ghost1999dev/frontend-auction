@@ -4,6 +4,7 @@ export interface userResponse{
 }
 
 export interface userResponseById{
+    status: boolean;
     message: string;
     user: usersWithImage[]
 }
@@ -75,6 +76,7 @@ export interface updateUserResponse{
 }
 
 export interface updateUserErrorResponse{
+    status: boolean;
     message: string;
 }
 

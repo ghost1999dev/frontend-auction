@@ -18,7 +18,9 @@ import { ActivateAccountComponent } from './activate-account/activate-account.co
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { PassportComponent } from './passport/passport.component';
 import { InputMaskModule } from 'primeng/inputmask';
-
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { ChipsModule } from 'primeng/chips';
+import { TagModule } from 'primeng/tag';
 const routes: Routes = [
   {
     path: '',
@@ -82,6 +84,10 @@ const routes: Routes = [
     ReactiveFormsModule,
     FormsModule,
     InputMaskModule,
+    InputTextareaModule,
+
+    ChipsModule,
+    TagModule,
 
     RouterModule.forChild(routes)
   ],

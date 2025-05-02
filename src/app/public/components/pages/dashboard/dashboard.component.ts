@@ -39,7 +39,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   companyForm!: FormGroup;
   submitted = false
   clicked = false
-
+  businessTypeTags: string[] = [];
 
   constructor(
     public layoutService: LayoutService,
@@ -258,6 +258,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  onBusinessTypeAdd(event: any) {
+      // Validar el input antes de agregar
+      const value = event.value;
+      if (value && /^[a-zA-ZÑñ\s,]+$/.test(value)) {
+          // Actualizar el formControl
+          this.companyForm.get('business_type')?.setValue(value);
+      } else {
+          // Mostrar error o revertir
+          this.businessTypeTags = this.businessTypeTags.filter(tag => tag !== value);
+      }
+  }
+
+  onBusinessTypeRemove(event: any) {
+      this.companyForm.get('business_type')?.setValue(this.businessTypeTags);
+  }
+
   validateUserRole() {
     this.displayAlert = false;
     const userId = this.getUserInfo();
@@ -343,7 +359,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         })
       },
       error: (err: any) => {
-        this.notificationServices.showErrorCustom("Error verifying your account")
+        //this.notificationServices.showErrorCustom("Error verifying your account")
       }
     });
   
@@ -384,12 +400,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.displayAlert = false;
             this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")
           }else{
-            this.notificationServices.showErrorCustom("Error Creating Developer.")
+            //this.notificationServices.showErrorCustom("Error Creating Developer.")
           }
         })
       },
       error: (err: any) => {
-        this.notificationServices.showErrorCustom("Error verifying your account")
+        //this.notificationServices.showErrorCustom("Error verifying your account")
       }
     });
 

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { HandlerErrorService } from './handler-error.service';
-import { catchError, map, Observable } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { 
   ProjectResponse, 
   ProjectResponseById, 
@@ -11,6 +11,7 @@ import {
   ProjectFilter
 } from '../models/projects';
 import { environment } from 'src/environments/environment';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class ProjectsService {
 
   constructor(
     private http: HttpClient,  
-    private HandlerErrorSrv: HandlerErrorService
+    private notificationServices: NotificationService
   ) { }
 
   getAllProjects(filter?: ProjectFilter): Observable<Project[]> {
@@ -40,7 +41,7 @@ export class ProjectsService {
     return this.http.post<ProjectResponseById>(`${environment.server_url}projects/create`, data)
       .pipe(
         map(response => response.project),
-        catchError((err) => this.HandlerErrorSrv.handlerError(err))
+        catchError((err) => this.handlerError(err))
       );
   }
 
@@ -48,21 +49,21 @@ export class ProjectsService {
     return this.http.put<ProjectResponseById>(`${environment.server_url}projects/update/${id}`, data)
       .pipe(
         map(response => response.project),
-        catchError((err) => this.HandlerErrorSrv.handlerError(err))
+        catchError((err) => this.handlerError(err))
       );
   }
 
   deactivateProject(id: number): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${environment.server_url}projects/desactivate/${id}`)
       .pipe(
-        catchError((err) => this.HandlerErrorSrv.handlerError(err))
+        catchError((err) => this.handlerError(err))
       );
   }
 
   hardDeleteProject(id: number): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${environment.server_url}projects/delete/${id}`)
       .pipe(
-        catchError((err) => this.HandlerErrorSrv.handlerError(err))
+        catchError((err) => this.handlerError(err))
       );
   }
 
@@ -78,5 +79,37 @@ export class ProjectsService {
       .pipe(
         map(response => response.projects)
       );
+  }
+
+  public handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
+    if (!err) {
+      return throwError('Error desconocido');
+    }
+  
+    switch (err.error.status) {
+      case 400:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      case 401:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      case 404:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      case 429:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      case 500:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      default:
+        this.notificationServices.showErrorCustom(err.message .message);
+    }
+
+    for (let i = 0; i < err.error.details.length; i++) {
+      this.notificationServices.showErrorCustom(err.error.details[i])
+    }
+  
+    return throwError(err);
   }
 }

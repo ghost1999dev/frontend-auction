@@ -7,6 +7,10 @@ import { OutletContext, RouterModule } from '@angular/router';
 import { AuthModule } from './components/auth/auth.module';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { ViewModule } from './components/view/view.module';
+import { PagesModule } from './components/pages/pages.module';
+import { ErrorModule } from './components/error/error.module';
+import { CompanyModule } from './components/company/company.module';
 
 @NgModule({
   schemas: [NO_ERRORS_SCHEMA], // <-- Oculta los errores de propiedades desconocidas
@@ -17,10 +21,15 @@ import { BrowserModule } from '@angular/platform-browser';
     BrowserModule,
     FormsModule,
     CommonModule,
+    RouterModule,
+
     CoreModule,
     SharedModule,
-    RouterModule,
-    AuthModule
+    AuthModule,
+    ViewModule,
+    PagesModule,
+    ErrorModule,
+    CompanyModule,
   ],
   providers: [
   ]

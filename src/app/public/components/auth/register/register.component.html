@@ -29,218 +29,247 @@
                 <!-- Developer Form -->
                 <div *ngIf="userType === 'developer'">
                     <form [formGroup]="developerForm" (ngSubmit)="onSubmitDeveloper()">
-                    <!-- Developer Name -->
-                    <div class="field">
-                        <label for="name" class="block text-900 font-medium mb-2 mt-3">Developer Name</label>
-                        <input id="name" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && developerForm.get('name')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('name')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('name')?.errors?.['required']">Developer Name is required</div>
-                        </div>
-                    </div>
-                
-                    <!-- Email -->
-                    <div class="field">
-                        <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
-                        <input id="email" [pattern]="emailPattern" type="email" pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && developerForm.get('email')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('email')?.errors?.['required']">Email is required</div>
-                        <div *ngIf="developerForm.get('email')?.errors?.['email']">Invalid email format</div>
-                        </div>
-                    </div>
-                
-                    <!-- Password -->
-                    <div class="field">
-                        <label for="password" class="block text-900 font-medium mb-2 mt-3">Password</label>
-                        <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && developerForm.get('password')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('password')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('password')?.errors?.['required']">Password is required</div>
-                        <div *ngIf="developerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
-                        </div>
-                    </div>
+                        <div class="grid">
+                            <!-- Columna 1 -->
+                            <div class="col-12 md:col-6">
+                                <!-- Developer Name -->
+                                <div class="field">
+                                    <label for="name" class="block text-900 font-medium mb-2 mt-3">Developer Name</label>
+                                    <input id="name" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && developerForm.get('name')?.errors }">
+                                    <div *ngIf="submitted && developerForm.get('name')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('name')?.errors?.['required']">Developer Name is required</div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Email -->
+                                <div class="field">
+                                    <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
+                                    <input id="email" [pattern]="emailPattern" type="email" pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && developerForm.get('email')?.errors }">
+                                    <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('email')?.errors?.['required']">Email is required</div>
+                                    <div *ngIf="developerForm.get('email')?.errors?.['email']">Invalid email format</div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Password -->
+                                <div class="field">
+                                    <label for="password" class="block text-900 font-medium mb-2 mt-3">Password</label>
+                                    <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && developerForm.get('password')?.errors }">
+                                    <div *ngIf="submitted && developerForm.get('password')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('password')?.errors?.['required']">Password is required</div>
+                                    <div *ngIf="developerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                                    </div>
+                                </div>
 
-                    <!-- Adress -->
-                    <div class="field">
-                        <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
-                        <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && developerForm.get('address')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('address')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('address')?.errors?.['required']">Address is required</div>
-                        </div>
-                    </div>
+                                <!-- Adress -->
+                                <div class="field">
+                                    <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
+                                    <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && developerForm.get('address')?.errors }">
+                                    <div *ngIf="submitted && developerForm.get('address')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('address')?.errors?.['required']">Address is required</div>
+                                    </div>
+                                </div>
 
-                    <!-- Phone -->
-                    <div class="field">
-                        <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
-                        <input id="phone" type="text" 
-                        (input)="formatPhone($event)" 
-                        pInputText class="w-full" 
-                        formControlName="phone" 
-                        [ngClass]="{ 'is-invalid': submitted && developerForm.get('phone')?.errors }">                        
-                        <div *ngIf="submitted && developerForm.get('phone')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('phone')?.errors?.['required']">Phone is required</div>
-                        </div>
-                    </div>
+                                <!-- Phone -->
+                                <div class="field">
+                                    <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
+                                    <input id="phone" type="text" 
+                                    (input)="formatPhone($event)" 
+                                    pInputText class="w-full" 
+                                    formControlName="phone" 
+                                    [ngClass]="{ 'is-invalid': submitted && developerForm.get('phone')?.errors }">                        
+                                    <div *ngIf="submitted && developerForm.get('phone')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('phone')?.errors?.['required']">Phone is required</div>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Biography -->
-                    <div class="field">
-                        <label for="bio" class="block text-900 font-medium mb-2 mt-3">Biography</label>
-                        <input id="bio" type="text" pInputText class="w-full" formControlName="bio" [ngClass]="{ 'is-invalid': submitted && developerForm.get('bio')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('bio')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('bio')?.errors?.['required']">Developer biography required</div>
-                        </div>
-                    </div>
+                            <!-- Columna 2 -->
+                            <div class="col-12 md:col-6">
 
-                    <!-- linkedin -->
-                    <div class="field">
-                        <label for="linkedin" class="block text-900 font-medium mb-2 mt-3">Linkedin</label>
-                        <input id="linkedin" type="text" pInputText class="w-full" formControlName="linkedin" [ngClass]="{ 'is-invalid': submitted && developerForm.get('linkedin')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('linkedin')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('linkedin')?.errors?.['required']">Developer linkedin required</div>
-                        </div>
-                    </div>
+                                <!-- linkedin -->
+                                <div class="field">
+                                    <label for="linkedin" class="block text-900 font-medium mb-2 mt-3">Linkedin</label>
+                                    <input id="linkedin" type="text" pInputText class="w-full" formControlName="linkedin" [ngClass]="{ 'is-invalid': submitted && developerForm.get('linkedin')?.errors }">
+                                    <div *ngIf="submitted && developerForm.get('linkedin')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('linkedin')?.errors?.['required']">Developer linkedin required</div>
+                                    </div>
+                                </div>
 
-                    <!-- occupation -->
-                    <div class="field">
-                        <label for="occupation" class="block text-900 font-medium mb-2 mt-3">Occupation</label>
-                        <input id="occupation" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="occupation" [ngClass]="{ 'is-invalid': submitted && developerForm.get('occupation')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('occupation')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('occupation')?.errors?.['required']">Developer occupation required</div>
-                        </div>
-                    </div>
+                                <!-- occupation -->
+                                <div class="field">
+                                    <label for="occupation" class="block text-900 font-medium mb-2 mt-3">Occupation</label>
+                                    <input id="occupation" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="occupation" [ngClass]="{ 'is-invalid': submitted && developerForm.get('occupation')?.errors }">
+                                    <div *ngIf="submitted && developerForm.get('occupation')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('occupation')?.errors?.['required']">Developer occupation required</div>
+                                    </div>
+                                </div>
 
-                    <!-- portfolio -->
-                    <div class="field">
-                        <label for="portfolio" class="block text-900 font-medium mb-2 mt-3">Portfolio</label>
-                        <input id="portfolio" type="text" pInputText class="w-full" formControlName="portfolio" [ngClass]="{ 'is-invalid': submitted && developerForm.get('portfolio')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('portfolio')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('portfolio')?.errors?.['required']">Developer portfolio required</div>
-                        </div>
-                    </div>
+                                <!-- portfolio -->
+                                <div class="field">
+                                    <label for="portfolio" class="block text-900 font-medium mb-2 mt-3">Portfolio</label>
+                                    <input id="portfolio" type="text" pInputText class="w-full" formControlName="portfolio" [ngClass]="{ 'is-invalid': submitted && developerForm.get('portfolio')?.errors }">
+                                    <div *ngIf="submitted && developerForm.get('portfolio')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('portfolio')?.errors?.['required']">Developer portfolio required</div>
+                                    </div>
+                                </div>
 
-                    <!-- Image of Profile -->
-<!--                     <div class="field">
-                        <label for="image" class="block text-900 font-medium mb-2 mt-3">Image of Profile</label>
-                        <input id="image" type="file" accept="image/*" (change)="onFileSelectProfilePhoto($event)" class="w-full" [ngClass]="{ 'is-invalid': submitted && developerForm.get('image')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('image')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="developerForm.get('image')?.errors?.['required']">Profile image is required</div>
+                                <!-- Biography -->
+                                <div class="field">
+                                    <label for="bio" class="block text-900 font-medium mb-2 mt-3">Biography</label>
+                                    <textarea id="bio" pInputTextarea class="w-full" formControlName="bio" 
+                                    [ngClass]="{ 'is-invalid': submitted && developerForm.get('bio')?.errors }" 
+                                    rows="5" [autoResize]="true"></textarea>                                    <div *ngIf="submitted && developerForm.get('bio')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="developerForm.get('bio')?.errors?.['required']">Developer biography required</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div> -->
-                
-                    <!-- Submit Button -->
-                    <button pButton type="submit" label="Register as Developer" class="w-full mt-3"></button>
+                    
+                        <!-- Submit Button -->
+                        <div class="col-12">
+                            <button pButton type="submit" label="Register as Developer" class="w-full mt-3"></button>
+                        </div>
                     </form>
                 </div>
                 
                 <!-- Company Form -->
                 <div *ngIf="userType === 'company'">
                     <form [formGroup]="companyForm" (ngSubmit)="onSubmitCompany()">
-                    <!-- Company Name -->
-                    <div class="field">
-                        <label for="name" class="block text-900 font-medium mb-2 mt-3">Company Name</label>
-                        <input id="name" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && companyForm.get('name')?.errors }">
-                        <div *ngIf="submitted && companyForm.get('name')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="companyForm.get('name')?.errors?.['required']">Company Name is required</div>
-                        </div>
-                    </div>
-                
-                    <!-- Email -->
-                    <div class="field">
-                        <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
-                        <input id="email" type="email" [pattern]="emailPattern"  pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && companyForm.get('email')?.errors }">
-                        <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="companyForm.get('email')?.errors?.['required']">Email is required</div>
-                        <div *ngIf="companyForm.get('email')?.errors?.['email']">Invalid email format</div>
-                        </div>
-                    </div>
-                
-                    <!-- Password -->
-                    <div class="field">
-                        <label for="password" class="block text-900 font-medium mb-2 mt-3">Password</label>
-                        <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && companyForm.get('password')?.errors }">
-                        <div *ngIf="submitted && companyForm.get('password')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="companyForm.get('password')?.errors?.['required']">Password is required</div>
-                        <div *ngIf="companyForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
-                        </div>
-                    </div>
+                        <div class="grid">
+                            <!-- Columna 1 -->
+                            <div class="col-12 md:col-6">
+                                <!-- Company Name -->
+                                <div class="field">
+                                    <label for="name" class="block text-900 font-medium mb-2 mt-3">Company Name</label>
+                                    <input id="name" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && companyForm.get('name')?.errors }">
+                                    <div *ngIf="submitted && companyForm.get('name')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="companyForm.get('name')?.errors?.['required']">Company Name is required</div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Email -->
+                                <div class="field">
+                                    <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
+                                    <input id="email" type="email" [pattern]="emailPattern"  pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && companyForm.get('email')?.errors }">
+                                    <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="companyForm.get('email')?.errors?.['required']">Email is required</div>
+                                    <div *ngIf="companyForm.get('email')?.errors?.['email']">Invalid email format</div>
+                                    </div>
+                                </div>
+                            
+                                <!-- Password -->
+                                <div class="field">
+                                    <label for="password" class="block text-900 font-medium mb-2 mt-3">Password</label>
+                                    <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && companyForm.get('password')?.errors }">
+                                    <div *ngIf="submitted && companyForm.get('password')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="companyForm.get('password')?.errors?.['required']">Password is required</div>
+                                    <div *ngIf="companyForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                                    </div>
+                                </div>
 
-                    <!-- Adress -->
-                    <div class="field">
-                        <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
-                        <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && companyForm.get('address')?.errors }">
-                        <div *ngIf="submitted && companyForm.get('address')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="companyForm.get('address')?.errors?.['required']">Address is required </div>
-                        </div>
-                    </div>
+                                <!-- Adress -->
+                                <div class="field">
+                                    <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
+                                    <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && companyForm.get('address')?.errors }">
+                                    <div *ngIf="submitted && companyForm.get('address')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="companyForm.get('address')?.errors?.['required']">Address is required </div>
+                                    </div>
+                                </div>
 
-                    <!-- Phone -->
-                    <div class="field">
-                        <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
-                        <input id="phone" type="text" 
-                        (input)="formatPhoneCompany($event)" 
-                        pInputText class="w-full" 
-                        formControlName="phone" 
-                        [ngClass]="{ 'is-invalid': submitted && companyForm.get('phone')?.errors }">  
-                        <div *ngIf="submitted && companyForm.get('phone')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="companyForm.get('phone')?.errors?.['required']">Phone is required</div>
-                        </div>
-                    </div>
-
-                    <!-- nrc_number -->
-                    <div class="field">
-                        <label for="nrc_number" class="block text-900 font-medium mb-2 mt-3">NRC Number</label>
-                        <input id="nrc_number" type="text" 
-                               (input)="formatNrcNumber($event)"
-                               pInputText class="w-full" 
-                               formControlName="nrc_number" 
-                               [ngClass]="{ 'is-invalid': submitted && companyForm.get('nrc_number')?.errors }">
-                        <div *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="invalid-feedback mt-1">
-                          <div *ngIf="companyForm.get('nrc_number')?.errors?.['required']">NRC Number is required</div>
-                          <div *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">
-                            El formato debe ser 123456-7 (6 dígitos, guión, 1 dígito)
-                          </div>
-                        </div>
-                      </div>
-
-                    <!-- business_type -->
-                    <div class="field">
-                        <label for="business_type" class="block text-900 font-medium mb-2 mt-3">Business Type</label>
-                        <input id="business_type" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="business_type" [ngClass]="{ 'is-invalid': submitted && companyForm.get('business_type')?.errors }">
-                        <div *ngIf="submitted && companyForm.get('business_type')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="companyForm.get('business_type')?.errors?.['required']">Business type is required</div>
-                        </div>
-                        </div>
-
-                     <!-- web_site -->
-                     <div class="field">
-                        <label for="web_site" class="block text-900 font-medium mb-2 mt-3">Web Site</label>
-                        <input id="web_site" type="text" pInputText class="w-full" formControlName="web_site" [ngClass]="{ 'is-invalid': submitted && companyForm.get('web_site')?.errors }">
-                        <div *ngIf="submitted && companyForm.get('web_site')?.errors" class="invalid-feedback mt-1">
-                        <div *ngIf="companyForm.get('web_site')?.errors?.['required']">Web Site is required</div>
-                        </div>
-                        </div>
-
-                    <!-- nit_number -->
-                    <div class="field">
-                        <label for="nit_number" class="block text-900 font-medium mb-2">NIT/DUI Number</label>
-                        <input id="nit_number" type="text" 
-                               (input)="formatNitNumber($event)"
-                               pInputText class="w-full" 
-                               formControlName="nit_number"
-                               [ngClass]="{ 'is-invalid': companyForm.get('nit_number')?.invalid && (companyForm.get('nit_number')?.dirty || companyForm.get('nit_number')?.touched) }"
-                               [maxlength]="19">
-                        
-                               <div *ngIf="submitted && companyForm.get('nit_number')?.errors" class="invalid-feedback mt-1">
-                                <div *ngIf="companyForm.get('nit_number')?.errors?.['required']">Número de NIT/DUI es requerido</div>
-                                <div *ngIf="companyForm.get('nit_number')?.errors?.['pattern']">
-                                  Formatos válidos:
-                                  <ul class="list-disc pl-5 mt-1">
-                                    <li><span class="font-mono">XXXXXXXX-X</span> (DUI Homologado)</li>
-                                    <li><span class="font-mono">XXXX-XXXXXX-XXX-XX</span> (NIT tradicional)</li>
-                                  </ul>
+                                <!-- Phone -->
+                                <div class="field">
+                                    <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
+                                    <input id="phone" type="text" 
+                                    (input)="formatPhoneCompany($event)" 
+                                    pInputText class="w-full" 
+                                    formControlName="phone" 
+                                    [ngClass]="{ 'is-invalid': submitted && companyForm.get('phone')?.errors }">  
+                                    <div *ngIf="submitted && companyForm.get('phone')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="companyForm.get('phone')?.errors?.['required']">Phone is required</div>
+                                    </div>
                                 </div>
                             </div>
-                      </div>
 
-                    <button pButton type="submit" label="Register as Company" class="w-full mt-3"></button>
+                            <!-- Columna 2 -->
+                            <div class="col-12 md:col-6">
+                                <!-- nrc_number -->
+                                <div class="field">
+                                    <label for="nrc_number" class="block text-900 font-medium mb-2 mt-3">NRC Number</label>
+                                    <input id="nrc_number" type="text" 
+                                           (input)="formatNrcNumber($event)"
+                                           pInputText class="w-full" 
+                                           formControlName="nrc_number" 
+                                           [ngClass]="{ 'is-invalid': submitted && companyForm.get('nrc_number')?.errors }">
+                                    <div *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="invalid-feedback mt-1">
+                                      <div *ngIf="companyForm.get('nrc_number')?.errors?.['required']">NRC Number is required</div>
+                                      <div *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">
+                                        El formato debe ser 123456-7 (6 dígitos, guión, 1 dígito)
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                <!-- Business Type as Tags -->
+                                <div class="field">
+                                    <label for="business_type" class="block text-900 font-medium mb-2 mt-3">Business Type</label>
+                                    
+                                    <p-chips id="business_type" 
+                                            [(ngModel)]="businessTypeTags"
+                                            [ngModelOptions]="{standalone: true}"
+                                            placeholder="Add business types"
+                                            (onAdd)="onBusinessTypeAdd($event)"
+                                            (onRemove)="onBusinessTypeRemove($event)"
+                                            [max]="1"
+                                            [allowDuplicate]="false"
+                                            [addOnBlur]="true"
+                                            [ngClass]="{ 'p-invalid': submitted && companyForm.get('business_type')?.errors }">
+                                        <ng-template let-item pTemplate="item">
+                                            <p-tag [value]="item" [rounded]="true"></p-tag>
+                                        </ng-template>
+                                    </p-chips>
+                                    
+                                    <div *ngIf="submitted && companyForm.get('business_type')?.errors" class="invalid-feedback mt-1">
+                                        <div *ngIf="companyForm.get('business_type')?.errors?.['required']">At least one business type is required</div>
+                                    </div>
+                                </div>
+
+                                 <!-- web_site -->
+                                 <div class="field">
+                                    <label for="web_site" class="block text-900 font-medium mb-2 mt-3">Web Site</label>
+                                    <input id="web_site" type="text" pInputText class="w-full" formControlName="web_site" [ngClass]="{ 'is-invalid': submitted && companyForm.get('web_site')?.errors }">
+                                    <div *ngIf="submitted && companyForm.get('web_site')?.errors" class="invalid-feedback mt-1">
+                                    <div *ngIf="companyForm.get('web_site')?.errors?.['required']">Web Site is required</div>
+                                    </div>
+                                    </div>
+
+                                <!-- nit_number -->
+                                <div class="field">
+                                    <label for="nit_number" class="block text-900 font-medium mb-2">NIT/DUI Number</label>
+                                    <input id="nit_number" type="text" 
+                                           (input)="formatNitNumber($event)"
+                                           pInputText class="w-full" 
+                                           formControlName="nit_number"
+                                           [ngClass]="{ 'is-invalid': companyForm.get('nit_number')?.invalid && (companyForm.get('nit_number')?.dirty || companyForm.get('nit_number')?.touched) }"
+                                           [maxlength]="19">
+                                    
+                                           <div *ngIf="submitted && companyForm.get('nit_number')?.errors" class="invalid-feedback mt-1">
+                                            <div *ngIf="companyForm.get('nit_number')?.errors?.['required']">Número de NIT/DUI es requerido</div>
+                                            <div *ngIf="companyForm.get('nit_number')?.errors?.['pattern']">
+                                              Formatos válidos:
+                                              <ul class="list-disc pl-5 mt-1">
+                                                <li><span class="font-mono">XXXXXXXX-X</span> (DUI Homologado)</li>
+                                                <li><span class="font-mono">XXXX-XXXXXX-XXX-XX</span> (NIT tradicional)</li>
+                                              </ul>
+                                            </div>
+                                        </div>
+                                  </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-12">
+                            <button pButton type="submit" label="Register as Company" class="w-full mt-3"></button>
+                        </div>
                     </form>
                 </div>
             </div>

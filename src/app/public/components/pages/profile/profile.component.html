@@ -223,28 +223,12 @@
           <ng-container *ngIf="this.developer">
               <p-divider></p-divider>
               <h4>Developer Information</h4>
-              
-              <div class="field">
-                  <label for="nit_number">NIT/DUI Number</label>
-                  <input type="text" pInputText id="nit_number" [(ngModel)]="companyUpdate.nit_number" 
-                  (input)="formatNitNumber($event)"
-                  [maxlength]="18"
-                  required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.nit_number}"/>
-                  <small *ngIf="submitted && !companyUpdate.nit_number" 
-                        class="ng-dirty ng-invalid">El NIT es requerido</small>
-              </div>
 
               <div class="field">
-                  <label for="nrc_number">NRC</label>
-                  <input type="text" pInputText id="nrc_number" [(ngModel)]="companyUpdate.nrc_number" 
-                  (input)="formatNrcNumber($event)"
-                  [maxlength]="8"
-                  required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.nrc_number}"/>
-                  <small *ngIf="submitted && !companyUpdate.nrc_number" 
-                        class="ng-dirty ng-invalid">El NRC es requerido</small>
-                  <label for="occupation">Occupation</label>
-                  <input type="text" pInputText id="occupation" [(ngModel)]="developerData.occupation"/>
+                <label for="occupation">Occupation</label>
+                <input type="text" pInputText id="occupation" [(ngModel)]="developerData.occupation"/>
               </div>
+
 
               <div class="field">
                   <label for="bio">Bio</label>
