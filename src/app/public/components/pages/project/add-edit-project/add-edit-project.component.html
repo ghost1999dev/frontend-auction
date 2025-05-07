@@ -61,7 +61,7 @@
       
       <!-- Terms and Conditions Section -->
 
-      <div class="col-12" ngIf="!this.project.id">
+      <div class="col-12" *ngIf="!this.project.id">
         <div class="field">
           <div class="flex align-items-center">
             <p-checkbox [(ngModel)]="termsAccepted" [binary]="true" inputId="terms"></p-checkbox>
@@ -70,7 +70,7 @@
               <a (click)="showTermsDialog()" class="text-primary cursor-pointer">Terms and Conditions</a>
             </label>
           </div>
-          <small class="p-error"ngIf="submitted && !termsAccepted">You must accept the terms and conditions</small>
+          <small class="p-error" *ngIf="submitted && !termsAccepted">You must accept the terms and conditions</small>
         </div>
       </div>
 

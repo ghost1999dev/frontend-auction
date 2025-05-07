@@ -76,10 +76,6 @@ export class ProjectComponent implements OnInit {
   ngOnInit(): void {
     this.getUserById(this.id)
     this.filteredProjects = [...this.projects];
-
-    console.log(this.projects.length)
-
-
   }
 
   loadCompany(userId: number): void {

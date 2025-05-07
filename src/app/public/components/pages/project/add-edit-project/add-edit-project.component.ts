@@ -17,6 +17,7 @@ export class AddEditProjectComponent implements OnInit {
   @Input() companyId!: number;
   @Output() saved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
+
   termsAccepted: boolean = false;
   displayTermsDialog: boolean = false;
 
@@ -102,8 +103,8 @@ export class AddEditProjectComponent implements OnInit {
     }
   }
 
-  // Add these methods
-  showTermsDialog() {
+   // Add these methods
+   showTermsDialog() {
     this.displayTermsDialog = true;
   }
 
@@ -113,15 +114,14 @@ export class AddEditProjectComponent implements OnInit {
   }
 
 
-onPdfError(error: any) {
-  console.error('Error loading PDF:', error);
-  this.pdfLoadError = true;
-}
+  onPdfError(error: any) {
+    console.error('Error loading PDF:', error);
+    this.pdfLoadError = true;
+  }
 
-closeDialog() {
-  this.displayTermsDialog = false;
-}
-
+  closeDialog() {
+    this.displayTermsDialog = false;
+  }
 
   loadProject(id: number): void {
     this.loading = true;
