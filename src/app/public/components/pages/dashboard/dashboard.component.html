@@ -263,20 +263,18 @@
             </div>
         </div>
     </div>
-        <ng-template pTemplate="footer">
-            <div class="footer-buttons">
-                <button pButton type="button" label="Go Back" icon="pi pi-arrow-left" 
-                        (click)="goBack()" 
-                        class="p-button-outlined p-button-secondary"></button>
-                <button pButton type="submit" label="Register" icon="pi pi-check" 
-                        (click)="register()" 
-                        class="p-button-success"
-                        [disabled]="clicked"></button>
-            </div>
-        </ng-template>
 </div>
-
- 
+<ng-template pTemplate="footer">
+    <div class="footer-buttons">
+        <button pButton type="button" label="Go Back" icon="pi pi-arrow-left" 
+                (click)="goBack()" 
+                class="p-button-outlined p-button-secondary"></button>
+        <button pButton type="submit" label="Register" icon="pi pi-check" 
+                (click)="register()" 
+                class="p-button-success"
+                [disabled]="clicked"></button>
+    </div>
+</ng-template>
 </p-dialog>
 
 <p-toast position="top-center"></p-toast>

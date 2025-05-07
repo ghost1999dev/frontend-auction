@@ -47,6 +47,7 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
 import { HttpClientModule } from '@angular/common/http';
 import { CheckboxModule } from 'primeng/checkbox';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
+import { NumbersOnlyDirective } from 'src/app/core/directives/numbers-only-directive.directive';
 
 const routes: Routes = [
   {
@@ -109,6 +110,7 @@ const routes: Routes = [
     UsersComponent,
     ProfileComponent,
     AddEditProjectComponent,
+    NumbersOnlyDirective,
   ],
   imports: [
     CommonModule,

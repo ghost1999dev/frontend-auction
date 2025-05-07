@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Observable, of, delay, map } from 'rxjs';
+import { Observable, of, delay, map, BehaviorSubject } from 'rxjs';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { CompanyWithRelations } from 'src/app/core/models/companies';
 import { DeveloperWithRelations, UpdateDeveloper } from 'src/app/core/models/developer';
@@ -28,6 +28,7 @@ export class ProfileComponent implements OnInit {
   imagePreview: string | null = null;
   selectedImageFile: File | null = null;
   uploadingImage: boolean = false;
+  private profileData$ = new BehaviorSubject<any>(null);
 
   roleNames: { [key: number]: string } = {
     1: 'Company',
@@ -319,23 +320,21 @@ export class ProfileComponent implements OnInit {
       this.cancelImageUpload();
       return;
     }
-
+  
     this.uploadingImage = true;
     
     this.imageUploadService.uploadUserImage(this.user.id, this.selectedImageFile).subscribe({
       next: (response: any) => {
-        this.notificationServices.showSuccessCustom('Profile picture updated successfully')
-
-        // Actualizar la imagen del usuario localmente
-        if (this.user) {
-          this.user.image = response.imagePath;
-        }
+        this.notificationServices.showSuccessCustom('Profile picture updated successfully');
+        
+        // Actualizar la imagen localmente
+        this.updateLocalProfile({ image: response.imagePath });
         
         this.cancelImageUpload();
       },
       error: (error) => {
         console.error('Error uploading image:', error);
-        this.notificationServices.showErrorCustom('The image could not be uploaded. Please try again.')
+        this.notificationServices.showErrorCustom('The image could not be uploaded. Please try again.');
       },
       complete: () => {
         this.uploadingImage = false;
@@ -350,26 +349,47 @@ export class ProfileComponent implements OnInit {
     this.loading = false;
   }
 
-  public getUserById(id: any){
-    this.userService.getUsersById(id)
-    .subscribe((next: any) => {
-      if(next){
-        this.user = next;
-        this.userUpdate = {
-          name: next.name || '',
-          address: next.address || '',
-          phone: next.phone || ''
-        };
+  public getUserById(id: any) {
+    this.userService.getUsersById(id).subscribe({
+      next: (userData: any) => {
+        if (userData) {
+          this.user = userData;
+          this.profileData$.next(userData); // Emitir los nuevos datos
+          
+          this.userUpdate = {
+            name: userData.name || '',
+            address: userData.address || '',
+            phone: userData.phone || ''
+          };
 
-        if(next.role_id === 1){
-          this.loadCompany(next.id)
-        }else if(next.role_id === 2){
-          this.loadDeveloper(next.id)
+          if (userData.role_id === 1) {
+            this.loadCompany(userData.id);
+          } else if (userData.role_id === 2) {
+            this.loadDeveloper(userData.id);
+          }
         }
-      }else{
-        
+      },
+      error: (err) => {
+        console.error('Error loading user:', err);
       }
-    })
+    });
+  }
+
+  private updateLocalProfile(updatedData: any) {
+    // Actualizar los datos locales
+    this.user = {...this.user, ...updatedData};
+    
+    // Emitir los nuevos datos a los suscriptores
+    this.profileData$.next(this.user);
+    
+    // También actualizar el formulario si está abierto
+    if (this.userDialog) {
+      this.userUpdate = {
+        name: this.user.name || '',
+        address: this.user.address || '',
+        phone: this.user.phone || ''
+      };
+    }
   }
 
   loadDeveloper(id: number): void {
@@ -394,27 +414,34 @@ export class ProfileComponent implements OnInit {
       this.userService.updatedUsers(this.userUpdate, this.id)
         .subscribe({
           next: (response) => {
-            if(this.user.role_id === 1){
+            // Actualizar datos locales primero
+            this.updateLocalProfile(this.userUpdate);
+            
+            if(this.user.role_id === 1) {
               this.companiesService.updateCompany(Number(this.company.id), this.companyUpdate).subscribe({
-                next: () => {
+                next: (companyResponse) => {
+                  this.company = {...this.company, ...this.companyUpdate};
                   this.userDialog = false;
-                  this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")
+                  this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.");
                 },
                 error: (err) => {
                   this.loading = false;
-                  this.notificationServices.showErrorCustom("Error! Your account has not been updated.")
+                  this.notificationServices.showErrorCustom("Error! Your account has not been updated.");
                 }
               });
-            }if(this.user.role_id === 2){
+            }
+            
+            if(this.user.role_id === 2) {
               this.developerService.updateDeveloper(Number(this.developer?.id), this.developerData)
               .subscribe({
                 next: (updatedDeveloper) => {
+                  this.developer = {...this.developer, ...this.developerData};
                   this.userDialog = false;
-                  this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")              
+                  this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.");              
                 },
                 error: (err) => {
                   this.loading = false;
-                  this.notificationServices.showErrorCustom("Error! Your account has not been updated.")
+                  this.notificationServices.showErrorCustom("Error! Your account has not been updated.");
                 }
               });
             }

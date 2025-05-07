@@ -33,6 +33,17 @@ export class AuthService {
     this.checkToken();
   }
 
+  handleAuthentication(token: string): void {
+    localStorage.setItem('login-token', token);
+    localStorage.setItem('isLoggedin', 'true');
+    this.notificationServices.showSuccessCustom('Welcome to CodeBind');
+    this.router.navigate(['/main/dashboard']);
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('isLoggedin');
+  }
+
   get isLogged(): Observable<boolean> {
     return this.loggedIn.asObservable();
   }

@@ -6,6 +6,8 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { Subscription } from 'rxjs';
 import { LayoutService } from 'src/app/core/services/layout.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { Category } from 'src/app/core/models/categories';
+import { CategoryService } from 'src/app/core/services/categories.service';
 
 @Component({
   selector: 'app-add-edit-project',
@@ -17,6 +19,7 @@ export class AddEditProjectComponent implements OnInit {
   @Input() companyId!: number;
   @Output() saved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
+  categories: Category[] = []; // Add this property
 
   termsAccepted: boolean = false;
   displayTermsDialog: boolean = false;
@@ -35,10 +38,13 @@ export class AddEditProjectComponent implements OnInit {
     private projectsService: ProjectsService,
     private notificationServices: NotificationService,
     private layoutService: LayoutService,
+    private categoryService: CategoryService, // Add this
     private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
+    this.loadCategories(); // Add this line before loading the project
+
     if (this.projectId) {
       this.loadProject(this.projectId);
     }
@@ -49,6 +55,18 @@ export class AddEditProjectComponent implements OnInit {
     this.themeSubscription = this.layoutService.configUpdate$.subscribe(() => {
       this.isDarkMode = this.layoutService.config.colorScheme === 'dark';
       this.updateEditorConfig();
+    });
+  }
+
+  loadCategories(): void {
+    this.categoryService.getAllCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: (error) => {
+        this.notificationServices.showErrorCustom('Failed to load categories');
+        console.error('Error loading categories:', error);
+      }
     });
   }
 
@@ -150,6 +168,7 @@ export class AddEditProjectComponent implements OnInit {
       // Update project
       const updateData: UpdateProject = {
         company_id: this.companyId,
+        category_id: this.project.category_id, // Add this
         project_name: this.project.project_name,
         description: this.project.description,
         budget: this.project.budget,
@@ -171,7 +190,7 @@ export class AddEditProjectComponent implements OnInit {
       // Create project
       const newProject = {
         company_id: this.companyId,
-        category_id: 1,
+        category_id: this.project.category_id, // Changed from hardcoded 1 to use selected value
         project_name: this.project.project_name,
         description: this.project.description,
         budget: this.project.budget,

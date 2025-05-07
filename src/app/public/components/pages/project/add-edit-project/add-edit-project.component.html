@@ -41,23 +41,33 @@
               class="w-full width-txt" onkeypress="return event.charCode >= 48"/>            
             }@else if(!this.project.id){
               <input type="number" min="0" pInputText id="days_available" [(ngModel)]="project.days_available" 
-              class="w-full width-txt" onkeypress="return event.charCode >= 48"/>  
+              class="w-full width-txt" appNumbersOnly />
               <small class="p-error" *ngIf="submitted && !project.days_available">Days Available is required.</small>          
             }
             <p class="mt-1" style="color: red; font-size: 13px;">
               The Project {{project.project_name}} is available {{project.days_available}} days, after the Project is approved.            
             </p>
           </div>
+
+          <!-- Add this select field -->
+          <div class="field">
+            <label for="category">Category*</label>
+            <p-dropdown [options]="categories" [(ngModel)]="project.category_id" optionLabel="name" 
+                        optionValue="id" id="category" [showClear]="true" placeholder="Select a category"
+                        [ngClass]="{'ng-invalid ng-dirty': submitted && !project.category_id}">
+            </p-dropdown>
+            <small class="p-error" *ngIf="submitted && !project.category_id">Category is required.</small>
+          </div>
         </div>
 
         <!-- Full Description (Full width below) -->
-      <div class="col-12">
-        <div class="field">
-          <label for="full_description">Full Description </label>
-          <angular-editor [(ngModel)]="project.full_description" [placeholder]="'Enter text here...'" height="15rem" class="_angular-editor" name="description" id="description"></angular-editor>
+        <div class="col-12">
+          <div class="field">
+            <label for="full_description">Full Description </label>
+            <angular-editor [(ngModel)]="project.full_description" [placeholder]="'Enter text here...'" height="15rem" class="_angular-editor" name="description" id="description"></angular-editor>
+            </div>
           </div>
         </div>
-      </div>
       
       <!-- Terms and Conditions Section -->
 
