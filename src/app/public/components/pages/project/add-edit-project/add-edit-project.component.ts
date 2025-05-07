@@ -17,6 +17,11 @@ export class AddEditProjectComponent implements OnInit {
   @Input() companyId!: number;
   @Output() saved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
+  termsAccepted: boolean = false;
+  displayTermsDialog: boolean = false;
+
+  termsPdfUrl = 'assets/docs/test.pdf';
+  pdfLoadError = false;
 
   project: Project = {} as Project;
   submitted: boolean = false;
@@ -96,6 +101,27 @@ export class AddEditProjectComponent implements OnInit {
       this.themeSubscription.unsubscribe();
     }
   }
+
+  // Add these methods
+  showTermsDialog() {
+    this.displayTermsDialog = true;
+  }
+
+  acceptTerms() {
+    this.termsAccepted = true;
+    this.displayTermsDialog = false;
+  }
+
+
+onPdfError(error: any) {
+  console.error('Error loading PDF:', error);
+  this.pdfLoadError = true;
+}
+
+closeDialog() {
+  this.displayTermsDialog = false;
+}
+
 
   loadProject(id: number): void {
     this.loading = true;

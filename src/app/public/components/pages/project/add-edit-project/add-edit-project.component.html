@@ -61,6 +61,19 @@
       
       <!-- Terms and Conditions Section -->
 
+      <div class="col-12" ngIf="!this.project.id">
+        <div class="field">
+          <div class="flex align-items-center">
+            <p-checkbox [(ngModel)]="termsAccepted" [binary]="true" inputId="terms"></p-checkbox>
+            <label for="terms" class="ml-2 mt-2">
+              I accept the 
+              <a (click)="showTermsDialog()" class="text-primary cursor-pointer">Terms and Conditions</a>
+            </label>
+          </div>
+          <small class="p-error"ngIf="submitted && !termsAccepted">You must accept the terms and conditions</small>
+        </div>
+      </div>
+
 
       <div class="flex justify-content-end gap-2 mt-4">
         <button pButton pRipple label="Cancel" icon="pi pi-times" 
@@ -74,3 +87,26 @@
   </div>
 
 <!-- Terms and Conditions Dialog -->
+
+<p-dialog header="Terms and Conditions" [(visible)]="displayTermsDialog" [style]="{width: '80vw'}" [maximizable]="true" [modal]="true">
+  <div class="pdf-container">
+    <pdf-viewer [src]="termsPdfUrl"
+                [render-text]="true"
+                [original-size]="false"
+                [show-all]="true"
+                style="width: 100%; height: 70vh;"
+                (error)="onPdfError($event)">
+    </pdf-viewer>
+
+    <!-- Mostrar mensaje si hay error al cargar PDF -->
+    <div *ngIf="pdfLoadError" class="p-4 text-center">
+      <p class="text-red-500">No se pudo cargar el PDF. Por favor intente más tarde.</p>
+      <p>Alternativamente, puede <a [href]="termsPdfUrl" target="_blank" class="text-primary">ver los términos en una nueva pestaña</a>.</p>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Close" icon="pi pi-times" (click)="closeDialog()" class="p-button-text"></button>
+    <button pButton pRipple label="Accept" icon="pi pi-check" (click)="acceptTerms()" [disabled]="pdfLoadError" class="p-button-text"></button>
+  </ng-template>
+</p-dialog>
