@@ -11,6 +11,9 @@ import { ViewModule } from './components/view/view.module';
 import { PagesModule } from './components/pages/pages.module';
 import { ErrorModule } from './components/error/error.module';
 import { CompanyModule } from './components/company/company.module';
+import { HttpClientModule } from '@angular/common/http';
+import { AngularEditorModule } from '@kolkov/angular-editor';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 
 @NgModule({
   schemas: [NO_ERRORS_SCHEMA], // <-- Oculta los errores de propiedades desconocidas
@@ -30,6 +33,11 @@ import { CompanyModule } from './components/company/company.module';
     PagesModule,
     ErrorModule,
     CompanyModule,
+
+    AngularEditorModule,
+    PdfViewerModule,
+
+    HttpClientModule,
   ],
   providers: [
   ]

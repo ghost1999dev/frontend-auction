@@ -1,14 +1,22 @@
 @if (this.company) {
     <div class="grid">
         <div class="col-12">
-            <div class="card px-6 py-6">
+            <div class="card px-6 py-6" *ngIf="!showAddEditDialog">
                 <p-toast></p-toast>
                 <p-toolbar styleClass="mb-4">
                     <ng-template pTemplate="left">
                         <div class="my-2">
-                            <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
-                            <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger" 
+                            @if (this.projects.length < 5) {
+                                <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                            }@else{
+                                <button disabled pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                                <p class="mt-1" style="color: red; font-size: 13px;">
+                                    The Companies cannot have more than 5 projects.            
+                                </p>
+                            }
+                            <!-- <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger" 
                                     (click)="deleteProjectsDialog = true" [disabled]="!selectedProjects || !selectedProjects.length"></button>
+                         -->
                         </div>
                     </ng-template>
     
@@ -33,9 +41,6 @@
                     </ng-template>
                     <ng-template pTemplate="header">
                         <tr>
-                            <th style="width: 3rem">
-                                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                            </th>
                             <th pSortableColumn="project_name">Name <p-sortIcon field="project_name"></p-sortIcon></th>
                             <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
                             <th pSortableColumn="budget">Budget <p-sortIcon field="budget"></p-sortIcon></th>
@@ -46,24 +51,21 @@
                     </ng-template>
                     <ng-template pTemplate="body" let-project>
                         <tr>
-                            <td>
-                                <p-tableCheckbox [value]="project"></p-tableCheckbox>
-                            </td>
-                            <td style="width:14%; min-width:10rem;">
+                            <td style="width:25%; min-width:10rem;">
                                 <span class="p-column-title">Name</span>
                                 {{project.project_name}}
                             </td>
-                            <td style="width:14%; min-width:10rem;">
+                            <td style="width:15%; min-width:10rem;">
                                 <span class="p-column-title">Description</span>
                                 {{project.description | slice:0:50}}{{project.description.length > 50 ? '...' : ''}}
                             </td>
-                            <td style="width:14%; min-width:8rem;">
+                            <td style="width:15%; min-width:8rem;">
                                 <span class="p-column-title">Budget</span>
                                 {{project.budget | currency:'USD'}}
                             </td>
                             <td style="width:14%; min-width:8rem;">
                                 <span class="p-column-title">Days Available</span>
-                                {{project.days_available}}
+                                {{project.days_available}} days
                             </td>
                             <td style="width:14%; min-width: 10rem;">
                                 <span class="p-column-title">Status</span>
@@ -75,7 +77,7 @@
                                 <div class="flex">
                                     <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
                                             (click)="editProject(project)"></button>
-                                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" 
+                                    <button *ngIf="project.status === 1" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" 
                                             (click)="deleteProject(project)"></button>
                                 </div>
                             </td>
@@ -83,8 +85,16 @@
                     </ng-template>
                 </p-table>
             </div>
+
+        <app-add-edit-project 
+            *ngIf="showAddEditDialog"
+            [projectId]="currentProjectId"
+            [companyId]="company?.id"
+            (saved)="onProjectSaved()"
+            (cancelled)="showAddEditDialog = false">
+        </app-add-edit-project>
     
-            <p-dialog [(visible)]="projectDialog" [style]="{width: '450px'}" header="Project Details" [modal]="true" class="p-fluid">
+            <!-- <p-dialog [(visible)]="projectDialog" [style]="{width: '450px'}" header="Project Details" [modal]="true" class="p-fluid">
                 <ng-template pTemplate="content">
                     <div class="field">
                         <label for="project_name">Project Name</label>
@@ -105,13 +115,6 @@
                         </textarea>
                     </div>
     
-                    <div class="field">
-                        <label for="status">Status</label>
-                        <p-dropdown id="status" [options]="statuses" optionLabel="label" optionValue="value" 
-                                   [(ngModel)]="project.status" placeholder="Select a Status">
-                        </p-dropdown>
-                    </div>
-    
                     <div class="formgrid grid">
                         <div class="field col">
                             <label for="budget">Budget</label>
@@ -128,7 +131,7 @@
                     <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
                     <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveProject(company.id)"></button>
                 </ng-template>
-            </p-dialog>
+            </p-dialog> -->
     
             <p-dialog [(visible)]="deleteProjectDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
                 <div class="flex align-items-center justify-content-center">

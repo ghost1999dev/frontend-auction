@@ -4,7 +4,7 @@
         <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
             <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
                 <div class="text-center mb-5">
-                    <div class="text-900 text-3xl font-medium mb-3">Welcome to Register User</div>
+                    <div class="text-900 text-3xl font-medium mb-3">Welcome to Register {{this.userType}}</div>
                     <span class="text-600 font-medium">Select one of the Options</span>
                 </div>
 
@@ -31,7 +31,7 @@
                     <form [formGroup]="developerForm" (ngSubmit)="onSubmitDeveloper()">
                         <div class="grid">
                             <!-- Columna 1 -->
-                            <div class="col-12 md:col-6">
+                            <div class="col-12">
                                 <!-- Developer Name -->
                                 <div class="field">
                                     <label for="name" class="block text-900 font-medium mb-2 mt-3">Developer Name</label>
@@ -53,16 +53,18 @@
                             
                                 <!-- Password -->
                                 <div class="field">
-                                    <label for="password" class="block text-900 font-medium mb-2 mt-3">Password</label>
+                                    <label for="password" class="block text-900 font-medium mb-3 mt-3">Password</label>
                                     <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && developerForm.get('password')?.errors }">
                                     <div *ngIf="submitted && developerForm.get('password')?.errors" class="invalid-feedback mt-1">
                                     <div *ngIf="developerForm.get('password')?.errors?.['required']">Password is required</div>
                                     <div *ngIf="developerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                                    <div *ngIf="developerForm.get('password')?.errors?.['passwordStrength']" class="mb-3">
+                                        {{ developerForm.get('password')?.errors?.['passwordStrength'].message }}
+                                      </div>
                                     </div>
                                 </div>
 
-                                <!-- Adress -->
-                                <div class="field">
+                                 <div class="field">
                                     <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
                                     <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && developerForm.get('address')?.errors }">
                                     <div *ngIf="submitted && developerForm.get('address')?.errors" class="invalid-feedback mt-1">
@@ -70,7 +72,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Phone -->
                                 <div class="field">
                                     <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
                                     <input id="phone" type="text" 
@@ -81,13 +82,12 @@
                                     <div *ngIf="submitted && developerForm.get('phone')?.errors" class="invalid-feedback mt-1">
                                     <div *ngIf="developerForm.get('phone')?.errors?.['required']">Phone is required</div>
                                     </div>
-                                </div>
+                                </div> 
                             </div>
 
                             <!-- Columna 2 -->
                             <div class="col-12 md:col-6">
 
-                                <!-- linkedin -->
                                 <div class="field">
                                     <label for="linkedin" class="block text-900 font-medium mb-2 mt-3">Linkedin</label>
                                     <input id="linkedin" type="text" pInputText class="w-full" formControlName="linkedin" [ngClass]="{ 'is-invalid': submitted && developerForm.get('linkedin')?.errors }">
@@ -96,7 +96,6 @@
                                     </div>
                                 </div>
 
-                                <!-- occupation -->
                                 <div class="field">
                                     <label for="occupation" class="block text-900 font-medium mb-2 mt-3">Occupation</label>
                                     <input id="occupation" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="occupation" [ngClass]="{ 'is-invalid': submitted && developerForm.get('occupation')?.errors }">
@@ -105,7 +104,6 @@
                                     </div>
                                 </div>
 
-                                <!-- portfolio -->
                                 <div class="field">
                                     <label for="portfolio" class="block text-900 font-medium mb-2 mt-3">Portfolio</label>
                                     <input id="portfolio" type="text" pInputText class="w-full" formControlName="portfolio" [ngClass]="{ 'is-invalid': submitted && developerForm.get('portfolio')?.errors }">
@@ -114,7 +112,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Biography -->
                                 <div class="field">
                                     <label for="bio" class="block text-900 font-medium mb-2 mt-3">Biography</label>
                                     <textarea id="bio" pInputTextarea class="w-full" formControlName="bio" 
@@ -138,7 +135,7 @@
                     <form [formGroup]="companyForm" (ngSubmit)="onSubmitCompany()">
                         <div class="grid">
                             <!-- Columna 1 -->
-                            <div class="col-12 md:col-6">
+                            <div class="col-12">
                                 <!-- Company Name -->
                                 <div class="field">
                                     <label for="name" class="block text-900 font-medium mb-2 mt-3">Company Name</label>
@@ -160,15 +157,16 @@
                             
                                 <!-- Password -->
                                 <div class="field">
-                                    <label for="password" class="block text-900 font-medium mb-2 mt-3">Password</label>
+                                    <label for="password" class="block text-900 font-medium mb-3 mt-3">Password</label>
                                     <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && companyForm.get('password')?.errors }">
                                     <div *ngIf="submitted && companyForm.get('password')?.errors" class="invalid-feedback mt-1">
                                     <div *ngIf="companyForm.get('password')?.errors?.['required']">Password is required</div>
                                     <div *ngIf="companyForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                                    <div *ngIf="companyForm.get('password')?.errors?.['passwordStrength']">
+                                        {{ companyForm.get('password')?.errors?.['passwordStrength'].message }}
+                                      </div>
                                     </div>
                                 </div>
-
-                                <!-- Adress -->
                                 <div class="field">
                                     <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
                                     <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && companyForm.get('address')?.errors }">
@@ -177,7 +175,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Phone -->
                                 <div class="field">
                                     <label for="phone" class="block text-900 font-medium mb-2 mt-3">Phone</label>
                                     <input id="phone" type="text" 
@@ -191,9 +188,7 @@
                                 </div>
                             </div>
 
-                            <!-- Columna 2 -->
                             <div class="col-12 md:col-6">
-                                <!-- nrc_number -->
                                 <div class="field">
                                     <label for="nrc_number" class="block text-900 font-medium mb-2 mt-3">NRC Number</label>
                                     <input id="nrc_number" type="text" 
@@ -207,9 +202,8 @@
                                         El formato debe ser 123456-7 (6 dígitos, guión, 1 dígito)
                                       </div>
                                     </div>
-                                  </div>
+                                </div>
 
-                                <!-- Business Type as Tags -->
                                 <div class="field">
                                     <label for="business_type" class="block text-900 font-medium mb-2 mt-3">Business Type</label>
                                     
@@ -233,16 +227,14 @@
                                     </div>
                                 </div>
 
-                                 <!-- web_site -->
-                                 <div class="field">
+                                <div class="field">
                                     <label for="web_site" class="block text-900 font-medium mb-2 mt-3">Web Site</label>
                                     <input id="web_site" type="text" pInputText class="w-full" formControlName="web_site" [ngClass]="{ 'is-invalid': submitted && companyForm.get('web_site')?.errors }">
                                     <div *ngIf="submitted && companyForm.get('web_site')?.errors" class="invalid-feedback mt-1">
                                     <div *ngIf="companyForm.get('web_site')?.errors?.['required']">Web Site is required</div>
                                     </div>
-                                    </div>
+                                </div>
 
-                                <!-- nit_number -->
                                 <div class="field">
                                     <label for="nit_number" class="block text-900 font-medium mb-2">NIT/DUI Number</label>
                                     <input id="nit_number" type="text" 
@@ -262,7 +254,7 @@
                                               </ul>
                                             </div>
                                         </div>
-                                  </div>
+                                </div> 
                             </div>
                         </div>
 

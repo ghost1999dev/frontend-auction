@@ -23,6 +23,8 @@ import { UserService } from './core/services/user.service';
 import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
 import { SimplePhoneMaskDirective } from './core/directives/number-mask.directive';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { HttpClientModule } from '@angular/common/http';
+import { AngularEditorModule } from '@kolkov/angular-editor';
 
 @NgModule({
   declarations: [
@@ -40,6 +42,9 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     SharedModule,
     HttpInterceptorModule,
     NgxMaskDirective,
+    AngularEditorModule,
+
+    HttpClientModule,
     RouterModule.forRoot([], {
       // Configuración especial para Angular 18
       paramsInheritanceStrategy: 'always',

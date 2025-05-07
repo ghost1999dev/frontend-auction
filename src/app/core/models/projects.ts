@@ -15,6 +15,8 @@ export interface ProjectResponse {
     project_name: string;
     description: string;
     budget: number;
+    short_description: string;  // Add this
+    full_description: string;   // Add this
     days_available: number;
     status: number; // 1 for active, 0 for inactive
     createdAt?: string;

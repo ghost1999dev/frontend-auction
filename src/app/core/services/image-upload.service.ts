@@ -12,9 +12,9 @@ export class ImageUploadService {
 
   uploadUserImage(userId: number, imageFile: File): Observable<any> {
     const formData = new FormData();
-    formData.append('image', imageFile); // 'image' debe coincidir con el nombre esperado por multer
+    formData.append('file', imageFile); // 'image' debe coincidir con el nombre esperado por multer
 
-    return this.http.patch(`${environment.server_url}users/update-fields/${userId}`, formData);
+    return this.http.put(`${environment.server_url}users/upload-image/${userId}`, formData);
   }
 
   getImageUrl(imagePath: string): string {

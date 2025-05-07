@@ -1,0 +1,76 @@
+<div class="grid p-4">
+    <div class="col-12">
+      <h2>{{ projectId ? 'Edit Project - ' : 'Add New Project' }} {{projectId ? project.project_name: ''}} </h2>
+      <p-toast></p-toast>
+      
+      <div class="grid">
+        <!-- Left Column -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="project_name">Project Name*</label>
+            <input type="text" pInputText id="project_name" [(ngModel)]="project.project_name" required 
+                   [ngClass]="{'ng-invalid ng-dirty': submitted && !project.project_name}"/>
+            <small class="p-error" *ngIf="submitted && !project.project_name">Project name is required.</small>
+          </div>
+          
+          <div class="field">
+            <label for="description">Short Description</label>
+            <textarea id="description" pInputTextarea [(ngModel)]="project.description" 
+                      rows="5" class="w-full"></textarea>
+            <small class="p-error" *ngIf="submitted && !project.description">Short Description is required.</small>
+          </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="budget">Budget</label>
+            @if(this.project.id){
+              <input disabled="true" type="number" min="0" (keypress)="keyPressNumbersWithDecimal($event)" pInputText id="budget" [(ngModel)]="project.budget" class="w-full "/>
+            }@else if(!this.project.id){
+              <input type="number" min="0" (keypress)="keyPressNumbersWithDecimal($event)" pInputText id="budget" [(ngModel)]="project.budget" class="w-full "/>
+              <small class="p-error" *ngIf="submitted && !project.budget">Budget is required.</small>
+            }
+          </div>
+          
+          <div class="field">
+            <label for="days_available">Days Available</label>
+
+            @if(this.project.id){
+              <input disabled="true" type="number" min="0" pInputText id="days_available" [(ngModel)]="project.days_available" 
+              class="w-full width-txt" onkeypress="return event.charCode >= 48"/>            
+            }@else if(!this.project.id){
+              <input type="number" min="0" pInputText id="days_available" [(ngModel)]="project.days_available" 
+              class="w-full width-txt" onkeypress="return event.charCode >= 48"/>  
+              <small class="p-error" *ngIf="submitted && !project.days_available">Days Available is required.</small>          
+            }
+            <p class="mt-1" style="color: red; font-size: 13px;">
+              The Project {{project.project_name}} is available {{project.days_available}} days, after the Project is approved.            
+            </p>
+          </div>
+        </div>
+
+        <!-- Full Description (Full width below) -->
+      <div class="col-12">
+        <div class="field">
+          <label for="full_description">Full Description </label>
+          <angular-editor [(ngModel)]="project.full_description" [placeholder]="'Enter text here...'" height="15rem" class="_angular-editor" name="description" id="description"></angular-editor>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Terms and Conditions Section -->
+
+
+      <div class="flex justify-content-end gap-2 mt-4">
+        <button pButton pRipple label="Cancel" icon="pi pi-times" 
+                class="p-button-text" (click)="cancel()" [disabled]="loading"></button>
+        <button pButton pRipple label="Save" icon="pi pi-check" 
+                class="p-button-text" (click)="saveProject()" [disabled]="loading">
+          <i *ngIf="loading" class="pi pi-spinner pi-spin mr-2"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+<!-- Terms and Conditions Dialog -->

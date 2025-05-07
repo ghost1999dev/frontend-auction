@@ -42,6 +42,9 @@ export class ProjectComponent implements OnInit {
   searchTerm: string = '';
   selectedStatus: number | 1 | null = null ;
   selectedSort: string = 'newest';
+
+  showAddEditDialog: boolean = false;
+  currentProjectId?: number;
   
   // Pagination
   page: number = 1;
@@ -73,6 +76,10 @@ export class ProjectComponent implements OnInit {
   ngOnInit(): void {
     this.getUserById(this.id)
     this.filteredProjects = [...this.projects];
+
+    console.log(this.projects.length)
+
+
   }
 
   loadCompany(userId: number): void {
@@ -124,12 +131,7 @@ export class ProjectComponent implements OnInit {
         this.projects = data;
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load projects',
-          life: 3000
-        });
+        this.notificationServices.showErrorCustom('Failed to load projects')
       }
     });
   }
@@ -142,26 +144,40 @@ export class ProjectComponent implements OnInit {
         this.clearFilters()
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load projects',
-          life: 3000
-        });
+        this.notificationServices.showErrorCustom('Failed to load projects')
       }
     });
   }
 
-  openNew(): void {
+/*   openNew(): void {
     this.project = {} as Project;
     this.submitted = false;
     this.projectDialog = true;
+  } */
+
+  openNew(): void {
+    this.currentProjectId = undefined;
+    this.showAddEditDialog = true;
   }
 
   editProject(project: Project): void {
+    this.currentProjectId = project.id;
+    this.showAddEditDialog = true;
+  }
+
+  onProjectSaved(): void {
+    this.showAddEditDialog = false;
+    if (this.company) {
+      this.loadProjects(this.company.id);
+    } else {
+      this.loadAllProjects();
+    }
+  }
+/* 
+  editProject(project: Project): void {
     this.project = { ...project };
     this.projectDialog = true;
-  }
+  } */
 
   deleteProject(project: Project): void {
     this.project = { ...project };
@@ -197,7 +213,7 @@ export class ProjectComponent implements OnInit {
         // Update existing project
         const updateData: UpdateProject = {
           company_id: Number(id),
-          category_id: 1,
+          category_id: 1, 
           project_name: this.project.project_name,
           description: this.project.description,
           budget: this.project.budget,
@@ -205,19 +221,14 @@ export class ProjectComponent implements OnInit {
           status: this.project.status
         };
 
-        console.log(updateData)
         this.projectsService.updateProject(this.project.id, updateData).subscribe({
-          next: (data: any) => {
-
-            console.log(data)
-
+          next: () => {
             this.notificationServices.showSuccessCustom('Project Updated')
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
           },
           error: (error) => {
-            console.log(error)
             this.notificationServices.showErrorCustom('Failed to update project')
           }
         });
@@ -230,7 +241,7 @@ export class ProjectComponent implements OnInit {
           description: this.project.description,
           budget: this.project.budget,
           days_available: this.project.days_available,
-          status: this.project.status || 1
+          //status: this.project.status || 1
         };
 
         console.log(newProject)
