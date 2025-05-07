@@ -5,6 +5,7 @@ import { forkJoin } from 'rxjs';
 import { CreateProject, Project, UpdateProject } from 'src/app/core/models/projects';
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { UserService } from 'src/app/core/services/user.service';
 
@@ -41,6 +42,9 @@ export class ProjectComponent implements OnInit {
   searchTerm: string = '';
   selectedStatus: number | 1 | null = null ;
   selectedSort: string = 'newest';
+
+  showAddEditDialog: boolean = false;
+  currentProjectId?: number;
   
   // Pagination
   page: number = 1;
@@ -65,12 +69,17 @@ export class ProjectComponent implements OnInit {
     private messageService: MessageService,
     private companiesService: CompaniesService,
     private userService: UserService,
+    private notificationServices: NotificationService,
     private developerService: DeveloperService
   ) { }
 
   ngOnInit(): void {
     this.getUserById(this.id)
     this.filteredProjects = [...this.projects];
+
+    console.log(this.projects.length)
+
+
   }
 
   loadCompany(userId: number): void {
@@ -122,12 +131,7 @@ export class ProjectComponent implements OnInit {
         this.projects = data;
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load projects',
-          life: 3000
-        });
+        this.notificationServices.showErrorCustom('Failed to load projects')
       }
     });
   }
@@ -140,26 +144,40 @@ export class ProjectComponent implements OnInit {
         this.clearFilters()
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load projects',
-          life: 3000
-        });
+        this.notificationServices.showErrorCustom('Failed to load projects')
       }
     });
   }
 
-  openNew(): void {
+/*   openNew(): void {
     this.project = {} as Project;
     this.submitted = false;
     this.projectDialog = true;
+  } */
+
+  openNew(): void {
+    this.currentProjectId = undefined;
+    this.showAddEditDialog = true;
   }
 
   editProject(project: Project): void {
+    this.currentProjectId = project.id;
+    this.showAddEditDialog = true;
+  }
+
+  onProjectSaved(): void {
+    this.showAddEditDialog = false;
+    if (this.company) {
+      this.loadProjects(this.company.id);
+    } else {
+      this.loadAllProjects();
+    }
+  }
+/* 
+  editProject(project: Project): void {
     this.project = { ...project };
     this.projectDialog = true;
-  }
+  } */
 
   deleteProject(project: Project): void {
     this.project = { ...project };
@@ -170,23 +188,13 @@ export class ProjectComponent implements OnInit {
     this.projectsService.deactivateProject(this.project.id)
     .subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Project Deactivated',
-          life: 3000
-        });
+        this.notificationServices.showSuccessCustom('Project Deactivated')
         this.loadProjects(this.company.id);
         this.deleteProjectDialog = false;
         this.project = {} as Project;
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to deactivate project',
-          life: 3000
-        });
+        this.notificationServices.showErrorCustom('Failed to deactivate project')
       }
     });
   }
@@ -205,6 +213,7 @@ export class ProjectComponent implements OnInit {
         // Update existing project
         const updateData: UpdateProject = {
           company_id: Number(id),
+          category_id: 1, 
           project_name: this.project.project_name,
           description: this.project.description,
           budget: this.project.budget,
@@ -214,23 +223,13 @@ export class ProjectComponent implements OnInit {
 
         this.projectsService.updateProject(this.project.id, updateData).subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'Project Updated',
-              life: 3000
-            });
+            this.notificationServices.showSuccessCustom('Project Updated')
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
           },
           error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to update project',
-              life: 3000
-            });
+            this.notificationServices.showErrorCustom('Failed to update project')
           }
         });
       } else {
@@ -242,7 +241,7 @@ export class ProjectComponent implements OnInit {
           description: this.project.description,
           budget: this.project.budget,
           days_available: this.project.days_available,
-          status: this.project.status || 1
+          //status: this.project.status || 1
         };
 
         console.log(newProject)
@@ -250,23 +249,13 @@ export class ProjectComponent implements OnInit {
         this.projectsService.createProject(newProject)
         .subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'Project Created',
-              life: 3000
-            });
+            this.notificationServices.showSuccessCustom('Project Created')
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
           },
           error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to create project',
-              life: 3000
-            });
+            this.notificationServices.showErrorCustom('Failed to create project')
           }
         });
       }
@@ -279,14 +268,8 @@ export class ProjectComponent implements OnInit {
 
   confirmDeleteSelected(): void {
     this.deleteProjectsDialog = false;
-    
     if (!this.selectedProjects || this.selectedProjects.length === 0) {
-      this.messageService.add({
-        severity: 'warn', 
-        summary: 'Warning',
-        detail: 'No projects selected',
-        life: 3000
-      });
+      this.notificationServices.showErrorCustom('No projects selected')
       return;
     }
   
@@ -298,22 +281,12 @@ export class ProjectComponent implements OnInit {
     // Execute all delete operations in parallel
     forkJoin(deleteOperations).subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: `${this.selectedProjects.length} projects deactivated`,
-          life: 3000
-        });
+        this.notificationServices.showSuccessCustom(`${this.selectedProjects.length} projects deactivated`)
         this.loadProjects(this.company.id);
         this.selectedProjects = [];
       },
       error: (error: any) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to deactivate some projects',
-          life: 3000
-        });
+        this.notificationServices.showErrorCustom('Failed to deactivate some projects')
       }
     });
   }

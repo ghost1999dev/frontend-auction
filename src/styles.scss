@@ -10,3 +10,22 @@ $gutter: 1rem; //for primeflex grid system
 /* Demos */
 @import "assets/demo/styles/flags/flags.css";
 @import "assets/demo/styles/badges.scss";
+
+.field {
+    position: relative;
+    margin-bottom: 2rem; /* Ajusta según necesites */
+  }
+  
+  .invalid-feedback {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    margin-top: 0.25rem;
+  }
+  
+  .error-message {
+    background-color: #f8d7da; /* Fondo rojo claro */
+    color: #721c24; /* Texto rojo oscuro */
+    padding: 0.25rem 0.5rem;
+}

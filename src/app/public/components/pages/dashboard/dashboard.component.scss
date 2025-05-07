@@ -16,6 +16,32 @@
     overflow: hidden;
 }
 
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.field-container {
+    width: 100%;
+}
+
+.centered-input {
+    width: 100%;
+}
+
 .form-container {
     width: 100%;
     background: var(--surface-card);
@@ -54,15 +80,15 @@
     flex-wrap: wrap;
 }
 
+.role-card ::ng-deep .p-card .p-card-body{
+    padding: 0rem !important;
+}
+
 .role-card {
     cursor: pointer;
     transition: all 0.3s;
     width: 250px;
-    
-    &:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        transform: translateY(-4px);
-    }
+
     
     .card-content {
         display: flex;

@@ -29,7 +29,6 @@ export class AuthService {
     private companiesService: CompaniesService,
     private developerService: DeveloperService,
     private notificationServices: NotificationService,
-    private HandlerErrorSrv: HandlerErrorService,
     ) {
     this.checkToken();
   }
@@ -48,7 +47,7 @@ export class AuthService {
         this.loggedIn.next(true);
         return res;
       }),
-      catchError((err) => this.HandlerErrorSrv.handlerError(err))
+      catchError((err) => this.handlerError(err))
     );
   }
 
@@ -81,13 +80,36 @@ export class AuthService {
     return !!localStorage.getItem('login-token');
   }
 
-  public handlerError(err: { message: any; }): Observable<never> {
-    let errorMessage = 'An errror occured retrienving data';
-    if (err) {
-      errorMessage = `Error: code ${err.message}`;
-      this.notificationServices.showErrorCustom('Error logging in');
+  public handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
+    if (!err) {
+      return throwError('Error desconocido');
     }
-    return throwError('');
+  
+    switch (err.error.status) {
+      case 400:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      case 401:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      case 404:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      case 429:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      case 500:
+        this.notificationServices.showErrorCustom(err.error.message);
+        break;
+      default:
+        this.notificationServices.showErrorCustom(err.message .message);
+    }
+
+    for (let i = 0; i < err.error.details.length; i++) {
+      this.notificationServices.showErrorCustom(err.error.details[i])
+    }
+  
+    return throwError(err);
   }
 
 }

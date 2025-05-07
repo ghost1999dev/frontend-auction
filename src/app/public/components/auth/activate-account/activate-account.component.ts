@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { addDeveloper } from 'src/app/core/models/developer';
 import { addUser } from 'src/app/core/models/users';
 import { LayoutService } from 'src/app/core/services/app.layout.service';
 import { CompaniesService } from 'src/app/core/services/companies.service';
@@ -74,7 +75,7 @@ export class ActivateAccountComponent {
       this.usersService.createUsers(userToCreate).subscribe({
         next: (response: any) => {
   
-          const developerAdd: any = {
+          const developerAdd: addDeveloper = {
             bio: this.userData.bio, 
             user_id: response.id, 
             linkedin: this.userData.linkedin, 
@@ -85,16 +86,18 @@ export class ActivateAccountComponent {
           this.developerSrv.createDeveloper(developerAdd)
           .subscribe((next: any) => {
             if(next){
+              next.status = false
+
               localStorage.removeItem('FormData');
               this.router.navigate(['/auth/login']);
-              this.notificationServices.showSuccessCustom("Congratulations! Your developer account has been successfully verified.")
+              this.notificationServices.showSuccessCustom(next.message)
             }else{
               this.notificationServices.showErrorCustom("Error Creating Developer.")
             }
           })
         },
         error: (err: any) => {
-          this.notificationServices.showErrorCustom("Error verifying your account")
+          //this.notificationServices.showErrorCustom("Error verifying your account")
         }
       });
     }else if(savedDataCompanies){
@@ -128,12 +131,12 @@ export class ActivateAccountComponent {
               this.router.navigate(['/auth/login']);
               this.notificationServices.showSuccessCustom("Congratulations! Your Companies account has been successfully verified.")
             }else{
-              this.notificationServices.showErrorCustom("Error creating the company.")
+              //this.notificationServices.showErrorCustom("Error creating the company.")
             }
           })
         },
         error: (err: any) => {
-          this.notificationServices.showErrorCustom("Error verifying your account")
+          //this.notificationServices.showErrorCustom("Error verifying your account")
         }
       });
     }

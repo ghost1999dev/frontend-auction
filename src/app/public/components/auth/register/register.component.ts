@@ -5,6 +5,7 @@ import { Observable, of, delay, map } from 'rxjs';
 import { LayoutService } from 'src/app/core/services/layout.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { UserService } from 'src/app/core/services/user.service';
+import { passwordValidator } from 'src/app/core/validations/passwordValidator';
 
 @Component({
   selector: 'app-register',
@@ -19,6 +20,7 @@ export class RegisterComponent {
   companyForm!: FormGroup;   
   submitted: boolean = false; 
   public formData: any = new FormData();
+  businessTypeTags: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -35,34 +37,28 @@ export class RegisterComponent {
     this.developerForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, passwordValidator()]],
       image: [''],
-      address: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern(/^\+\(503\) \d{4}-\d{4}$/)]],
-      bio: [''],
-      linkedin: [''],
-      occupation: [''],
-      portfolio: [''],
+      address: ['Unknow'],
+      phone: ['+(000) 0000-0000'],
+      bio: ['Unknow'],
+      linkedin: ['Unknow'],
+      occupation: ['Unknow'],
+      portfolio: ['Unknow'],
       role_id: [2]
     });
   
     this.companyForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, passwordValidator()]],
       image: [''],
-      address: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern(/^\+\(503\) \d{4}-\d{4}$/)]],
-      nrc_number: ['', {
-        validators: [Validators.required, Validators.pattern(/^\d{6}-\d$/)],
-        asyncValidators: [this.nrcValidator.bind(this)],
-        updateOn: 'blur' // Opcional: para que no valide con cada tecla presionada
-      }],   
-      business_type: ['', Validators.required],
-      web_site: ['', Validators.required],
-      nit_number: ['', [
-        Validators.required,
-      ]], 
+      address: ['Unknow'],
+      phone: ['+(000) 0000-0000'],
+      nrc_number: [''],   
+      business_type: ['Unknow'],
+      web_site: ['Unknow'],
+      nit_number: [''], 
       role_id: [1]
     });
   }
@@ -70,6 +66,23 @@ export class RegisterComponent {
   selectUserType(userType: 'developer' | 'company') {
     this.userType = userType;
     this.submitted = false; 
+  }
+
+  onBusinessTypeAdd(event: any) {
+      // Validar el input antes de agregar
+      const value = event.value;
+      if (value && /^[a-zA-ZÑñ\s,]+$/.test(value)) {
+          // Actualizar el formControl
+          this.companyForm.get('business_type')?.setValue(value);
+      } else {
+          // Mostrar error o revertir
+          this.businessTypeTags = this.businessTypeTags.filter(tag => tag !== value);
+      }
+
+  }
+
+  onBusinessTypeRemove(event: any) {
+      this.companyForm.get('business_type')?.setValue(this.businessTypeTags);
   }
 
   nrcValidator(control: AbstractControl): Observable<ValidationErrors | null> {

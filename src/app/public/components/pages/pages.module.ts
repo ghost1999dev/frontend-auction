@@ -1,6 +1,6 @@
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { PagesComponent } from './pages.component';
@@ -41,6 +41,12 @@ import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
 import { ToolbarModule } from 'primeng/toolbar';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
+import { AddEditProjectComponent } from './project/add-edit-project/add-edit-project.component';
+import { AngularEditorModule } from '@kolkov/angular-editor';
+import { HttpClientModule } from '@angular/common/http';
+import { CheckboxModule } from 'primeng/checkbox';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 
 const routes: Routes = [
   {
@@ -93,7 +99,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  schemas: [NO_ERRORS_SCHEMA], // <-- Oculta los errores de propiedades desconocidas
+  schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA], // <-- Oculta los errores de propiedades desconocidas
   declarations: [
     PagesComponent,
     DashboardComponent,
@@ -102,6 +108,7 @@ const routes: Routes = [
     FavoritesComponent,
     UsersComponent,
     ProfileComponent,
+    AddEditProjectComponent,
   ],
   imports: [
     CommonModule,
@@ -110,6 +117,7 @@ const routes: Routes = [
     TableModule,
     MenuModule,
     ChartModule,
+    CheckboxModule,
     DialogModule,
     ButtonModule,
     PasswordModule,
@@ -118,6 +126,10 @@ const routes: Routes = [
 
     DropdownModule,
     PaginatorModule,
+    AngularEditorModule,
+    PdfViewerModule,
+
+    HttpClientModule,
     
     StyleClassModule,
     PanelMenuModule,
@@ -129,7 +141,8 @@ const routes: Routes = [
     InputSwitchModule,
     RippleModule,
     ReactiveFormsModule,
-
+    NgxMaskDirective,
+    NgxMaskPipe,    
     AvatarModule,
     BadgeModule,
     ButtonModule,
@@ -143,6 +156,7 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
   providers: [
+    provideNgxMask(),
     MessageService, // Add this line
   ]
 })

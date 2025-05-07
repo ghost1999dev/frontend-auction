@@ -33,7 +33,7 @@
         
         <div class="flex align-items-center justify-content-between">
             <!-- Botones de Login y Sign Up -->
-            <div class="flex align-items-center">
+            <div class="flex align-items-center" *ngIf="!getTokens()">
                 <button pButton (click)="navigateTo('/auth/login')" label="Log In"
                 class="p-button-text p-button-rounded border-none text-blue-500"></button>
                 
@@ -43,12 +43,12 @@
           
             <!-- Toggle Switch -->
             <label class="toggle-switch flex m-0 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
-              <input type="checkbox" [checked]="isDarkMode" (change)="toggleTheme()">
-              <span class="slider">
-                <span class="icon sun">☀️</span>
-                <span class="icon moon">🌙</span>
-              </span>
-            </label>
+                <input type="checkbox" [checked]="isDarkMode" (change)="toggleTheme()">
+                <span class="slider round">
+                  <span class="icon sun">☀️</span>
+                  <span class="icon moon">🌙</span>
+                </span>
+              </label>
           </div>
     </div>
 </div>

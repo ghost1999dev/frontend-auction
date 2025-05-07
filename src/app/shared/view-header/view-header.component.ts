@@ -7,36 +7,30 @@ import { LayoutService } from 'src/app/core/services/layout.service';
   templateUrl: './view-header.component.html',
   styleUrls: ['./view-header.component.scss']
 })
-export class ViewHeaderComponent implements OnInit {
+export class ViewHeaderComponent {
 
-  constructor(public layoutService: LayoutService, public router: Router) { }
+  constructor(public layoutService: LayoutService, public router: Router) {}
 
-  isDarkMode = false; // Valor por defecto, será sobrescrito en ngOnInit
-
-  ngOnInit() {
-    // Al iniciar el componente, leemos el tema guardado en localStorage
-    const savedTheme = localStorage.getItem('themePreference');
-    if (savedTheme) {
-      this.isDarkMode = savedTheme === 'dark';
-      this.applyTheme(); // Aplicamos el tema guardado
-    }
+  get isDarkMode(): boolean {
+    return this.layoutService.config.colorScheme === 'dark';
   }
 
   toggleTheme() {
-    this.isDarkMode = !this.isDarkMode;
-    // Guardamos la preferencia en localStorage
-    localStorage.setItem('themePreference', this.isDarkMode ? 'dark' : 'light');
-    this.applyTheme();
+    const newScheme = this.isDarkMode ? 'light' : 'dark';
+    localStorage.setItem('themePreference', newScheme);
+    this.changeTheme(
+      newScheme === 'dark' ? 'bootstrap4-dark-blue' : 'lara-light-indigo',
+      newScheme
+    );
   }
 
   changeTheme(theme: string, colorScheme: string) {
     const themeLink = <HTMLLinkElement>document.getElementById('theme-css');
     const newHref = themeLink.getAttribute('href')!.replace(this.layoutService.config.theme, theme);
-    this.layoutService.config.colorScheme
     this.replaceThemeLink(newHref, () => {
-        this.layoutService.config.theme = theme;
-        this.layoutService.config.colorScheme = colorScheme;
-        this.layoutService.onConfigUpdate();
+      this.layoutService.config.theme = theme;
+      this.layoutService.config.colorScheme = colorScheme;
+      this.layoutService.onConfigUpdate();
     });
   }
 
@@ -51,20 +45,10 @@ export class ViewHeaderComponent implements OnInit {
     themeLink.parentNode!.insertBefore(cloneLinkElement, themeLink.nextSibling);
 
     cloneLinkElement.addEventListener('load', () => {
-        themeLink.remove();
-        cloneLinkElement.setAttribute('id', id);
-        onComplete();
+      themeLink.remove();
+      cloneLinkElement.setAttribute('id', id);
+      onComplete();
     });
-  }
-
-  applyTheme() {
-    if (this.isDarkMode) {
-      console.log("Aplica modo Oscuro")
-      this.changeTheme('bootstrap4-dark-blue', 'dark');
-    } else {
-      console.log("Aplica modo claro")
-      this.changeTheme('lara-light-indigo', 'light')
-    }
   }
 
   navigateTo(route: string) {
