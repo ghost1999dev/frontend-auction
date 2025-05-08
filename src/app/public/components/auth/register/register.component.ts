@@ -68,6 +68,10 @@ export class RegisterComponent {
     this.submitted = false; 
   }
 
+  get isDarkMode(): boolean {
+    return this.layoutService.config.colorScheme === 'dark';
+  }
+
   onBusinessTypeAdd(event: any) {
       // Validar el input antes de agregar
       const value = event.value;

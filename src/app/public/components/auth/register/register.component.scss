@@ -18,11 +18,44 @@
     background-color: var(--primary-color-light);
     border-radius: 20px;
     font-size: 10px !important;
-    box-shadow: 0 7px 14px rgba(255, 255, 255, 0.1), 0 3px 6px rgba(252, 252, 252, 0.08);}
+}
 
 .cursor-pointer {
     cursor: pointer;
 }
+
+.selected-card {
+    transition: all 0.3s ease;
+    
+    &.light-mode {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+    }
+    
+    &.dark-mode {
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+      border: 1px solid #444;
+    }
+  }
+  
+  .pd-all {
+    padding: 1.5rem;
+  }
+  
+  /* Estilos base para las tarjetas no seleccionadas */
+  ::ng-deep .p-card {
+    transition: all 0.3s ease;
+    
+    &.light-mode {
+      background-color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    &.dark-mode {
+      background-color: #2d3748;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+  }
 
 .pd-all{
     padding: 10px !important;

@@ -10,15 +10,27 @@
 
                 <div class="flex justify-content-center gap-5 mb-5">
                     <!-- Card for Developer -->
-                    <p-card class="cursor-pointer" (click)="selectUserType('developer')" [ngClass]="{'selected-card': userType === 'developer'}">
+                    <p-card class="cursor-pointer" 
+                            (click)="selectUserType('developer')" 
+                            [ngClass]="{
+                                'selected-card': userType === 'developer',
+                                'dark-mode': isDarkMode,
+                                'light-mode': !isDarkMode
+                            }">
                         <div class="flex flex-column align-items-center pd-all">
                             <i class="pi pi-user text-6xl mb-3"></i>
                             <span class="text-900 text-xl font-medium">Developer</span>
                         </div>
                     </p-card>
-
+                
                     <!-- Card for Company -->
-                    <p-card class="cursor-pointer" (click)="selectUserType('company')" [ngClass]="{'selected-card': userType === 'company'}">
+                    <p-card class="cursor-pointer" 
+                            (click)="selectUserType('company')" 
+                            [ngClass]="{
+                                'selected-card': userType === 'company',
+                                'dark-mode': isDarkMode,
+                                'light-mode': !isDarkMode
+                            }">
                         <div class="flex flex-column align-items-center pd-all">
                             <i class="pi pi-building text-6xl mb-3"></i>
                             <span class="text-900 text-xl font-medium">Company</span>
