@@ -483,6 +483,24 @@ pdf-viewer {
   border-radius: 4px;
 }
 
+/* Estilos para el dropdown de categoría */
+.category-dropdown {
+  width: -webkit-fill-available !important;
+  width: -moz-available !important;
+  width: stretch !important;
+  
+  ::ng-deep .p-dropdown {
+      width: 100% !important;
+  }
+}
+
+/* Para mantener consistencia con otros inputs */
+::ng-deep .p-inputtext {
+  width: -webkit-fill-available !important;
+  width: -moz-available !important;
+  width: stretch !important;
+}
+
 /* Terms checkbox styling */
 .terms-checkbox {
   margin: 20px 0;

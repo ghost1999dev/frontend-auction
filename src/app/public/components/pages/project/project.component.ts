@@ -26,6 +26,7 @@ export class ProjectComponent implements OnInit {
   projects: any[] = [];
   selectedProjects: Project[] = [];
   project: Project = {} as Project;
+  public isRepublishing: any;
 
   projectDialog: boolean = false;
   deleteProjectDialog: boolean = false;
@@ -131,6 +132,12 @@ export class ProjectComponent implements OnInit {
       }
     });
   }
+
+  rePublishProject(project: Project): void {
+    this.currentProjectId = project.id;
+    this.showAddEditDialog = true;
+    this.isRepublishing = true; // Añade esta propiedad en la clase
+}
 
   loadAllProjects(): void {
     this.projectsService.getAllProjects()

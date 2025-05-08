@@ -162,3 +162,13 @@
         }
     }
 }
+
+.p-button.p-button-info {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  
+  &:enabled:hover {
+      background-color: #2563eb;
+      border-color: #2563eb;
+  }
+}

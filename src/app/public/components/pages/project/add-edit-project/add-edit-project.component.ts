@@ -19,6 +19,8 @@ export class AddEditProjectComponent implements OnInit {
   @Input() companyId!: number;
   @Output() saved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
+  @Input() isRepublishing: boolean = false;
+
   categories: Category[] = []; // Add this property
 
   termsAccepted: boolean = false;
@@ -157,6 +159,11 @@ export class AddEditProjectComponent implements OnInit {
 
   saveProject(): void {
     this.submitted = true;
+
+    if ((!this.projectId || this.isRepublishing) && !this.termsAccepted) {
+      this.notificationServices.showErrorCustom('You must accept the terms and conditions');
+      return;
+    }
     
     if (!this.project.project_name?.trim()) {
       return;
@@ -164,52 +171,73 @@ export class AddEditProjectComponent implements OnInit {
 
     this.loading = true;
     
-    if (this.project.id) {
-      // Update project
-      const updateData: UpdateProject = {
+    if (this.project.id && !this.isRepublishing) {
+        // Update project
+        const updateData: UpdateProject = {
+          company_id: this.companyId,
+          category_id: this.project.category_id, // Add this
+          project_name: this.project.project_name,
+          description: this.project.description,
+          budget: this.project.budget,
+          days_available: this.project.days_available
+        };
+  
+        this.projectsService.updateProject(this.project.id, updateData).subscribe({
+          next: () => {
+            this.notificationServices.showSuccessCustom('Project updated successfully')
+            this.saved.emit();
+            this.loading = false;
+          },
+          error: () => {
+            this.notificationServices.showErrorCustom('Failed to update project')
+            this.loading = false;
+          }
+        });
+    }else{
+      // Para republicar o crear nuevo
+      const projectData = {
         company_id: this.companyId,
-        category_id: this.project.category_id, // Add this
+        category_id: this.project.category_id,
         project_name: this.project.project_name,
         description: this.project.description,
-        budget: this.project.budget,
-        days_available: this.project.days_available
-      };
-
-      this.projectsService.updateProject(this.project.id, updateData).subscribe({
-        next: () => {
-          this.notificationServices.showSuccessCustom('Project updated successfully')
-          this.saved.emit();
-          this.loading = false;
-        },
-        error: () => {
-          this.notificationServices.showErrorCustom('Failed to update project')
-          this.loading = false;
-        }
-      });
-    } else {
-      // Create project
-      const newProject = {
-        company_id: this.companyId,
-        category_id: this.project.category_id, // Changed from hardcoded 1 to use selected value
-        project_name: this.project.project_name,
-        description: this.project.description,
+        full_description: this.project.full_description,
         budget: this.project.budget,
         days_available: this.project.days_available,
-        status: 1
+        status: 0 // Siempre activo para republicaciones
       };
 
-      this.projectsService.createProject(newProject).subscribe({
-        next: () => {
-          this.notificationServices.showSuccessCustom('Project created successfully')
-          this.saved.emit();
-          this.loading = false;
-        },
-        error: () => {
-          this.notificationServices.showErrorCustom('Failed to created project')
-          this.loading = false;
+      if (this.isRepublishing) {
+        // Clonar el proyecto existente
+        this.projectsService.createProject(projectData).subscribe({
+            next: () => {
+                this.notificationServices.showSuccessCustom('Project republished successfully');
+                this.saved.emit();
+                this.loading = false;
+            },
+            error: () => {
+                this.notificationServices.showErrorCustom('Failed to republish project');
+                this.loading = false;
+            }
+        });
+      } else {
+          this.projectsService.createProject(projectData)
+          .subscribe({
+            next: () => {
+              this.notificationServices.showSuccessCustom('Project created successfully')
+              this.saved.emit();
+              this.loading = false;
+            },
+            error: () => {
+              this.notificationServices.showErrorCustom('Failed to created project')
+              this.loading = false;
+            }
+          });      
         }
-      });
     }
+  }
+
+  shouldDisableFields(): boolean {
+    return !!this.projectId && !this.isRepublishing;
   }
 
   cancel(): void {

@@ -77,8 +77,10 @@
                                 <div class="flex">
                                     <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
                                             (click)="editProject(project)"></button>
-                                    <button *ngIf="project.status === 1" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" 
+                                    <button *ngIf="project.status === 1" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" 
                                             (click)="deleteProject(project)"></button>
+                                    <button pButton pRipple icon="pi pi-replay" class="p-button-rounded p-button-info" 
+                                            (click)="rePublishProject(project)"></button>
                                 </div>
                             </td>
                         </tr>
@@ -90,8 +92,9 @@
             *ngIf="showAddEditDialog"
             [projectId]="currentProjectId"
             [companyId]="company?.id"
+            [isRepublishing]="isRepublishing"
             (saved)="onProjectSaved()"
-            (cancelled)="showAddEditDialog = false">
+            (cancelled)="showAddEditDialog = false; isRepublishing = false">
         </app-add-edit-project>
     
             <!-- <p-dialog [(visible)]="projectDialog" [style]="{width: '450px'}" header="Project Details" [modal]="true" class="p-fluid">
