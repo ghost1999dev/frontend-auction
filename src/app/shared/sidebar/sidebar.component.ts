@@ -1,5 +1,8 @@
+import { companies } from './../../core/models/companies';
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { LayoutService } from 'src/app/core/services/app.layout.service';
+import { CompaniesService } from 'src/app/core/services/companies.service';
+import { ProjectsService } from 'src/app/core/services/projects.service';
 import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
@@ -9,20 +12,24 @@ import { UserService } from 'src/app/core/services/user.service';
 })
 export class SidebarComponent implements OnInit {
 
+  projects: any[] = [];
   model: any[] = [];
   public user: any;
+  project_availables: any[] = []
 
   constructor(
+    private projectsService: ProjectsService,
     public layoutService: LayoutService, 
     public el: ElementRef,     
     private userService: UserService,
+    private companiesService: CompaniesService,
   ) { }
 
   ngOnInit() {
     this.getUserById(this.id)
   }
 
-  private initializeMenuBasedOnRole() {
+  private initializeMenuBasedOnRole(number: number) {
     if (this.user?.role_id === 1) { // Company - mostrar todo
       this.model = [
         {
@@ -35,7 +42,7 @@ export class SidebarComponent implements OnInit {
           label: 'Menu',
           items: [
             //{ label: 'Auctions', icon: 'pi pi-fw pi-id-card', routerLink: ['/main/auctions'] },
-            { label: 'Projects', icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects'] },
+            { label: `Projects - ${number}/5`, icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects'] },
             //{ label: 'Favorites', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
             //{ label: 'Users', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/users'] }
           ]
@@ -62,14 +69,36 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  public getUserById(id: any){
+  loadProjects(id: any): void {
+    this.projectsService.getProjectsByCompany(id)
+    .subscribe({
+      next: (data) => {
+        this.projects = data;
+        this.initializeMenuBasedOnRole(this.projects.length)
+      },
+      error: (error) => {
+      }
+    });
+  }
+
+  loadCompany(userId: number): void {
+    this.companiesService.getCompanyByUserId(userId)
+    .subscribe({
+      next: (data: any) => {
+        this.loadProjects(data.id)
+      },
+      error: (error: any) => {
+        console.error('Error loading company:', error);
+      }
+    });
+  }
+
+    public getUserById(id: any){
     this.userService.getUsersById(id)
     .subscribe((next: any) => {
       if(next){
         this.user = next;
-        this.initializeMenuBasedOnRole();
-      }else{
-        
+        this.loadCompany(next.id)
       }
     })
   }

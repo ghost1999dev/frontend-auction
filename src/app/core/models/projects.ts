@@ -21,8 +21,8 @@ export interface ProjectResponse {
     status: number; // 1 for active, 0 for inactive
     createdAt?: string;
     updatedAt?: string;
-    category?: Category;
-    company?: Company;
+    category: Category[];
+    company: Company[];
   }
   
   export interface Category {

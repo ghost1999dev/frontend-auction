@@ -92,7 +92,6 @@ export class ProjectComponent implements OnInit {
     });
   }
 
-
   loadDeveloper(id: number): void {
     this.developerService.getDeveloperByIdUser(id)
     .subscribe({
