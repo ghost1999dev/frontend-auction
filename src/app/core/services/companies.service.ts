@@ -31,7 +31,6 @@ export class CompaniesService {
     return this.http.get<CompanyResponseByUserId>(`${environment.server_url}companies/show/user_id/${userId}`)
       .pipe(
         map(response => response.company),
-        catchError((err) => this.handlerError(err))
       );
   }
 

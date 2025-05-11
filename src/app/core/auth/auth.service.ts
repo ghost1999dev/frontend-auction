@@ -65,6 +65,7 @@ export class AuthService {
   public logout():void{
     localStorage.removeItem('login-token');
     localStorage.removeItem('isLoggedin');
+    localStorage.removeItem('lenght_projects');
     this.userService.clearCache()
     this.developerService.clearDevelopersCache()
     this.companiesService.clearCompaniesCache()

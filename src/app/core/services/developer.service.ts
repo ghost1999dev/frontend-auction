@@ -29,7 +29,6 @@ export class DeveloperService {
     return this.http.get<DeveloperResponseById>(`${environment.server_url}developers/show/user_id/${id}`)
       .pipe(
         map(response => response.developer),
-        catchError((err) => this.handlerError(err))
       );
   }
 
