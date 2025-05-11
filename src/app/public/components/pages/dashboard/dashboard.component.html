@@ -121,12 +121,8 @@
                                         <!-- Bio -->
                                         <div class="field-container">
                                             <div class="input-group">
-                                                <label for="bio" class="input-label">Bio/Description</label>
-                                                <p-inputTextarea id="bio" formControlName="bio" 
-                                                        [rows]="3" [autoResize]="true"
-                                                        class="centered-input w-full"
-                                                        placeholder="Tell us about your skills and experience">
-                                                </p-inputTextarea>
+                                            <label for="bio" class="input-label">Bio/Description</label>
+                                            <textarea pInputText id="bio" formControlName="bio" class="centered-input" rows="3"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -188,19 +184,6 @@
 
                                     <!-- Columna 2 -->
                                     <div class="form-column">
-                                        <!-- Business Type -->
-                                        <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="business_type" class="input-label">Business Type</label>
-                                                <input id="business_type" type="text" pInputText formControlName="business_type" 
-                                                        class="centered-input"
-                                                        onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)"
-                                                        [ngClass]="{'p-invalid': submitted && companyForm.get('business_type')?.errors}">
-                                                <small *ngIf="submitted && companyForm.get('business_type')?.errors" class="error-message">
-                                                    Business Type is required
-                                                </small>
-                                            </div>
-                                        </div>
 
                                         <div class="field-container">
                                             <div class="input-group">
@@ -214,6 +197,7 @@
                                                         [max]="1"
                                                         [allowDuplicate]="false"
                                                         [addOnBlur]="true"
+                                                        class="centered-input"
                                                         [ngClass]="{ 'p-invalid': submitted && companyForm.get('business_type')?.errors }">
                                                     <ng-template let-item pTemplate="item">
                                                         <p-tag [value]="item" [rounded]="true"></p-tag>

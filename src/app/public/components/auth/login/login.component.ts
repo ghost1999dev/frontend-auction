@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { LayoutService } from 'src/app/core/services/layout.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -53,12 +54,10 @@ export class LoginComponent implements OnInit {
   }
 
   loginWithGoogle() {
-    // Redirige al endpoint de autenticación de Google en tu backend
-    window.location.href = 'https://backend-auction-5zdm.onrender.com/passport/auth/google/callback';
+    window.location.href = `${environment.server_url}passport/auth/google/callback`;
   }
 
   loginWithGitHub() {
-    // Redirige al endpoint de autenticación de Google en tu backend
-    window.location.href = 'https://backend-auction-5zdm.onrender.com/passport/auth/github/callback';
+    window.location.href = `${environment.server_url}passport/auth/github/callback`;
   }
 }

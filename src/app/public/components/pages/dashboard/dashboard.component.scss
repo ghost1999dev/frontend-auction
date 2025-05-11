@@ -16,6 +16,24 @@
     overflow: hidden;
 }
 
+.field-container {
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.centered-input {
+  width: 100%;
+}
+
+.w-full {
+  width: 100%;
+}
+
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

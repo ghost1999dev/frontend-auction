@@ -12,7 +12,7 @@ import { TableModule } from 'primeng/table';
 import { MenuModule } from 'primeng/menu'; // Import MenuModule
 import { ChartModule } from 'primeng/chart'; // Import ChartModule
 import { AuctionsComponent } from './auctions/auctions.component';
-
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { InputTextModule } from 'primeng/inputtext';
 import { SidebarModule } from 'primeng/sidebar';
@@ -40,7 +40,9 @@ import { MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
 import { ToolbarModule } from 'primeng/toolbar';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+
+import { ChipsModule } from 'primeng/chips';
+
 import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 import { AddEditProjectComponent } from './project/add-edit-project/add-edit-project.component';
 import { AngularEditorModule } from '@kolkov/angular-editor';
@@ -125,6 +127,7 @@ const routes: Routes = [
     PasswordModule,
     ToolbarModule,
     InputTextareaModule,
+    ChipsModule,
 
     DropdownModule,
     PaginatorModule,
