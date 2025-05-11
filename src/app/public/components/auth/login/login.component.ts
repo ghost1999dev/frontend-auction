@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
       if(res){        
         this.onLoggedin()
         this.router.navigate(['/main/dashboard']);
-        this.notificationServices.showSuccessCustom('Welcome to CodeBind');
+        this.notificationServices.showSuccessCustom('Welcome to CodeBid');
       }
     },
     (err: any) => {

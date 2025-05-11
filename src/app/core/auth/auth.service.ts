@@ -36,7 +36,7 @@ export class AuthService {
   handleAuthentication(token: string): void {
     localStorage.setItem('login-token', token);
     localStorage.setItem('isLoggedin', 'true');
-    this.notificationServices.showSuccessCustom('Welcome to CodeBind');
+    this.notificationServices.showSuccessCustom('Welcome to CodeBid');
     this.router.navigate(['/main/dashboard']);
   }
 
