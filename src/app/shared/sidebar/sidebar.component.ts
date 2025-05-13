@@ -69,7 +69,7 @@ export class SidebarComponent implements OnInit {
       ];
   }
 
-    public getUserById(id: any){
+  public getUserById(id: any){
     this.userService.getUsersById(id)
     .subscribe((next: any) => {
       if(next){
