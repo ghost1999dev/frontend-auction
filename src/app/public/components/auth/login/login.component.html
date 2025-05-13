@@ -4,69 +4,65 @@
       <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
         <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
           <div class="text-center mb-5">
-            <div class="text-900 text-3xl font-medium mb-3">Welcome to Sign In</div>
-            <span class="text-600 font-medium">Sign in to continue</span>
+            <div class="text-900 text-3xl font-medium mb-3">Bienvenido a iniciar sesión</div>
+            <span class="text-600 font-medium">Inicia sesión para continuar</span>
           </div>
   
           <div>
             <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
               <!-- Email Field -->
-              <label for="email" class="block text-900 text-xl font-medium mb-2">Email</label>
-              <input formControlName="email" [pattern]="emailPattern" id="email" name="email" type="email" placeholder="Email address" pInputText class="w-full md:w-30rem" style="padding:1rem" [ngClass]="{ 'is-invalid': submitted && loginForm.get('email')?.errors }" />
+              <label for="email" class="block text-900 text-xl font-medium mb-2">Correo electrónico</label>
+              <input formControlName="email" [pattern]="emailPattern" id="email" name="email" type="email" placeholder="Dirección de correo electrónico" pInputText class="w-full md:w-30rem" style="padding:1rem" [ngClass]="{ 'is-invalid': submitted && loginForm.get('email')?.errors }" />
               <div *ngIf="submitted && loginForm.get('email')?.errors" class="invalid-feed mt-1">
-                <div *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</div>
-                <div *ngIf="loginForm.get('email')?.errors?.['pattern']">Invalid email format</div>
-              </div>
+                <div *ngIf="loginForm.get('email')?.errors?.['required']">Correo electrónico es requerido</div>
+                <div *ngIf="loginForm.get('email')?.errors?.['pattern']">Formato de correo electrónico no válido</div>
+              </div>             
   
               <!-- Password Field -->
-              <label for="password" class="block text-900 font-medium text-xl mb-2 mt-5">Password</label>
-              <input formControlName="password" id="password" name="password" type="password" placeholder="Password" pInputText class="w-full md:w-30rem" style="padding:1rem" [ngClass]="{ 'is-invalid': submitted && loginForm.get('password')?.errors }" />
+              <label for="password" class="block text-900 font-medium text-xl mb-2 mt-5">Contraseña</label>
+              <input formControlName="password" id="password" name="password" type="password" placeholder="Contraseña" pInputText class="w-full md:w-30rem" style="padding:1rem" [ngClass]="{ 'is-invalid': submitted && loginForm.get('password')?.errors }" />
               <div *ngIf="submitted && loginForm.get('password')?.errors" class="invalid-feed mt-1">
-                <div *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</div>
-                <div *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                <div *ngIf="loginForm.get('password')?.errors?.['required']">La Constraseña es Requerida</div>
+                <div *ngIf="loginForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</div>
               </div>
   
               <!-- Remember Me and Forgot Password -->
               <div class="flex align-items-center justify-content-between mb-5 gap-5 mt-5">
                 <div class="flex align-items-center">
-                  <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox>
-                  <label for="rememberme1">Remember me</label>
+                  <!-- <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox>
+                  <label for="rememberme1">Remember me</label> -->
                 </div>
                 <a class="font-medium no-underline ml-2 text-right cursor-pointer" [routerLink]="['/auth/forgot-password']" style="color: var(--primary-color)">Forgot password?</a>
               </div>
   
               <!-- Submit Button -->
-              <button pButton pRipple label="Sign In" class="w-full p-3 text-xl"></button>
+              <button type="submit" pButton pRipple label="Iniciar Sesión" class="w-full p-3 text-xl"></button>
                             
-              <!-- Divider -->
               <div class="flex align-items-center justify-content-center my-5">
                 <div class="border-top-1 border-300 flex-grow-1"></div>
-                <span class="px-3 text-600 font-medium">or other method</span>
+                <span class="px-3 text-600 font-medium">u otro método</span>
                 <div class="border-top-1 border-300 flex-grow-1"></div>
               </div>
 
-              <!-- Google Sign In Button -->
               <button pButton pRipple 
                     type="button" 
                     icon="pi pi-google" 
-                    [label]="layoutService.config.colorScheme === 'light' ? 'Sign in with Google' : 'Sign in with Google'" 
+                    [label]="layoutService.config.colorScheme === 'light' ? 'Iniciar con Google' : 'Iniciar con Google'" 
                     class="w-full p-3 text-xl" 
                     [style]="layoutService.config.colorScheme === 'light' ? 
                             'background-color: #DB4437; border-color: #DB4437; color: white;' : 
                             'background-color: #DB4437; border-color: #DB4437; color: white;'"
                     (click)="loginWithGoogle()"></button>
 
-              <!-- GitHub Sign In Button -->
               <button pButton pRipple 
                     type="button" 
                     icon="pi pi-github" 
-                    [label]="layoutService.config.colorScheme === 'light' ? 'Sign in with GitHub' : 'Sign in with GitHub'" 
+                    [label]="layoutService.config.colorScheme === 'light' ? 'Iniciar con GitHub' : 'Iniciar con GitHub'" 
                     class="w-full p-3 text-xl mt-6" 
-                    [style]="layoutService.config.colorScheme === 'light' ? 
+                     [style]="layoutService.config.colorScheme === 'light' ? 
                             'background-color: #333; border-color: #333; color: white;' : 
                             'background-color: #fff; border-color: #fff; color: #333;'"
-                    (click)="loginWithGitHub()"></button>
-
+                    (click)="loginWithGitHub()"></button> 
 
             </form>
           </div>
@@ -74,3 +70,4 @@
       </div>
     </div>
   </div>
+

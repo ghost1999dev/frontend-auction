@@ -25,17 +25,16 @@ export class LandingComponent {
   
   // Options
   statusOptions: any[] = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 }
+    { label: 'Activo', value: 1 },
+    { label: 'Inactivo', value: 0 }
   ];
   
   sortOptions: any[] = [
-    { label: 'Newest First', value: 'newest' },
-    { label: 'Oldest First', value: 'oldest' },
-    { label: 'Highest Budget', value: 'highest' },
-    { label: 'Lowest Budget', value: 'lowest' }
+    { label: 'Más nuevo primero', value: 'newest' },
+    { label: 'Más antiguo primero', value: 'oldest' },
+    { label: 'Presupuesto mas alto', value: 'highest' },
+    { label: 'Presupuesto mas bajo', value: 'lowest' }
   ];
-
 
   constructor(
     public layoutService: LayoutService, 
@@ -58,7 +57,7 @@ export class LandingComponent {
         this.clearFilters()
       },
       error: (error) => {
-        console.log("Error")
+        console.error("Error: ", error)
       }
     });
   }

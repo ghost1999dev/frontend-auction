@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <!-- Developer Specific Information -->
+      <!-- Información específica para Desarrolladores -->
       <ng-container *ngIf="developer">
         <div class="detail-item">
           <i class="pi pi-briefcase"></i>
@@ -93,7 +93,7 @@
         <div class="detail-item">
           <i class="pi pi-info-circle"></i>
           <div>
-            <span class="detail-label">Bio</span>
+            <span class="detail-label">Biografía</span>
             <span class="detail-value">{{ developer.bio || 'No especificada' }}</span>
           </div>
         </div>
@@ -119,7 +119,7 @@
         </div>
       </ng-container>
 
-      <!-- Company Specific Information -->
+      <!-- Información específica para Empresas -->
       <ng-container *ngIf="company">
         <div class="detail-item">
           <i class="pi pi-id-card"></i>
@@ -155,7 +155,6 @@
           </div>
         </div>
       </ng-container>
-      
     </div>
 
     <div class="profile-actions">
@@ -174,33 +173,33 @@
         pButton pRipple 
         (click)="showDialogPassword()"
         [icon]="user.status ? 'pi pi-lock-open' : 'pi pi-lock'" 
-        label="Update Password" 
+        label="Actualizar Contraseña" 
         class="ml-2"></button>
     </div>
   </p-card>
 </div>
 
-<p-dialog [(visible)]="userDialog" [style]="{width: '550px'}" header="Update Profile" [modal]="true" class="p-fluid">
+<p-dialog [(visible)]="userDialog" [style]="{width: '550px'}" header="Actualizar Perfil" [modal]="true" class="p-fluid">
   <ng-template pTemplate="content">
       <div *ngIf="loading" class="text-center p-5">
           <p-progressSpinner></p-progressSpinner>
-          <p>Loading user data...</p>
+          <p>Cargando datos del usuario...</p>
       </div>
 
       <div *ngIf="!loading">
-          <!-- Common User Fields -->
+          <!-- Campos comunes de usuario -->
           <div class="field">
-              <label for="name">Name</label>
+              <label for="name">Nombre</label>
               <input type="text" pInputText id="name" [(ngModel)]="userUpdate.name" required 
                      [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.name}"/>
-              <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.name">Name is required.</small>
+              <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.name">Nombre es requerido.</small>
           </div>
           
           <div class="field">
-              <label for="address">Address</label>
+              <label for="address">Dirección</label>
               <input type="text" pInputText id="address" [(ngModel)]="userUpdate.address" required 
                      [ngClass]="{'ng-invalid ng-dirty': submitted && !userUpdate.address}"/>
-              <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.address">Address is required.</small>
+              <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.address">Dirección es requerida.</small>
           </div>
 
           <div class="field">
@@ -219,44 +218,43 @@
             <small class="ng-dirty ng-invalid" *ngIf="submitted && !userUpdate.phone">Teléfono es requerido.</small>
           </div>
 
-          <!-- Developer Specific Fields -->
+          <!-- Campos específicos para Desarrolladores -->
           <ng-container *ngIf="this.developer">
               <p-divider></p-divider>
-              <h4>Developer Information</h4>
+              <h4>Información del Desarrollador</h4>
 
               <div class="field">
-                <label for="occupation">Occupation</label>
+                <label for="occupation">Ocupación</label>
                 <input type="text" pInputText id="occupation" [(ngModel)]="developerData.occupation"/>
               </div>
 
-
               <div class="field">
-                  <label for="bio">Bio</label>
+                  <label for="bio">Biografía</label>
                   <input type="text" pInputText id="bio" [(ngModel)]="developerData.bio" rows="3"/>
               </div>
 
               <div class="field">
-                  <label for="linkedin">LinkedIn URL</label>
+                  <label for="linkedin">URL de LinkedIn</label>
                   <input type="url" pInputText id="linkedin" [(ngModel)]="developerData.linkedin"/>
                   <small *ngIf="submitted && developerData.linkedin"
-                         class="ng-dirty ng-invalid">Please enter a valid URL</small>
+                         class="ng-dirty ng-invalid">Ingrese una URL válida</small>
               </div>
 
               <div class="field">
-                  <label for="portfolio">Portfolio URL</label>
+                  <label for="portfolio">URL de Portafolio</label>
                   <input type="url" pInputText id="portfolio" [(ngModel)]="developerData.portfolio"/>
                   <small *ngIf="submitted && developerData.portfolio" 
-                         class="ng-dirty ng-invalid">Please enter a valid URL</small>
+                         class="ng-dirty ng-invalid">Ingrese una URL válida</small>
               </div>
           </ng-container>
 
-          <!-- Company Specific Fields -->
+          <!-- Campos específicos para Empresas -->
           <ng-container *ngIf="this.company">
             <p-divider></p-divider>
             <h4>Información de la Empresa</h4>
             
             <div class="field">
-                <label for="nit_number">NIT/DUI Number</label>
+                <label for="nit_number">Número de NIT/DUI</label>
                 <input type="text" pInputText id="nit_number" [(ngModel)]="companyUpdate.nit_number" 
                 (input)="formatNitNumber($event)"
                 [maxlength]="18"
@@ -297,54 +295,54 @@
   </ng-template>
 
   <ng-template pTemplate="footer">
-      <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" 
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" 
               (click)="hideDialog()" [disabled]="loading"></button>
-      <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text" 
+      <button pButton pRipple label="Actualizar" icon="pi pi-check" class="p-button-text" 
               (click)="updateUser()" [disabled]="loading"></button>
   </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="passwordDialog" [style]="{width: '450px'}" header="Update Password" [modal]="true" class="p-fluid">
+<p-dialog [(visible)]="passwordDialog" [style]="{width: '450px'}" header="Actualizar Contraseña" [modal]="true" class="p-fluid">
 <ng-template pTemplate="content">
     <div class="field">
-        <label for="currentPassword">Current Password</label>
+        <label for="currentPassword">Contraseña Actual</label>
         <p-password id="currentPassword" [(ngModel)]="passwordData.currentPassword" 
                    [feedback]="false" required [toggleMask]="true"
                    class="eye-icons"
                    [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.currentPassword}">
         </p-password>
         <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.currentPassword">
-            Current password is required.
+            La contraseña actual es requerida.
         </small>
     </div>
 
     <div class="field">
-        <label for="newPassword">New Password</label>
+        <label for="newPassword">Nueva Contraseña</label>
         <p-password id="newPassword" [(ngModel)]="passwordData.Newpassword" 
                    [feedback]="true" required [toggleMask]="true"
                    [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.Newpassword}">
         </p-password>
         <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.Newpassword">
-            New password is required.
+            La nueva contraseña es requerida.
         </small>
     </div>
 
     <div class="field" *ngIf="passwordData.Newpassword && passwordData.currentPassword">
-        <label for="confirmPassword">Confirm New Password</label>
+        <label for="confirmPassword">Confirmar Nueva Contraseña</label>
         <p-password id="confirmPassword" [(ngModel)]="confirmPassword" 
                    [feedback]="false" required [toggleMask]="true"
                    [ngClass]="{'ng-invalid ng-dirty': submitted && passwordData.Newpassword !== confirmPassword}">
         </p-password>
         <small class="ng-dirty ng-invalid" *ngIf="submitted && passwordData.Newpassword !== confirmPassword">
-            Passwords do not match.
+            Las contraseñas no coinciden.
         </small>
     </div>
 </ng-template>
 
 <ng-template pTemplate="footer">
-    <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" 
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" 
             (click)="hideDialog()" [disabled]="loading"></button>
-    <button pButton pRipple label="Update" icon="pi pi-check" class="p-button-text" 
+    <button pButton pRipple label="Actualizar" icon="pi pi-check" class="p-button-text" 
             (click)="updatePassword()" [disabled]="loading"></button>
 </ng-template>
 </p-dialog>

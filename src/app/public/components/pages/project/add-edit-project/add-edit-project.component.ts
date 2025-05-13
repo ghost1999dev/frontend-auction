@@ -66,8 +66,8 @@ export class AddEditProjectComponent implements OnInit {
         this.categories = categories;
       },
       error: (error) => {
-        this.notificationServices.showErrorCustom('Failed to load categories');
-        console.error('Error loading categories:', error);
+        this.notificationServices.showErrorCustom('No se pudo cargar categorías');
+        console.error('No se pudo cargar categorías:', error);
       }
     });
   }
@@ -151,7 +151,7 @@ export class AddEditProjectComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.notificationServices.showErrorCustom('Failed to load projects')
+        this.notificationServices.showErrorCustom('No se pudo cargar proyectos')
         this.loading = false;
       }
     });
@@ -161,7 +161,7 @@ export class AddEditProjectComponent implements OnInit {
     this.submitted = true;
 
     if ((!this.projectId || this.isRepublishing) && !this.termsAccepted) {
-      this.notificationServices.showErrorCustom('You must accept the terms and conditions');
+      this.notificationServices.showErrorCustom('Debe aceptar los términos y condiciones');
       return;
     }
     
@@ -184,12 +184,12 @@ export class AddEditProjectComponent implements OnInit {
   
         this.projectsService.updateProject(this.project.id, updateData).subscribe({
           next: () => {
-            this.notificationServices.showSuccessCustom('Project updated successfully')
+            this.notificationServices.showSuccessCustom('Proyecto actualizado con éxito')
             this.saved.emit();
             this.loading = false;
           },
           error: () => {
-            this.notificationServices.showErrorCustom('Failed to update project')
+            this.notificationServices.showErrorCustom('No se pudo actualizar el proyecto')
             this.loading = false;
           }
         });
@@ -210,12 +210,12 @@ export class AddEditProjectComponent implements OnInit {
         // Clonar el proyecto existente
         this.projectsService.createProject(projectData).subscribe({
             next: () => {
-                this.notificationServices.showSuccessCustom('Project republished successfully');
+                this.notificationServices.showSuccessCustom('Proyecto publicado con éxito');
                 this.saved.emit();
                 this.loading = false;
             },
             error: () => {
-                this.notificationServices.showErrorCustom('Failed to republish project');
+                this.notificationServices.showErrorCustom('No se pudo volver a publicar el proyecto');
                 this.loading = false;
             }
         });
@@ -223,12 +223,12 @@ export class AddEditProjectComponent implements OnInit {
           this.projectsService.createProject(projectData)
           .subscribe({
             next: () => {
-              this.notificationServices.showSuccessCustom('Project created successfully')
+              this.notificationServices.showSuccessCustom('Proyecto creado con éxito')
               this.saved.emit();
               this.loading = false;
             },
             error: () => {
-              this.notificationServices.showErrorCustom('Failed to created project')
+              this.notificationServices.showErrorCustom('No se pudo crear el proyecto')
               this.loading = false;
             }
           });      

@@ -45,7 +45,6 @@ export class ActivateAccountComponent {
     }else if (savedDataCompanies) {
       this.userDataCompanies = JSON.parse(savedDataCompanies);
     }else {
-      console.warn('No se encontraron datos de registro en localStorage');
       this.router.navigate(['/auth/register']);
     }
   }
@@ -92,7 +91,7 @@ export class ActivateAccountComponent {
               this.router.navigate(['/auth/login']);
               this.notificationServices.showSuccessCustom(next.message)
             }else{
-              this.notificationServices.showErrorCustom("Error Creating Developer.")
+              this.notificationServices.showErrorCustom("Error al crear el desarrollador")
             }
           })
         },
@@ -129,7 +128,7 @@ export class ActivateAccountComponent {
             if(next){
               localStorage.removeItem('FormDataCompanies');
               this.router.navigate(['/auth/login']);
-              this.notificationServices.showSuccessCustom("Congratulations! Your Companies account has been successfully verified.")
+              this.notificationServices.showSuccessCustom('¡Felicitaciones! Su cuenta de empresa ha sido verificada exitosamente.')
             }else{
               //this.notificationServices.showErrorCustom("Error creating the company.")
             }

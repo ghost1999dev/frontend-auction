@@ -7,75 +7,75 @@
                     <ng-template pTemplate="left">
                         <div class="my-2">
                             @if (this.projects.length < 5) {
-                                <button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                                <button pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
                             }@else{
-                                <button disabled pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
+                                <button disabled pButton pRipple label="Nuevo" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button>
                                 <p class="mt-1" style="color: red; font-size: 13px;">
-                                    The Companies cannot have more than 5 projects.            
+                                    Las empresas no pueden tener más de 5 proyectos.            
                                 </p>
                             }
-                            <!-- <button pButton pRipple label="Delete" icon="pi pi-trash" class="p-button-danger" 
+                            <!-- <button pButton pRipple label="Eliminar" icon="pi pi-trash" class="p-button-danger" 
                                     (click)="deleteProjectsDialog = true" [disabled]="!selectedProjects || !selectedProjects.length"></button>
                          -->
                         </div>
                     </ng-template>
     
                     <ng-template pTemplate="right">
-                        <!--<button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>-->
+                        <!--<button pButton pRipple label="Exportar" icon="pi pi-upload" class="p-button-help" (click)="dt.exportCSV()"></button>-->
                     </ng-template>
                 </p-toolbar>
     
                 <p-table #dt [value]="projects" responsiveLayout="scroll" [rows]="10" 
                         [globalFilterFields]="['project_name','description','status']" [paginator]="true" 
                         [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" 
+                        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" 
                         [(selection)]="selectedProjects" selectionMode="multiple" [rowHover]="true" dataKey="id">
                     <ng-template pTemplate="caption">
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">Manage Projects</h5>
+                            <h5 class="m-0">Administrar Proyectos</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search"></i>
-                                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." class="w-full sm:w-auto"/>
+                                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..." class="w-full sm:w-auto"/>
                             </span>
                         </div>
                     </ng-template>
                     <ng-template pTemplate="header">
                         <tr>
-                            <th pSortableColumn="project_name">Name <p-sortIcon field="project_name"></p-sortIcon></th>
-                            <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
-                            <th pSortableColumn="budget">Budget <p-sortIcon field="budget"></p-sortIcon></th>
-                            <th pSortableColumn="days_available">Days Available <p-sortIcon field="days_available"></p-sortIcon></th>
-                            <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+                            <th pSortableColumn="project_name">Nombre <p-sortIcon field="project_name"></p-sortIcon></th>
+                            <th pSortableColumn="description">Descripción <p-sortIcon field="description"></p-sortIcon></th>
+                            <th pSortableColumn="budget">Presupuesto <p-sortIcon field="budget"></p-sortIcon></th>
+                            <th pSortableColumn="days_available">Días Disponibles <p-sortIcon field="days_available"></p-sortIcon></th>
+                            <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
                             <th></th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-project>
                         <tr>
                             <td style="width:25%; min-width:10rem;">
-                                <span class="p-column-title">Name</span>
+                                <span class="p-column-title">Nombre</span>
                                 {{project.project_name}}
                             </td>
                             <td style="width:15%; min-width:10rem;">
-                                <span class="p-column-title">Description</span>
+                                <span class="p-column-title">Descripción</span>
                                 {{project.description | slice:0:50}}{{project.description.length > 50 ? '...' : ''}}
                             </td>
                             <td style="width:15%; min-width:8rem;">
-                                <span class="p-column-title">Budget</span>
+                                <span class="p-column-title">Presupuesto</span>
                                 {{project.budget | currency:'USD'}}
                             </td>
                             <td style="width:14%; min-width:8rem;">
-                                <span class="p-column-title">Days Available</span>
-                                {{project.days_available}} days
+                                <span class="p-column-title">Días Disponibles</span>
+                                {{project.days_available}} días
                             </td>
                             <td style="width:14%; min-width: 10rem;">
-                                <span class="p-column-title">Status</span>
+                                <span class="p-column-title">Estado</span>
                                 <span [class]="'project-badge status-' + (project.status === 1 ? 'active' : 'inactive')">
-                                    {{project.status === 1 ? 'Active' : 'Inactive'}}
+                                    {{project.status === 1 ? 'Activo' : 'Inactivo'}}
                                 </span>
                             </td>
                             <td>
                                 <div class="flex">
-                                    <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
+                                    <button *ngIf="project.status === 0" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
                                             (click)="editProject(project)"></button>
                                     <button *ngIf="project.status === 1" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" 
                                             (click)="deleteProject(project)"></button>
@@ -97,64 +97,25 @@
             (cancelled)="showAddEditDialog = false; isRepublishing = false">
         </app-add-edit-project>
     
-            <!-- <p-dialog [(visible)]="projectDialog" [style]="{width: '450px'}" header="Project Details" [modal]="true" class="p-fluid">
-                <ng-template pTemplate="content">
-                    <div class="field">
-                        <label for="project_name">Project Name</label>
-                        <input type="text" pInputText id="project_name" [(ngModel)]="project.project_name" required autofocus 
-                               [ngClass]="{'ng-invalid ng-dirty' : submitted && !project.project_name}"/>
-                        <small class="ng-dirty ng-invalid" *ngIf="submitted && !project.project_name">Project name is required.</small>
-                    </div>
-                    <div class="field">
-                        <label for="description">Description</label>
-                        <textarea 
-                            id="description" 
-                            pInputTextarea 
-                            [(ngModel)]="project.description" 
-                            required 
-                            rows="3" 
-                            cols="20"
-                            class="w-full">
-                        </textarea>
-                    </div>
-    
-                    <div class="formgrid grid">
-                        <div class="field col">
-                            <label for="budget">Budget</label>
-                            <p-inputNumber id="budget" [(ngModel)]="project.budget" mode="currency" currency="USD" locale="en-US"></p-inputNumber>
-                        </div>
-                        <div class="field col">
-                            <label for="days_available">Days Available</label>
-                            <p-inputNumber id="days_available" [(ngModel)]="project.days_available"></p-inputNumber>
-                        </div>
-                    </div>
-                </ng-template>
-    
-                <ng-template pTemplate="footer">
-                    <button pButton pRipple label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-                    <button pButton pRipple label="Save" icon="pi pi-check" class="p-button-text" (click)="saveProject(company.id)"></button>
-                </ng-template>
-            </p-dialog> -->
-    
-            <p-dialog [(visible)]="deleteProjectDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <p-dialog [(visible)]="deleteProjectDialog" header="Confirmar" [modal]="true" [style]="{width:'450px'}">
                 <div class="flex align-items-center justify-content-center">
                     <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-                    <span *ngIf="project">Are you sure you want to deactivate <b>{{project.project_name}}</b>?</span>
+                    <span *ngIf="project">¿Estás seguro que deseas desactivar <b>{{project.project_name}}</b>?</span>
                 </div>
                 <ng-template pTemplate="footer">
                     <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteProjectDialog = false"></button>
-                    <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDelete()"></button>
+                    <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Sí" (click)="confirmDelete()"></button>
                 </ng-template>
             </p-dialog>
     
-            <p-dialog [(visible)]="deleteProjectsDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+            <p-dialog [(visible)]="deleteProjectsDialog" header="Confirmar" [modal]="true" [style]="{width:'450px'}">
                 <div class="flex align-items-center justify-content-center">
                     <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-                    <span>Are you sure you want to deactivate selected projects?</span>
+                    <span>¿Estás seguro que deseas desactivar los proyectos seleccionados?</span>
                 </div>
                 <ng-template pTemplate="footer">
                     <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No" (click)="deleteProjectsDialog = false"></button>
-                    <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Yes" (click)="confirmDeleteSelected()"></button>
+                    <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Sí" (click)="confirmDeleteSelected()"></button>
                 </ng-template>
             </p-dialog>
         </div>
@@ -162,37 +123,37 @@
 }@else if (this.developer) {
     <div class="grid">
         <div class="col-12">
-          <!-- Projects Section -->
+          <!-- Sección de Proyectos -->
           <div id="projects" class="py-4 px-4 lg:px-8 mt-5 mx-0 lg:mx-8">
             <div class="grid justify-content-center">
               <div class="col-12 text-center mb-4">
-                <h2 class="text-900 font-normal mb-2">Projects</h2>
-                <span class="text-600 text-2xl">Browse and bid on current programming projects</span>
+                <h2 class="text-900 font-normal mb-2">Proyectos</h2>
+                <span class="text-600 text-2xl">Explora y haz ofertas en proyectos de programación</span>
               </div>
           
-              <!-- Search and Filter Bar -->
+              <!-- Barra de búsqueda y filtros -->
               <div class="col-12 mb-5">
                 <div class="p-inputgroup">
                   <span class="p-inputgroup-addon">
                     <i class="pi pi-search"></i>
                   </span>
-                  <input type="text" pInputText placeholder="Search projects..." 
+                  <input type="text" pInputText placeholder="Buscar proyectos..." 
                         [(ngModel)]="searchTerm" (input)="filterProjects()">
-                  <button pButton pRipple type="button" icon="pi pi-filter-slash" label="Clear"
+                  <button pButton pRipple type="button" icon="pi pi-filter-slash" label="Limpiar"
                           class="p-button-outlined" (click)="clearFilters()"></button>
                 </div>
                 
                 <div class="flex mt-3 gap-2">
                   <p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatus" 
-                             optionLabel="label" optionValue="value" placeholder="Status"
+                             optionLabel="label" optionValue="value" placeholder="Estado"
                              (onChange)="filterProjects()" [showClear]="true"></p-dropdown>
                   <p-dropdown [options]="sortOptions" [(ngModel)]="selectedSort" 
-                             optionLabel="label" optionValue="value" placeholder="Sort By"
+                             optionLabel="label" optionValue="value" placeholder="Ordenar por"
                              (onChange)="filterProjects()"></p-dropdown>
                 </div>
               </div>
           
-              <!-- Projects Grid - 2 per column -->
+              <!-- Grid de Proyectos - 2 por columna -->
               <div class="col-12 grid">
                 <div *ngFor="let project of filteredProjects | slice: (page-1)*pageSize : page*pageSize" 
                      class="col-12 md:col-6 p-3">
@@ -210,22 +171,22 @@
                     <div class="flex justify-content-between align-items-center">
                       <div class="flex align-items-center">
                         <i class="pi pi-building text-600 mr-2"></i>
-                        <span class="text-sm text-600">{{project.company?.name || 'Company'}}</span>
+                        <span class="text-sm text-600">{{project.company?.name || 'Empresa'}}</span>
                       </div>
                       <span class="text-sm font-bold" 
                             [ngClass]="{'text-green-500': project.status === 1, 'text-red-500': project.status === 0}">
-                        {{project.status === 1 ? 'Active' : 'Inactive'}}
+                        {{project.status === 1 ? 'Activo' : 'Inactivo'}}
                       </span>
                     </div>
                     
                     <div class="mt-3 pt-3 border-top-1 surface-border flex justify-content-between">
                       <div>
                         <i class="pi pi-clock text-600 mr-1"></i>
-                        <span class="text-sm text-600">{{project.days_available || '0'}} days</span>
+                        <span class="text-sm text-600">{{project.days_available || '0'}} días</span>
                       </div>
                       <button pButton pRipple 
                               type="button" 
-                              label="View Project" 
+                              label="Ver Proyecto" 
                               icon="pi pi-arrow-right"
                               iconPos="right"
                               [routerLink]="['/main/projects']"
@@ -235,17 +196,17 @@
                 </div>
               </div>
           
-              <!-- No Results Message -->
+              <!-- Mensaje sin resultados -->
               <div class="col-12 text-center mt-5" *ngIf="filteredProjects.length === 0">
-                <p class="text-600 text-xl">No projects found matching your criteria</p>
+                <p class="text-600 text-xl">No se encontraron proyectos que coincidan con tus criterios</p>
                 <button pButton pRipple type="button" 
-                        label="Reset Filters" 
+                        label="Reiniciar Filtros" 
                         icon="pi pi-refresh"
                         class="p-button-outlined mt-3"
                         (click)="clearFilters()"></button>
               </div>
           
-              <!-- Paginator -->
+              <!-- Paginador -->
               <div class="col-12 mt-5" *ngIf="filteredProjects.length > 0">
                 <p-paginator [rows]="pageSize" [totalRecords]="filteredProjects.length" 
                             [first]="first" (onPageChange)="onPageChange($event)"
@@ -256,4 +217,3 @@
         </div>
     </div>
 }
-

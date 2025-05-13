@@ -32,16 +32,16 @@ export class SidebarComponent implements OnInit {
   private initializeMenuBasedOnRoleDev(){
     this.model = [
         {
-          label: 'Home',
+          label: 'Inicio',
           items: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/main/dashboard'] }
+            { label: 'Panel', icon: 'pi pi-fw pi-home', routerLink: ['/main/dashboard'] }
           ]
         },
         {
           label: 'Menu',
           items: [
             //{ label: 'Auctions', icon: 'pi pi-fw pi-id-card', routerLink: ['/main/auctions'] },
-            { label: 'Projects', icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects'] },
+            { label: 'Proyectos', icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects'] },
             //{ label: 'Favorites', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
             //{ label: 'Users', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/users'] }
           ]
@@ -49,48 +49,24 @@ export class SidebarComponent implements OnInit {
       ];
   }
 
-  private initializeMenuBasedOnRole(number: number) {
+  private initializeMenuBasedOnRole() {
       this.model = [
         {
-          label: 'Home',
+          label: 'Inicio',
           items: [
-            { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/main/dashboard'] }
+            { label: 'Panel', icon: 'pi pi-fw pi-home', routerLink: ['/main/dashboard'] }
           ]
         },
         {
-          label: 'Menu',
+          label: 'Menú',
           items: [
             //{ label: 'Auctions', icon: 'pi pi-fw pi-id-card', routerLink: ['/main/auctions'] },
-            { label: `Projects - ${number}/5`, icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects'] },
+            { label: `Projectos`, icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects'] },
             //{ label: 'Favorites', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
             //{ label: 'Users', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/users'] }
           ]
         },
       ];
-  }
-
-  loadProjects(id: any): void {
-    this.projectsService.getProjectsByCompany(id)
-    .subscribe({
-      next: (data) => {
-        this.projects = data;
-        localStorage.setItem('lenght_projects', `${this.projects.length}`)
-      },
-      error: (error) => {
-      }
-    });
-  }
-
-  loadCompany(userId: number): void {
-    this.companiesService.getCompanyByUserId(userId)
-    .subscribe({
-      next: (data: any) => {
-        this.loadProjects(data.id)
-      },
-      error: (error: any) => {
-        console.error('Error loading company:', error);
-      }
-    });
   }
 
     public getUserById(id: any){
@@ -99,11 +75,7 @@ export class SidebarComponent implements OnInit {
       if(next){
         this.user = next;
         if(next.role_id === 1){
-          this.loadCompany(next.id)
-          const length = localStorage.getItem('lenght_projects');
-          setTimeout(() => {
-            this.initializeMenuBasedOnRole(Number(length))
-          }, 100)
+          this.initializeMenuBasedOnRole()
         }else if(next.role_id === 2){
           this.initializeMenuBasedOnRoleDev()
         }

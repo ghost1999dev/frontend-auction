@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { forkJoin } from 'rxjs';
 import { CreateProject, Project, UpdateProject } from 'src/app/core/models/projects';
@@ -14,7 +13,6 @@ import { UserService } from 'src/app/core/services/user.service';
   selector: 'app-project',
   templateUrl: './project.component.html',
   styleUrls: ['./project.component.scss'],
-  providers: [MessageService] // Add this line
 })
 export class ProjectComponent implements OnInit {
 
@@ -34,8 +32,8 @@ export class ProjectComponent implements OnInit {
 
   submitted: boolean = false;
   statuses: any[] = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 }
+    { label: 'Activo', value: 1 },
+    { label: 'Inactivo', value: 0 }
   ];
 
   // Filtering and pagination
@@ -54,20 +52,19 @@ export class ProjectComponent implements OnInit {
   
   // Options
   statusOptions: any[] = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 }
+    { label: 'Activo', value: 1 },
+    { label: 'Inactivo', value: 0 }
   ];
   
   sortOptions: any[] = [
-    { label: 'Newest First', value: 'newest' },
-    { label: 'Oldest First', value: 'oldest' },
-    { label: 'Highest Budget', value: 'highest' },
-    { label: 'Lowest Budget', value: 'lowest' }
+    { label: 'Más nuevo primero', value: 'newest' },
+    { label: 'Más antiguo primero', value: 'oldest' },
+    { label: 'Presupuesto mas alto', value: 'highest' },
+    { label: 'Presupuesto mas bajo', value: 'lowest' }
   ];
 
   constructor(
     private projectsService: ProjectsService,
-    private messageService: MessageService,
     private companiesService: CompaniesService,
     private userService: UserService,
     private notificationServices: NotificationService,
@@ -87,7 +84,7 @@ export class ProjectComponent implements OnInit {
         this.loadProjects(data.id)
       },
       error: (error: any) => {
-        console.error('Error loading company:', error);
+        console.error('Error de carga de la empresa:', error);
       }
     });
   }
@@ -99,7 +96,7 @@ export class ProjectComponent implements OnInit {
         this.developer = data;
       },
       error: (error) => {
-        console.error('Error loading developer:', error);
+        console.error('Error de carga del desarrollador:', error);
       }
     });
   }
@@ -127,7 +124,7 @@ export class ProjectComponent implements OnInit {
         this.projects = data;
       },
       error: (error) => {
-        this.notificationServices.showErrorCustom('Failed to load projects')
+        this.notificationServices.showErrorCustom('No se pudo cargar proyectos')
       }
     });
   }
@@ -146,7 +143,7 @@ export class ProjectComponent implements OnInit {
         this.clearFilters()
       },
       error: (error) => {
-        this.notificationServices.showErrorCustom('Failed to load projects')
+        this.notificationServices.showErrorCustom('No se pudo cargar proyectos')
       }
     });
   }
@@ -190,13 +187,13 @@ export class ProjectComponent implements OnInit {
     this.projectsService.deactivateProject(this.project.id)
     .subscribe({
       next: () => {
-        this.notificationServices.showSuccessCustom('Project Deactivated')
+        this.notificationServices.showSuccessCustom('Proyecto desactivado')
         this.loadProjects(this.company.id);
         this.deleteProjectDialog = false;
         this.project = {} as Project;
       },
       error: (error) => {
-        this.notificationServices.showErrorCustom('Failed to deactivate project')
+        this.notificationServices.showErrorCustom('No se pudo desactivar el proyecto')
       }
     });
   }
@@ -225,13 +222,13 @@ export class ProjectComponent implements OnInit {
 
         this.projectsService.updateProject(this.project.id, updateData).subscribe({
           next: () => {
-            this.notificationServices.showSuccessCustom('Project Updated')
+            this.notificationServices.showSuccessCustom('Proyecto actualizado')
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
           },
           error: (error) => {
-            this.notificationServices.showErrorCustom('Failed to update project')
+            this.notificationServices.showErrorCustom('No se pudo actualizar el proyecto')
           }
         });
       } else {
@@ -251,13 +248,13 @@ export class ProjectComponent implements OnInit {
         this.projectsService.createProject(newProject)
         .subscribe({
           next: () => {
-            this.notificationServices.showSuccessCustom('Project Created')
+            this.notificationServices.showSuccessCustom('Proyecto creado')
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
           },
           error: (error) => {
-            this.notificationServices.showErrorCustom('Failed to create project')
+            this.notificationServices.showErrorCustom('No se pudo crear el proyecto')
           }
         });
       }
@@ -271,7 +268,7 @@ export class ProjectComponent implements OnInit {
   confirmDeleteSelected(): void {
     this.deleteProjectsDialog = false;
     if (!this.selectedProjects || this.selectedProjects.length === 0) {
-      this.notificationServices.showErrorCustom('No projects selected')
+      this.notificationServices.showErrorCustom('No hay proyectos seleccionados')
       return;
     }
   
@@ -283,12 +280,12 @@ export class ProjectComponent implements OnInit {
     // Execute all delete operations in parallel
     forkJoin(deleteOperations).subscribe({
       next: () => {
-        this.notificationServices.showSuccessCustom(`${this.selectedProjects.length} projects deactivated`)
+        this.notificationServices.showSuccessCustom(`${this.selectedProjects.length} proyectos desactivados`)
         this.loadProjects(this.company.id);
         this.selectedProjects = [];
       },
       error: (error: any) => {
-        this.notificationServices.showErrorCustom('Failed to deactivate some projects')
+        this.notificationServices.showErrorCustom('No se pudo desactivar algunos proyectos')
       }
     });
   }

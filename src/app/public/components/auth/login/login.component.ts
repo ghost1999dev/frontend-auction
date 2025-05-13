@@ -40,11 +40,11 @@ export class LoginComponent implements OnInit {
       if(res){        
         this.onLoggedin()
         this.router.navigate(['/main/dashboard']);
-        this.notificationServices.showSuccessCustom('Welcome to CodeBid');
+        this.notificationServices.showSuccessCustom('Bienvenido a CodeBid');
       }
     },
     (err: any) => {
-      this.notificationServices.showErrorCustom('Incorrect username or password');
+      this.notificationServices.showErrorCustom('Nombre de usuario o contraseña incorrectos');
     })
 
   }

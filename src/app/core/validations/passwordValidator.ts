@@ -16,7 +16,7 @@ export function passwordValidator(): ValidatorFn {
     const passwordValid = hasUpperCase && hasLowerCase && hasNumber && isValidLength && isAlphanumeric;
 
     return !passwordValid ? { passwordStrength: {
-      message: 'The password must have at least one uppercase letter, one lowercase letter, one number, and at least 6 alphanumeric characters.'
+      message: 'La contraseña debe tener al menos una letra mayúscula, una letra minúscula, un número y al menos 6 caracteres alfanuméricos.'
     }} : null;
   };
 }

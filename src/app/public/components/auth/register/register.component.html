@@ -4,8 +4,8 @@
         <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
             <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
                 <div class="text-center mb-5">
-                    <div class="text-900 text-3xl font-medium mb-3">Welcome to Register {{this.userType}}</div>
-                    <span class="text-600 font-medium">Select one of the Options</span>
+                    <div class="text-900 text-3xl font-medium mb-3">Bienvenido al Registro</div>
+                    <span class="text-600 font-medium">Seleccione una de las opciones</span>
                 </div>
 
                 <div class="flex justify-content-center gap-5 mb-5">
@@ -19,7 +19,7 @@
                             }">
                         <div class="flex flex-column align-items-center pd-all">
                             <i class="pi pi-user text-6xl mb-3"></i>
-                            <span class="text-900 text-xl font-medium">Developer</span>
+                            <span class="text-900 text-xl font-medium">Desarrollador</span>
                         </div>
                     </p-card>
                 
@@ -33,7 +33,7 @@
                             }">
                         <div class="flex flex-column align-items-center pd-all">
                             <i class="pi pi-building text-6xl mb-3"></i>
-                            <span class="text-900 text-xl font-medium">Company</span>
+                            <span class="text-900 text-xl font-medium">Compañía</span>
                         </div>
                     </p-card>
                 </div>
@@ -46,30 +46,30 @@
                             <div class="col-12">
                                 <!-- Developer Name -->
                                 <div class="field">
-                                    <label for="name" class="block text-900 font-medium mb-2 mt-3">Developer Name</label>
+                                    <label for="name" class="block text-900 font-medium mb-2 mt-3">Nombre del desarrollador</label>
                                     <input id="name" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && developerForm.get('name')?.errors }">
                                     <div *ngIf="submitted && developerForm.get('name')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="developerForm.get('name')?.errors?.['required']">Developer Name is required</div>
+                                    <div *ngIf="developerForm.get('name')?.errors?.['required']">Nombre del desarrollador es requerido</div>
                                     </div>
                                 </div>
                             
                                 <!-- Email -->
                                 <div class="field">
-                                    <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
+                                    <label for="email" class="block text-900 font-medium mb-2 mt-3">Correo electrónico</label>
                                     <input id="email" [pattern]="emailPattern" type="email" pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && developerForm.get('email')?.errors }">
                                     <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="developerForm.get('email')?.errors?.['required']">Email is required</div>
-                                    <div *ngIf="developerForm.get('email')?.errors?.['email']">Invalid email format</div>
+                                    <div *ngIf="developerForm.get('email')?.errors?.['required']">Correo electrónico es requerido</div>
+                                    <div *ngIf="developerForm.get('email')?.errors?.['email']">Formato de correo electrónico no válido</div>
                                     </div>
                                 </div>
                             
                                 <!-- Password -->
                                 <div class="field">
-                                    <label for="password" class="block text-900 font-medium mb-3 mt-3">Password</label>
+                                    <label for="password" class="block text-900 font-medium mb-3 mt-3">Contraseña</label>
                                     <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && developerForm.get('password')?.errors }">
                                     <div *ngIf="submitted && developerForm.get('password')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="developerForm.get('password')?.errors?.['required']">Password is required</div>
-                                    <div *ngIf="developerForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                                    <div *ngIf="developerForm.get('password')?.errors?.['required']">Contraseña es requerido</div>
+                                    <div *ngIf="developerForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</div>
                                     <div *ngIf="developerForm.get('password')?.errors?.['passwordStrength']" class="mb-3">
                                         {{ developerForm.get('password')?.errors?.['passwordStrength'].message }}
                                       </div>
@@ -80,7 +80,7 @@
                                     <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
                                     <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && developerForm.get('address')?.errors }">
                                     <div *ngIf="submitted && developerForm.get('address')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="developerForm.get('address')?.errors?.['required']">Address is required</div>
+                                    <div *ngIf="developerForm.get('address')?.errors?.['required']">Address es requerido</div>
                                     </div>
                                 </div>
 
@@ -92,7 +92,7 @@
                                     formControlName="phone" 
                                     [ngClass]="{ 'is-invalid': submitted && developerForm.get('phone')?.errors }">                        
                                     <div *ngIf="submitted && developerForm.get('phone')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="developerForm.get('phone')?.errors?.['required']">Phone is required</div>
+                                    <div *ngIf="developerForm.get('phone')?.errors?.['required']">Phone es requerido</div>
                                     </div>
                                 </div> -->
                             </div>
@@ -137,7 +137,7 @@
                     
                         <!-- Submit Button -->
                         <div class="col-12">
-                            <button pButton type="submit" label="Register as Developer" class="w-full mt-3"></button>
+                            <button pButton type="submit" label="Registrarse como desarrollador" class="w-full mt-3"></button>
                         </div>
                     </form>
                 </div>
@@ -150,30 +150,30 @@
                             <div class="col-12">
                                 <!-- Company Name -->
                                 <div class="field">
-                                    <label for="name" class="block text-900 font-medium mb-2 mt-3">Company Name</label>
+                                    <label for="name" class="block text-900 font-medium mb-2 mt-3">Nombre de empresa</label>
                                     <input id="name" type="text" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)" pInputText class="w-full" formControlName="name" [ngClass]="{ 'is-invalid': submitted && companyForm.get('name')?.errors }">
                                     <div *ngIf="submitted && companyForm.get('name')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="companyForm.get('name')?.errors?.['required']">Company Name is required</div>
+                                    <div *ngIf="companyForm.get('name')?.errors?.['required']">Nombre de empresa es requerido</div>
                                     </div>
                                 </div>
                             
                                 <!-- Email -->
                                 <div class="field">
-                                    <label for="email" class="block text-900 font-medium mb-2 mt-3">Email</label>
+                                    <label for="email" class="block text-900 font-medium mb-2 mt-3">Correo electrónico</label>
                                     <input id="email" type="email" [pattern]="emailPattern"  pInputText class="w-full" formControlName="email" [ngClass]="{ 'is-invalid': submitted && companyForm.get('email')?.errors }">
                                     <div *ngIf="submitted && developerForm.get('email')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="companyForm.get('email')?.errors?.['required']">Email is required</div>
-                                    <div *ngIf="companyForm.get('email')?.errors?.['email']">Invalid email format</div>
+                                    <div *ngIf="companyForm.get('email')?.errors?.['required']">Correo electrónico es requerido</div>
+                                    <div *ngIf="companyForm.get('email')?.errors?.['email']">Formato de correo electrónico no válido</div>
                                     </div>
                                 </div>
                             
                                 <!-- Password -->
                                 <div class="field">
-                                    <label for="password" class="block text-900 font-medium mb-3 mt-3">Password</label>
+                                    <label for="password" class="block text-900 font-medium mb-3 mt-3">Contraseña</label>
                                     <input id="password" type="password" pInputText class="w-full" formControlName="password" [ngClass]="{ 'is-invalid': submitted && companyForm.get('password')?.errors }">
                                     <div *ngIf="submitted && companyForm.get('password')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="companyForm.get('password')?.errors?.['required']">Password is required</div>
-                                    <div *ngIf="companyForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+                                    <div *ngIf="companyForm.get('password')?.errors?.['required']">Contraseña es requerido</div>
+                                    <div *ngIf="companyForm.get('password')?.errors?.['minlength']">La contraseña debe tener al menos 6 caracteres</div>
                                     <div *ngIf="companyForm.get('password')?.errors?.['passwordStrength']">
                                         {{ companyForm.get('password')?.errors?.['passwordStrength'].message }}
                                       </div>
@@ -184,7 +184,7 @@
                                     <label for="address" class="block text-900 font-medium mb-2 mt-3">Address</label>
                                     <input id="address" type="text" pInputText class="w-full" formControlName="address" [ngClass]="{ 'is-invalid': submitted && companyForm.get('address')?.errors }">
                                     <div *ngIf="submitted && companyForm.get('address')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="companyForm.get('address')?.errors?.['required']">Address is required </div>
+                                    <div *ngIf="companyForm.get('address')?.errors?.['required']">Address es requerido </div>
                                     </div>
                                 </div>
 
@@ -196,7 +196,7 @@
                                     formControlName="phone" 
                                     [ngClass]="{ 'is-invalid': submitted && companyForm.get('phone')?.errors }">  
                                     <div *ngIf="submitted && companyForm.get('phone')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="companyForm.get('phone')?.errors?.['required']">Phone is required</div>
+                                    <div *ngIf="companyForm.get('phone')?.errors?.['required']">Phone es requerido</div>
                                     </div>
                                 </div> -->
                             </div>
@@ -211,7 +211,7 @@
                                            formControlName="nrc_number" 
                                            [ngClass]="{ 'is-invalid': submitted && companyForm.get('nrc_number')?.errors }">
                                     <div *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="invalid-feedback mt-1">
-                                      <div *ngIf="companyForm.get('nrc_number')?.errors?.['required']">NRC Number is required</div>
+                                      <div *ngIf="companyForm.get('nrc_number')?.errors?.['required']">NRC Number es requerido</div>
                                       <div *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">
                                         El formato debe ser 123456-7 (6 dígitos, guión, 1 dígito)
                                       </div>
@@ -237,7 +237,7 @@
                                     </p-chips>
                                     
                                     <div *ngIf="submitted && companyForm.get('business_type')?.errors" class="invalid-feedback mt-1">
-                                        <div *ngIf="companyForm.get('business_type')?.errors?.['required']">At least one business type is required</div>
+                                        <div *ngIf="companyForm.get('business_type')?.errors?.['required']">At least one business type es requerido</div>
                                     </div>
                                 </div>
 
@@ -245,7 +245,7 @@
                                     <label for="web_site" class="block text-900 font-medium mb-2 mt-3">Web Site</label>
                                     <input id="web_site" type="text" pInputText class="w-full" formControlName="web_site" [ngClass]="{ 'is-invalid': submitted && companyForm.get('web_site')?.errors }">
                                     <div *ngIf="submitted && companyForm.get('web_site')?.errors" class="invalid-feedback mt-1">
-                                    <div *ngIf="companyForm.get('web_site')?.errors?.['required']">Web Site is required</div>
+                                    <div *ngIf="companyForm.get('web_site')?.errors?.['required']">Web Site es requerido</div>
                                     </div>
                                 </div>
 
@@ -274,7 +274,7 @@
 
                         <!-- Submit Button -->
                         <div class="col-12">
-                            <button pButton type="submit" label="Register as Company" class="w-full mt-3"></button>
+                            <button pButton type="submit" label="Registrarse como empresa" class="w-full mt-3"></button>
                         </div>
                     </form>
                 </div>

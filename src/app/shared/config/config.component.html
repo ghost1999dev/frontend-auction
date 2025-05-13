@@ -5,15 +5,15 @@
 <p-sidebar [(visible)]="visible" position="right" [transitionOptions]="'.3s cubic-bezier(0, 0, 0.2, 1)'" styleClass="layout-config-sidebar w-20rem">
 
     <ng-container *ngIf="!minimal">
-        <h5>Theme Style</h5>
+        <h5>Estilo del tema</h5>
         <div class="flex">
             <div class="field-radiobutton flex-1">
                 <p-radioButton name="inputStyle" value="outlined" (click)="toggleTheme('dark')"></p-radioButton>
-                <label for="outlined_input">Dark</label>
+                <label for="outlined_input">Oscuro</label>
             </div>
             <div class="field-radiobutton flex-1">
                 <p-radioButton name="inputStyle" value="outlined" (click)="toggleTheme('light')"></p-radioButton>
-                <label for="filled_input">Light</label>
+                <label for="filled_input">Claro</label>
             </div>
         </div>
     </ng-container>   

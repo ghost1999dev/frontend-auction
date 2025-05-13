@@ -284,13 +284,13 @@ export class ProfileComponent implements OnInit {
       // Validar tipo de archivo
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!allowedTypes.includes(file.type)) {
-        this.notificationServices.showErrorCustom('Only JPEG, PNG or GIF images are allowed.')
+        this.notificationServices.showErrorCustom('Solo se permiten imágenes JPEG, PNG o GIF.')
         return;
       }
 
       // Validar tamaño (ejemplo: máximo 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        this.notificationServices.showErrorCustom('The image cannot exceed 2MB')
+        this.notificationServices.showErrorCustom('La imagen no puede exceder 2 MB')
         return;
       }
 
@@ -325,7 +325,7 @@ export class ProfileComponent implements OnInit {
     
     this.imageUploadService.uploadUserImage(this.user.id, this.selectedImageFile).subscribe({
       next: (response: any) => {
-        this.notificationServices.showSuccessCustom('Profile picture updated successfully');
+        this.notificationServices.showSuccessCustom('Imagen de perfil actualizada correctamente');
         
         // Actualizar la imagen localmente
         this.updateLocalProfile({ image: response.imagePath });
@@ -334,7 +334,7 @@ export class ProfileComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error uploading image:', error);
-        this.notificationServices.showErrorCustom('The image could not be uploaded. Please try again.');
+        this.notificationServices.showErrorCustom('La imagen no se pudo cargar. Por favor intente de nuevo.');
       },
       complete: () => {
         this.uploadingImage = false;
@@ -424,11 +424,11 @@ export class ProfileComponent implements OnInit {
                 next: (companyResponse) => {
                   this.company = {...this.company, ...this.companyUpdate};
                   this.userDialog = false;
-                  this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.");
+                  this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.");
                 },
                 error: (err) => {
                   this.loading = false;
-                  this.notificationServices.showErrorCustom("Error! Your account has not been updated.");
+                  this.notificationServices.showErrorCustom("");
                 }
               });
             }
@@ -443,7 +443,7 @@ export class ProfileComponent implements OnInit {
                 },
                 error: (err) => {
                   this.loading = false;
-                  this.notificationServices.showErrorCustom("Error! Your account has not been updated.");
+                  this.notificationServices.showErrorCustom("¡Error! Su cuenta no ha sido actualizada.");
                 }
               });
             }
@@ -466,12 +466,12 @@ export class ProfileComponent implements OnInit {
           next: (response: any) => {
             this.passwordDialog = false;
             this.authService.logout();
-            this.notificationServices.showSuccessCustom("Password updated successfully.")
+            this.notificationServices.showSuccessCustom("Contraseña actualizada correctamente.")
           },
           error: (err) => {
             console.error('Error updating password:', err);
             this.loading = false;
-            this.notificationServices.showErrorCustom("Current Password is incorrect")
+            this.notificationServices.showErrorCustom("La contraseña actual es incorrecta")
           }
         });
     }

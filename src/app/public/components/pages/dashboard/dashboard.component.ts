@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MenuItem, MessageService } from 'primeng/api';
+import { MenuItem } from 'primeng/api';
 import { delay, forkJoin, map, Observable, of, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { Product } from 'src/app/core/models/product';
@@ -16,7 +16,6 @@ import { UserService } from 'src/app/core/services/user.service';
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  providers: [MessageService]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
 
@@ -52,8 +51,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private usersService: UserService,
     private developerSrv: DeveloperService,
     private notificationServices: NotificationService,
-    private companiesServices: CompaniesService,
-    private messageService: MessageService) {
+    private companiesServices: CompaniesService) {
       this.subscription = this.layoutService.configUpdate$.subscribe(() => {
           this.initChart();
       });
@@ -304,19 +302,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private showWarning(message: string) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Advertencia',
-      detail: message
-    });
+    this.notificationServices.showErrorCustom(message);
   }
 
   private showError(message: string) {
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: message
-    });
+    this.notificationServices.showErrorCustom(message);
   }
 
   onSubmitDeveloper() {
@@ -352,9 +342,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe((next: any) => {
           if(next){
             this.displayAlert = false;
-            this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")
+            this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.")
           }else{
-            this.notificationServices.showErrorCustom("Error Creating Developer.")
+            this.notificationServices.showErrorCustom("Error a crear desarrollador.")
           }
         })
       },
@@ -398,7 +388,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe((next: any) => {
           if(next){
             this.displayAlert = false;
-            this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.")
+            this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.")
           }else{
             //this.notificationServices.showErrorCustom("Error Creating Developer.")
           }
@@ -434,11 +424,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.onSubmitCompany();
           }
         } else {
-            this.messageService.add({
-                severity: 'warn',
-                summary: 'Advertencia',
-                detail: 'Por favor seleccione un tipo de usuario'
-            });
+            this.notificationServices.showErrorCustom('Por favor seleccione un tipo de usuario');
         }
     }
 
