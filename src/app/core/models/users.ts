@@ -9,6 +9,28 @@ export interface userResponseById{
     user: usersWithImage[]
 }
 
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ForgotPasswordResponse {
+    status: number;
+    message: string;
+    email?: string;
+}
+
+export interface ResetPasswordRequest {
+    email: string;
+    code: string;
+    password: string;
+}
+
+export interface ResetPasswordResponse {
+    status: number;
+    message: string;
+    user?: any;
+}
+
 export interface usersWithImage{
     id: number;
     role_id: number;

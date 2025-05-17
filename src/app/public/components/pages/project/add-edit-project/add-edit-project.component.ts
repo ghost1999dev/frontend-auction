@@ -15,6 +15,7 @@ import { CategoryService } from 'src/app/core/services/categories.service';
   styleUrls: ['./add-edit-project.component.scss'],
 })
 export class AddEditProjectComponent implements OnInit {
+  
   @Input() projectId?: number;
   @Input() companyId!: number;
   @Output() saved = new EventEmitter<void>();
@@ -178,9 +179,12 @@ export class AddEditProjectComponent implements OnInit {
           category_id: this.project.category_id, // Add this
           project_name: this.project.project_name,
           description: this.project.description,
+          long_description: this.project.long_description,
           budget: this.project.budget,
           days_available: this.project.days_available
         };
+
+        console.log(updateData)
   
         this.projectsService.updateProject(this.project.id, updateData).subscribe({
           next: () => {
@@ -200,7 +204,7 @@ export class AddEditProjectComponent implements OnInit {
         category_id: this.project.category_id,
         project_name: this.project.project_name,
         description: this.project.description,
-        full_description: this.project.full_description,
+        long_description: this.project.long_description,
         budget: this.project.budget,
         days_available: this.project.days_available,
         status: 0 // Siempre activo para republicaciones

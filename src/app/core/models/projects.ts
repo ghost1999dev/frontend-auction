@@ -14,6 +14,7 @@ export interface ProjectResponse {
     category_id: number;
     project_name: string;
     description: string;
+    long_description: string;
     budget: number;
     short_description: string;  // Add this
     full_description: string;   // Add this
@@ -42,6 +43,7 @@ export interface ProjectResponse {
     category_id: number;
     project_name: string;
     description: string;
+    long_description: string;
     budget?: number;
     days_available?: number;
     status?: number; // Optional as it has default value in backend
@@ -52,6 +54,7 @@ export interface ProjectResponse {
     category_id?: number;
     project_name?: string;
     description?: string;
+    long_description?: string;
     budget?: number;
     days_available?: number;
     status?: number;
