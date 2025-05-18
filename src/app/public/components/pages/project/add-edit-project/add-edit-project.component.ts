@@ -207,7 +207,7 @@ export class AddEditProjectComponent implements OnInit {
         long_description: this.project.long_description,
         budget: this.project.budget,
         days_available: this.project.days_available,
-        status: 0 // Siempre activo para republicaciones
+        //status: 0 // Siempre activo para republicaciones
       };
 
       if (this.isRepublishing) {

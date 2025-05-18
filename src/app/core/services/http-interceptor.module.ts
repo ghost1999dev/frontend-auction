@@ -1,20 +1,18 @@
 import { Injectable, NgModule } from "@angular/core";
-import {Observable} from "rxjs";
+import { Observable } from "rxjs";
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from "@angular/common/http";
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
 
 @Injectable({ providedIn: 'root' })
 export class HttpRequestInterceptor implements HttpInterceptor {
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        var token = localStorage.getItem('login-token');
-        if(token){
-            const newReq = req.clone(
-                {
-                    headers: req.headers.set('login-token', token)
-                }
-            )
+        const token = localStorage.getItem('login-token');
+        if (token) {
+            const newReq = req.clone({
+                headers: req.headers.set('Authorization', `Bearer ${token}`)
+            });
             return next.handle(newReq);
-        }else{
+        } else {
             return next.handle(req);
         }
     }
@@ -28,5 +26,4 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     }],
     declarations: []
 })
-
-export class HttpInterceptorModule{}
+export class HttpInterceptorModule {}
