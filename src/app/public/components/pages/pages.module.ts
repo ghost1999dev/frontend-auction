@@ -50,6 +50,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { CheckboxModule } from 'primeng/checkbox';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { NumbersOnlyDirective } from 'src/app/core/directives/numbers-only-directive.directive';
+import { ProjectsApplicationComponent } from './projects-application/projects-application.component';
+import { AddEditProjectsApplicationComponent } from './projects-application/add-edit-projects-application/add-edit-projects-application.component';
 
 const routes: Routes = [
   {
@@ -77,7 +79,7 @@ const routes: Routes = [
         path: 'auctions',
         component: AuctionsComponent,
         canActivate: [RoleGuard],
-        data: { allowedRoles: [1] } 
+        data: { allowedRoles: [1, 2] } 
       },
       {
         path: 'projects',
@@ -95,7 +97,13 @@ const routes: Routes = [
         path: 'users',
         component: UsersComponent,
         canActivate: [RoleGuard],
-        data: { allowedRoles: [1] } 
+        data: { allowedRoles: [0] } 
+      },
+      {
+        path: 'projects-application',
+        component: ProjectsApplicationComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [2] } 
       }
     ]
   },
@@ -113,6 +121,8 @@ const routes: Routes = [
     ProfileComponent,
     AddEditProjectComponent,
     NumbersOnlyDirective,
+    ProjectsApplicationComponent,
+    AddEditProjectsApplicationComponent,
   ],
   imports: [
     CommonModule,

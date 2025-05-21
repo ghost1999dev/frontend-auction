@@ -5,6 +5,7 @@ import { CreateProject, Project, UpdateProject } from 'src/app/core/models/proje
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { ProjectApplicationsService } from 'src/app/core/services/project-applications.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { UserService } from 'src/app/core/services/user.service';
 
@@ -20,6 +21,9 @@ export class ProjectComponent implements OnInit {
   public company: any;
   public company_id!: number;
   public developer: any;
+
+  applyDialogVisible: boolean = false;
+  selectedProject: any = null;
 
   projects: any[] = [];
   selectedProjects: Project[] = [];
@@ -64,6 +68,7 @@ export class ProjectComponent implements OnInit {
   ];
 
   constructor(
+    private projectApplicationsService: ProjectApplicationsService,
     private projectsService: ProjectsService,
     private companiesService: CompaniesService,
     private userService: UserService,
@@ -89,10 +94,43 @@ export class ProjectComponent implements OnInit {
     });
   }
 
+  // Añade este método para mostrar el diálogo
+showApplyDialog(project: any): void {
+    this.selectedProject = project;
+    this.applyDialogVisible = true;
+}
+
+// Añade este método para confirmar la aplicación
+confirmApply(): void {
+    if (!this.selectedProject || !this.developer) return;
+
+    const applicationData = {
+        project_id: this.selectedProject.id,
+        developer_id: this.developer.id,
+        status: 0
+    };
+
+    console.log(applicationData)
+
+    this.projectApplicationsService.createApplication(applicationData)
+    .subscribe({
+        next: () => {
+            this.notificationServices.showSuccessCustom('Has aplicado al proyecto correctamente');
+            this.applyDialogVisible = false;
+            this.selectedProject = null;
+        },
+        error: (err) => {
+            this.notificationServices.showErrorCustom('Error al aplicar al proyecto');
+            console.error('Error applying to project:', err);
+        }
+    });
+}
+
   loadDeveloper(id: number): void {
     this.developerService.getDeveloperByIdUser(id)
     .subscribe({
       next: (data: any) => {
+        console.log("developer: ", data)
         this.developer = data;
       },
       error: (error) => {

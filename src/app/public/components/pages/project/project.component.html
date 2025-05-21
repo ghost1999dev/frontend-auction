@@ -182,15 +182,15 @@
                     <div class="mt-3 pt-3 border-top-1 surface-border flex justify-content-between">
                       <div>
                         <i class="pi pi-clock text-600 mr-1"></i>
-                        <span class="text-sm text-600">{{project.days_available || '0'}} días</span>
+                        <span class="text-sm text-600">{{project.days_remaining || '0'}} días</span>
                       </div>
-                      <button pButton pRipple 
-                              type="button" 
-                              label="Ver Proyecto" 
-                              icon="pi pi-arrow-right"
-                              iconPos="right"
-                              [routerLink]="['/main/projects']"
-                              class="p-button-sm p-button-text"></button>
+                    <button *ngIf="project.status === 1" pButton pRipple 
+                            type="button" 
+                            label="Aplicar a este Proyecto" 
+                            icon="pi pi-arrow-right"
+                            iconPos="right"
+                            class="p-button-sm p-button-text"
+                            (click)="showApplyDialog(project)"></button>
                     </div>
                   </div>
                 </div>
@@ -216,4 +216,17 @@
           </div>
         </div>
     </div>
+
+    <p-dialog [(visible)]="applyDialogVisible" [style]="{width: '450px'}" header="Confirmar Aplicación" [modal]="true">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-circle mr-3" style="font-size: 2rem"></i>
+            <span>¿Estás seguro que deseas aplicar al proyecto <b>{{selectedProject?.project_name}}</b>?</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple icon="pi pi-times" class="p-button-text" 
+                    label="Cancelar" (click)="applyDialogVisible = false"></button>
+            <button pButton pRipple icon="pi pi-check" class="p-button-text" 
+                    label="Aplicar" (click)="confirmApply()"></button>
+        </ng-template>
+    </p-dialog>
 }
