@@ -1,0 +1,178 @@
+/* Estilos generales */
+.applications-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 600;
+  position: relative;
+}
+
+.title::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #9b59b6);
+  margin: 0.5rem auto 0;
+  border-radius: 2px;
+}
+
+/* Grid de aplicaciones */
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Card de aplicación */
+.application-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.application-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Encabezado de la card */
+.application-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.project-info {
+  flex: 1;
+}
+
+.project-name {
+  font-size: 1.25rem;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.company-name {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  display: block;
+}
+
+/* Badge de estado */
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 1rem;
+}
+
+/* Colores para los diferentes estados */
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-accepted {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Detalles de la aplicación */
+.application-details {
+  padding: 1.5rem;
+}
+
+.detail-item {
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.detail-row .detail-item {
+  flex: 1;
+  min-width: 120px;
+}
+
+.detail-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.95rem;
+  color: #34495e;
+  font-weight: 500;
+}
+
+.project-description {
+  color: #34495e;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0.5rem 0 0;
+}
+
+/* Acciones */
+.application-actions {
+  padding: 0 1.5rem 1.5rem;
+  text-align: right;
+}
+
+.withdraw-btn {
+  border-radius: 20px;
+  padding: 0.25rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.withdraw-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estados de carga y sin aplicaciones */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.no-applications {
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #6c757d;
+  font-size: 1.1rem;
+}
