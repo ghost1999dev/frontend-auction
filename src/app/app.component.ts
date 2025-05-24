@@ -59,10 +59,8 @@ export class AppComponent implements OnInit {
 
   applyTheme() {
     if (this.isDarkMode) {
-      console.log("Aplica modo Oscuro")
       this.changeTheme('bootstrap4-dark-blue', 'dark');
     } else {
-      console.log("Aplica modo claro")
       this.changeTheme('lara-light-indigo', 'light')
     }
   }

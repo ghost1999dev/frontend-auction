@@ -1,1 +1,144 @@
-<p>¡Las subastas funcionan!</p>
+@if (this.company) {
+    <div class="card" *ngIf="!showAddEditDialog">
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h1>Mis subastas</h1>
+        <button pButton pRipple label="Nueva subasta" icon="pi pi-plus" class="p-button-success" (click)="openNew()"></button>
+    </div>
+
+    <p-table #dt [value]="auctions" [loading]="loading" responsiveLayout="scroll" [rows]="10" 
+            [globalFilterFields]="['project.project_name','status']" [paginator]="true" 
+            [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas" 
+            [(selection)]="selectedAuctions" selectionMode="multiple" [rowHover]="true" dataKey="id">
+        <ng-template pTemplate="caption">
+            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                <h5 class="m-0"></h5>
+                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..." class="w-full sm:w-auto"/>
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="project.project_name">Proyecto <p-sortIcon field="project.project_name"></p-sortIcon></th>
+                <th pSortableColumn="bidding_started_at">Fecha inicio <p-sortIcon field="bidding_started_at"></p-sortIcon></th>
+                <th pSortableColumn="bidding_deadline">Fecha límite <p-sortIcon field="bidding_deadline"></p-sortIcon></th>
+                <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
+                <th>Acciones</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-auction>
+            <tr>
+                <td>
+                    <span class="p-column-title">Proyecto</span>
+                    {{auction.project?.project_name || 'N/A'}}
+                </td>
+                <td>
+                    <span class="p-column-title">Fecha inicio</span>
+                    {{auction.bidding_started_at | date:'medium'}}
+                </td>
+                <td>
+                    <span class="p-column-title">Fecha límite</span>
+                    {{auction.bidding_deadline | date:'medium'}}
+                </td>
+                <td>
+                    <span class="p-column-title">Estado</span>
+                    <p-tag [severity]="getStatusSeverity(auction.status)" [value]="getStatusLabel(auction.status)"></p-tag>
+                </td>
+                <td>
+                    <div class="flex gap-2">
+                        <!-- En la sección de acciones de la tabla, agrega este botón -->
+                        <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" 
+                                (click)="viewPublicAuction(auction)"></button>
+                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
+                                (click)="editAuction(auction)"></button>
+                        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" 
+                                (click)="deleteAuction(auction)"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    </div>
+
+    <app-add-edit-auction
+    *ngIf="showAddEditDialog"
+    [auctionId]="currentAuctionId"
+    (saved)="onAuctionSaved()"
+    (cancelled)="showAddEditDialog = false">
+    </app-add-edit-auction>
+
+    <p-dialog [(visible)]="deleteAuctionDialog" [style]="{width: '450px'}" header="Confirmar" [modal]="true">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span>¿Estás seguro de que quieres eliminar esta subasta?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="No" icon="pi pi-times" class="p-button-text" (click)="deleteAuctionDialog = false"></button>
+        <button pButton pRipple label="Si" icon="pi pi-check" class="p-button-text" (click)="confirmDelete()"></button>
+    </ng-template>
+    </p-dialog>
+
+    <p-dialog [(visible)]="deleteAuctionsDialog" [style]="{width: '450px'}" header="Confirmar" [modal]="true">
+    <div class="flex align-items-center justify-content-center">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+        <span>¿Está seguro de que desea eliminar las subastas seleccionadas?</span>
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="No" icon="pi pi-times" class="p-button-text" (click)="deleteAuctionsDialog = false"></button>
+        <button pButton pRipple label="Si" icon="pi pi-check" class="p-button-text" (click)="confirmDeleteSelected()"></button>
+    </ng-template>
+    </p-dialog>
+
+    <p-toast></p-toast>
+}@else if (this.developer){ 
+<div class="">
+        <div class="flex justify-content-between align-items-center mb-4">
+            <h1>Subastas disponibles</h1>
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Buscar subastas..." (input)="filterAuctions($event)"/>
+            </span>
+        </div>
+
+        <div class="grid">
+            <div class="col-12 md:col-6 " *ngFor="let auction of filteredActiveAuctions">
+                <p-card [header]="auction.project?.project_name || 'N/A'" 
+                        [subheader]="'Fecha límite: ' + (auction.bidding_deadline | date:'medium')"
+                        styleClass="h-full"
+                        >
+                    <div class="flex flex-column gap-2">
+                        <div class="flex align-items-center gap-2">
+                            <i class="pi pi-calendar"></i>
+                            <span>Inicio: {{auction.bidding_started_at | date:'medium'}}</span>
+                        </div>
+                        <div class="flex align-items-center gap-2">
+                            <i class="pi pi-tag"></i>
+                            <p-tag [severity]="getStatusSeverity(auction.status)" 
+                                  [value]="getStatusLabel(auction.status)"></p-tag>
+                        </div>
+                    </div>
+                    <ng-template pTemplate="footer">
+                        <div class="flex justify-content-end gap-2">
+                            <button pButton pRipple icon="pi pi-eye" 
+                                    class="p-button-rounded p-button-info" 
+                                    (click)="viewPublicAuction(auction)"
+                                    pTooltip="Ver detalles" tooltipPosition="top"></button>
+                            <button pButton pRipple icon="pi pi-dollar" 
+                                    class="p-button-rounded p-button-success" 
+                                    (click)="placeBid(auction)"
+                                    pTooltip="Hacer oferta" tooltipPosition="top"></button>
+                        </div>
+                    </ng-template>
+                </p-card>
+            </div>
+        </div>
+
+        @if (filteredActiveAuctions.length === 0) {
+            <div class="flex justify-content-center py-5">
+                <p class="text-500">No hay subastas activas disponibles</p>
+            </div>
+        }
+    </div>
+}

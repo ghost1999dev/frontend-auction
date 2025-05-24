@@ -14,6 +14,8 @@ import { CompanyModule } from './components/company/company.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
+import { BidsComponent } from './components/pages/bids/bids.component';
+import { AddEditBidComponent } from './components/pages/bids/add-edit-bid/add-edit-bid.component';
 
 @NgModule({
   schemas: [NO_ERRORS_SCHEMA], // <-- Oculta los errores de propiedades desconocidas

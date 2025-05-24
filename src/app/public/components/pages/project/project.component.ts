@@ -1,14 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
 import { forkJoin } from 'rxjs';
-import { CreateProject, Project, UpdateProject } from 'src/app/core/models/projects';
+import { Project, UpdateProject } from 'src/app/core/models/projects';
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProjectApplicationsService } from 'src/app/core/services/project-applications.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { UserService } from 'src/app/core/services/user.service';
-
 
 @Component({
   selector: 'app-project',
@@ -71,10 +70,10 @@ export class ProjectComponent implements OnInit {
   constructor(
     private projectApplicationsService: ProjectApplicationsService,
     private projectsService: ProjectsService,
-    private companiesService: CompaniesService,
     private userService: UserService,
     private notificationServices: NotificationService,
-    private developerService: DeveloperService
+    private developerService: DeveloperService,
+    private companiesService: CompaniesService,
   ) { }
 
   ngOnInit(): void {
@@ -110,8 +109,6 @@ confirmApply(): void {
         developer_id: this.developer.id,
         status: 0
     };
-
-    console.log(applicationData)
 
     this.projectApplicationsService.createApplication(applicationData)
     .subscribe({
@@ -171,12 +168,7 @@ confirmApply(): void {
     this.projectsService.getProjectsByCompany(id)
     .subscribe({
       next: (data: any) => {
-        for(let project of data){
-          if(project.status === 1){
-            this.projects.push(project)
-          }
-        }
-       // this.projects = data;
+        this.projects = data;
       },
       error: (error) => {
         this.notificationServices.showErrorCustom('No se pudo cargar proyectos')
@@ -188,7 +180,7 @@ confirmApply(): void {
     this.currentProjectId = project.id;
     this.showAddEditDialog = true;
     this.isRepublishing = true; // Añade esta propiedad en la clase
-}
+  }
 
   loadAllProjects(): void {
     this.projectsService.getAllProjects()
@@ -263,7 +255,6 @@ confirmApply(): void {
   }
 
   saveProject(id: any): void {
-    console.log(id)
     this.submitted = true;
 
     if (this.project.project_name?.trim()) {
@@ -301,8 +292,6 @@ confirmApply(): void {
           days_available: this.project.days_available,
           //status: this.project.status || 1
         };
-
-        console.log(newProject)
 
         this.projectsService.createProject(newProject)
         .subscribe({

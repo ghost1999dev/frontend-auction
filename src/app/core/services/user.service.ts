@@ -97,7 +97,6 @@ export class UserService {
     return this.http.post<activateRes>(`${environment.server_url}users/validate-email`, data)
     .pipe(
       map((res:activateRes)=> {
-        console.log(res)
         return res;
       }),
       catchError((err) => this.handlerError(err))

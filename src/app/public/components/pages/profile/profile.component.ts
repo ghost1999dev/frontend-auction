@@ -362,8 +362,6 @@ export class ProfileComponent implements OnInit {
             phone: userData.phone || ''
           };
 
-          console.log(userData)
-
           if (userData.role_id === 1) {
             this.loadCompany(userData.id);
           } else if (userData.role_id === 2) {

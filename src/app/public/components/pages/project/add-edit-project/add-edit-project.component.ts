@@ -183,8 +183,6 @@ export class AddEditProjectComponent implements OnInit {
           budget: this.project.budget,
           days_available: this.project.days_available
         };
-
-        console.log(updateData)
   
         this.projectsService.updateProject(this.project.id, updateData).subscribe({
           next: () => {

@@ -1,0 +1,88 @@
+<div class="card">
+    <div class="flex justify-content-between align-items-center mb-5">
+      <h2>{{ auctionId ? 'Editar estado de la subasta' : 'Crear nueva subasta' }}</h2>
+    </div>
+  
+    <form [formGroup]="auctionForm" (ngSubmit)="onSubmit()">
+      <div class="grid">
+        <!-- Left Column -->
+        <div class="col-12 md:col-6">
+          <!-- Project Field -->
+        <div class="field mb-4" *ngIf="!auctionId">
+            <label for="project_id" class="block mb-2 font-medium">Proyecto*</label>
+            <p-dropdown 
+                [style]="{'width':'100%'}" 
+                id="project_id" 
+                formControlName="project_id" 
+                [options]="projects" 
+                optionLabel="project_name" 
+                optionValue="id" 
+                placeholder="Seleccione un proyecto" 
+                class="w-full"
+                [ngClass]="{'ng-invalid ng-dirty': submitted && f['project_id'].errors}"
+                [filter]="true"                
+                filterBy="project_name"        
+                [filterPlaceholder]="'Buscar proyecto...'"  
+                [showClear]="true"             
+            >
+            </p-dropdown>
+            <small class="p-error block mt-1" *ngIf="submitted && f['project_id'].errors?.['required']">
+                Se requiere un proyecto
+            </small>
+        </div>
+            
+        <div class="field mb-4" *ngIf="auctionId">
+          <label for="status" class="block mb-2 font-medium">Estado*</label>
+          <p-dropdown [style]="{'width':'100%'}" id="status" formControlName="status" [options]="statuses" 
+                      optionLabel="label" optionValue="value" placeholder="Seleccione un estado" class="w-full"
+                      [ngClass]="{'ng-invalid ng-dirty': submitted && f['status'].errors}">
+          </p-dropdown>
+          <small class="p-error block mt-1" *ngIf="submitted && f['status'].errors?.['required']">
+            Se requiere estado
+          </small>
+        </div>
+  
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-12 md:col-6">
+
+          <!-- Start Date Field -->
+          <div class="field mb-4" *ngIf="!auctionId">
+            <label for="bidding_started_at" class="block mb-2 font-medium">Fecha de inicio*</label>
+            <input [disabled]="auctionId > 0" type="date" id="bidding_started_at" formControlName="bidding_started_at"  
+                       [minDate]="minStartDate" [maxDate]="maxStartDate" class="w-full"
+                       [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_started_at'].errors}"/>
+            <small class="p-error block mt-1" *ngIf="submitted && f['bidding_started_at'].errors?.['required']">
+              Se requiere fecha de inicio
+            </small>
+          </div>
+
+          <!-- Deadline Field -->
+          <div class="field mb-4" *ngIf="!auctionId">
+            <label for="bidding_deadline" class="block mb-2 font-medium">Fecha límite*</label>
+            <input type="date" id="bidding_deadline" formControlName="bidding_deadline" 
+                       [minDate]="minDeadlineDate" class="w-full"
+                       [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline'].errors}"/>
+            <small class="p-error block mt-1" *ngIf="submitted && f['bidding_deadline'].errors?.['required']">
+              Se requiere fecha límite
+            </small>
+            <small class="p-error block mt-1" *ngIf="auctionForm.errors?.['deadlineBeforeStart']">
+              La fecha límite debe ser posterior a la fecha de inicio
+            </small>
+          </div>
+
+        </div>
+      </div>
+  
+      <!-- Form Actions -->
+      <div class="flex justify-content-end gap-3 mt-5">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" 
+                class="p-button-outlined p-button-secondary" (click)="onCancel()" [disabled]="loading"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" 
+                class="p-button-primary" type="submit" [disabled]="loading">
+          <i *ngIf="loading" class="pi pi-spinner pi-spin mr-2"></i>
+        </button>
+      </div>
+    </form>
+</div>

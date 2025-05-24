@@ -40,6 +40,8 @@ export class SidebarComponent implements OnInit {
         {
           label: 'Menu',
           items: [
+            { label: 'Subastas', icon: 'pi pi-fw pi-id-card', routerLink: ['/main/auctions'] },
+            { label: `Ofertas a Subastas`, icon: 'pi pi-fw pi-dollar', routerLink: ['/main/bids'] },
             { label: 'Proyectos', icon: 'pi pi-fw pi-folder-open', routerLink: ['/main/projects'] },
             { label: `Aplicación a Proyectos`, icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects-application'] },
             //{ label: 'Subastas', icon: 'pi pi-fw pi-tag', routerLink: ['/main/auctions'] },
@@ -61,8 +63,9 @@ export class SidebarComponent implements OnInit {
         {
           label: 'Menú',
           items: [
-            { label: 'Subastas', icon: 'pi pi-fw pi-id-card', routerLink: ['/main/auctions'] },
             { label: `Proyectos`, icon: 'pi pi-fw pi-folder-open', routerLink: ['/main/projects'] },
+            { label: `Aplicaciones a mis proyectos`, icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects-application'] },
+            { label: 'Subastas', icon: 'pi pi-fw pi-id-card', routerLink: ['/main/auctions'] },
             //{ label: 'Favorites', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
             //{ label: 'Users', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/users'] }
           ]

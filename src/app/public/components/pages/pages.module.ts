@@ -33,6 +33,7 @@ import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { PasswordModule } from 'primeng/password';
 import { RoleGuard } from 'src/app/core/guards/role.guard';
@@ -52,6 +53,10 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { NumbersOnlyDirective } from 'src/app/core/directives/numbers-only-directive.directive';
 import { ProjectsApplicationComponent } from './projects-application/projects-application.component';
 import { AddEditProjectsApplicationComponent } from './projects-application/add-edit-projects-application/add-edit-projects-application.component';
+import { AddEditAuctionComponent } from './auctions/add-edit-auction/add-edit-auction.component';
+import { PublicAuctionViewComponent } from './auctions/public-auction-view/public-auction-view.component';
+import { BidsComponent } from './bids/bids.component';
+import { AddEditBidComponent } from './bids/add-edit-bid/add-edit-bid.component';
 
 const routes: Routes = [
   {
@@ -103,7 +108,19 @@ const routes: Routes = [
         path: 'projects-application',
         component: ProjectsApplicationComponent,
         canActivate: [RoleGuard],
-        data: { allowedRoles: [2] } 
+        data: { allowedRoles: [1, 2] } 
+      },
+      {
+        path: 'auctions/public/:id', 
+        component: PublicAuctionViewComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1, 2] } 
+      },
+      {
+        path: 'bids', 
+        component: BidsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1, 2] } 
       }
     ]
   },
@@ -123,6 +140,10 @@ const routes: Routes = [
     NumbersOnlyDirective,
     ProjectsApplicationComponent,
     AddEditProjectsApplicationComponent,
+    AddEditAuctionComponent,
+    PublicAuctionViewComponent,
+    BidsComponent,
+    AddEditBidComponent
   ],
   imports: [
     CommonModule,
@@ -167,7 +188,7 @@ const routes: Routes = [
     TooltipModule,
     SkeletonModule,
     FormsModule,
-
+    ProgressSpinnerModule,
     RouterModule.forChild(routes)
   ],
   providers: [
