@@ -27,6 +27,7 @@ export class ProjectComponent implements OnInit {
 
   projects: any[] = [];
   selectedProjects: Project[] = [];
+  applications: any[] = [];
   project: Project = {} as Project;
   public isRepublishing: any;
 
@@ -126,11 +127,22 @@ confirmApply(): void {
     });
 }
 
+  loadApplications(id: number): void {
+    this.projectApplicationsService.getApplicationsByDeveloper(id).subscribe({
+      next: (apps: any) => {
+        this.applications = apps;
+      },
+      error: (err) => {
+        console.error('Error de carga del application Projects:', err);
+      }
+    });
+  }
+
   loadDeveloper(id: number): void {
     this.developerService.getDeveloperByIdUser(id)
     .subscribe({
       next: (data: any) => {
-        console.log("developer: ", data)
+        this.loadApplications(Number(data.id))
         this.developer = data;
       },
       error: (error) => {
@@ -158,8 +170,13 @@ confirmApply(): void {
   loadProjects(id: any): void {
     this.projectsService.getProjectsByCompany(id)
     .subscribe({
-      next: (data) => {
-        this.projects = data;
+      next: (data: any) => {
+        for(let project of data){
+          if(project.status === 1){
+            this.projects.push(project)
+          }
+        }
+       // this.projects = data;
       },
       error: (error) => {
         this.notificationServices.showErrorCustom('No se pudo cargar proyectos')
@@ -177,7 +194,11 @@ confirmApply(): void {
     this.projectsService.getAllProjects()
     .subscribe({
       next: (data) => {
-        this.projects = data;
+        for(let project of data){
+          if(project.status === 1){
+            this.projects.push(project)
+          }
+        }        
         this.clearFilters()
       },
       error: (error) => {

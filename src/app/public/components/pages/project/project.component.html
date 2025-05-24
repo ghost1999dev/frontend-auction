@@ -75,11 +75,11 @@
                             </td>
                             <td>
                                 <div class="flex">
-                                    <button *ngIf="project.status === 0" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
+                                    <button [disabled]="project.status === 0" pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
                                             (click)="editProject(project)"></button>
-                                    <button *ngIf="project.status === 1" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" 
+                                    <button [disabled]="project.status === 1" pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" 
                                             (click)="deleteProject(project)"></button>
-                                    <button *ngIf="project.status != 1" pButton pRipple icon="pi pi-replay" class="p-button-rounded p-button-info" 
+                                    <button [disabled]="project.status != 1" pButton pRipple icon="pi pi-replay" class="p-button-rounded p-button-info" 
                                             (click)="rePublishProject(project)"></button>
                                 </div>
                             </td>
@@ -144,9 +144,9 @@
                 </div>
                 
                 <div class="flex mt-3 gap-2">
-                  <p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatus" 
+                  <!--<p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatus" 
                              optionLabel="label" optionValue="value" placeholder="Estado"
-                             (onChange)="filterProjects()" [showClear]="true"></p-dropdown>
+                             (onChange)="filterProjects()" [showClear]="true"></p-dropdown>-->
                   <p-dropdown [options]="sortOptions" [(ngModel)]="selectedSort" 
                              optionLabel="label" optionValue="value" placeholder="Ordenar por"
                              (onChange)="filterProjects()"></p-dropdown>
@@ -184,13 +184,15 @@
                         <i class="pi pi-clock text-600 mr-1"></i>
                         <span class="text-sm text-600">{{project.days_remaining || '0'}} días</span>
                       </div>
-                    <button *ngIf="project.status === 1" pButton pRipple 
+                    <button *ngIf="project.status === 1 && applications.length < 5" pButton pRipple 
                             type="button" 
                             label="Aplicar a este Proyecto" 
                             icon="pi pi-arrow-right"
                             iconPos="right"
                             class="p-button-sm p-button-text"
                             (click)="showApplyDialog(project)"></button>
+                    <h6 *ngIf="project.status === 1 && applications.length >= 5"  class="text-700 font-normal " style="color: red !important; margin-top: 03px;">Haz alcanzado el Maximo a 5 Proyectos</h6>
+
                     </div>
                   </div>
                 </div>
