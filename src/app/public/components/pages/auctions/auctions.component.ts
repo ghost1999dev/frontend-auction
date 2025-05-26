@@ -1,50 +1,54 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { ViewChild } from '@angular/core';
+import { Table } from 'primeng/table';
+import { forkJoin, Subscription } from 'rxjs';
+
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { UserService } from 'src/app/core/services/user.service';
-import { ViewChild } from '@angular/core';
-import { Table } from 'primeng/table';
-import { forkJoin } from 'rxjs';
 import { NotificationService } from 'src/app/core/services/notification.service';
-import { Auction } from 'src/app/core/models/auctions';
 import { AuctionService } from 'src/app/core/services/auction.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
-import { Router } from '@angular/router';
+import { Auction } from 'src/app/core/models/auctions';
 
 @Component({
   selector: 'app-auctions',
   templateUrl: './auctions.component.html',
   styleUrls: ['./auctions.component.scss']
 })
-export class AuctionsComponent implements OnInit {
-
-  public company: any;
-  public developer: any;
-  projects: any[] = [];
-  filteredActiveAuctions: any[] = [];
-  searchTerm: string = '';
-
+export class AuctionsComponent implements OnInit, OnDestroy {
   @ViewChild('dt') dt: Table | undefined;
   
+  // Datos del usuario
+  company: any = null;
+  developer: any = null;
+  id: string = this.getUserInfo();
+  
+  // Datos de la aplicación
+  projects: any[] = [];
   auctions: Auction[] = [];
+  filteredActiveAuctions: Auction[] = [];
   selectedAuctions: Auction[] = [];
   auction: Auction = {} as Auction;
-
+  
+  // Estados y controles UI
   showAddEditDialog = false;
   currentAuctionId?: number;
-
-  deleteAuctionDialog: boolean = false;
-  deleteAuctionsDialog: boolean = false;
-
-  submitted: boolean = false;
-  loading: boolean = false;
-
+  deleteAuctionDialog = false;
+  deleteAuctionsDialog = false;
+  submitted = false;
+  loading = false;
+  searchTerm = '';
+  
   statuses = [
-    { label: 'Pendiente', value: 0 },
-    { label: 'Activa', value: 1 },
-    { label: 'Completada', value: 2 },
-    { label: 'Cancelada', value: 3 }
+    { label: 'Pendiente', value: '0' },
+    { label: 'Activa', value: '1' },
+    { label: 'Completada', value: '2' },
+    { label: 'Cancelada', value: '3' }
   ];
+
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private router: Router,
@@ -57,98 +61,130 @@ export class AuctionsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getUserById(this.id);
+    this.loadInitialData();
   }
 
-  loadAuctions(): void {
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  private loadInitialData(): void {
     this.loading = true;
-    this.auctionService.getAuctions()
-    .subscribe({
-        next: (auctions) => {
-            if (this.company) {
-                // Lógica existente para empresas
-                this.auctions = auctions.filter((auction: any) => {
-                    return this.projects.some((project: any) => project.id === auction.project_id);
-                });
-            } else if (this.developer) {
-                // Filtrar solo subastas activas para desarrolladores
-                this.auctions = auctions.filter((auction: any) => auction.status === "1");
-                this.filteredActiveAuctions = [...this.auctions];
-            }
-            this.loading = false;
-        },
-        error: (error) => {
-            this.notificationService.showErrorCustom('Error al cargar las subastas');
-            this.loading = false;
+    const userSub = this.userService.getUsersById(this.id).subscribe({
+      next: (user: any) => {
+        if (!user) return;
+        
+        if (user.role_id === 1) {
+          this.loadCompanyData(user.id);
+        } else if (user.role_id === 2) {
+          this.loadDeveloperData(user.id);
         }
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar datos del usuario');
+        this.loading = false;
+      }
     });
-}
+    
+    this.subscriptions.add(userSub);
+  }
+
+  private loadCompanyData(userId: number): void {
+    const companySub = this.companiesService.getCompanyByUserId(userId).subscribe({
+      next: (company) => {
+        this.company = company;
+        this.loadCompanyProjectsAndAuctions(company.id);
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar datos de la empresa');
+        this.loading = false;
+      }
+    });
+    
+    this.subscriptions.add(companySub);
+  }
+
+  private loadCompanyProjectsAndAuctions(companyId: number): void {
+    forkJoin([
+      this.projectsService.getProjectsByCompany(companyId),
+      this.auctionService.getAuctions()
+    ]).subscribe({
+      next: ([projects, auctions]) => {
+        this.projects = projects;
+        this.auctions = auctions.filter(auction => 
+          projects.some(project => project.id === auction.project_id)
+        );
+        this.loading = false;
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar proyectos y subastas');
+        this.loading = false;
+      }
+    });
+  }
+
+  private loadDeveloperData(userId: number): void {
+    const devSub = this.developerService.getDeveloperByIdUser(userId).subscribe({
+      next: (developer) => {
+        this.developer = developer;
+        this.loadActiveAuctions();
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar datos del desarrollador');
+        this.loading = false;
+      }
+    });
+    
+    this.subscriptions.add(devSub);
+  }
+
+  private loadActiveAuctions(): void {
+    this.loading = true;
+    const auctionsSub = this.auctionService.getAuctions().subscribe({
+      next: (auctions) => {
+        this.auctions = auctions.filter((auction: any) => auction.status === "1");
+        this.filteredActiveAuctions = [...this.auctions];
+        this.loading = false;
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar subastas activas');
+        this.loading = false;
+      }
+    });
+    
+    this.subscriptions.add(auctionsSub);
+  }
+
+  // Métodos de UI y utilidades
   getStatusLabel(status: any): any {
-    switch(status) {
-      case "0": return 'Pendiente';
-      case "1": return 'Activa';
-      case "2": return 'Completada';
-      case "3": return 'Cancelada';
-      default: return 'Desconocido';
-    }
+    const statusMap: Record<string, string> = {
+      '0': 'Pendiente',
+      '1': 'Activa',
+      '2': 'Completada',
+      '3': 'Cancelada'
+    };
+    return statusMap[status] || 'Desconocido';
   }
 
   getStatusSeverity(status: any): any {
-    switch(status) {
-      case "0": return 'warning';
-      case "1": return 'success';
-      case "2": return 'info';
-      case "3": return 'danger';
-      default: return '';
-    }
+    const severityMap: Record<string, string> = {
+      '0': 'warning',
+      '1': 'success',
+      '2': 'info',
+      '3': 'danger'
+    };
+    return severityMap[status] || '';
   }
 
-  deleteAuction(auction: Auction): void {
-    this.auction = { ...auction };
-    this.deleteAuctionDialog = true;
-  }
-
-  confirmDelete(): void {
-    this.deleteAuctionDialog = false;
-    this.auctionService.deleteAuction(this.auction.id).subscribe({
-      next: () => {
-        this.notificationService.showSuccessCustom('Subasta eliminada exitosamente');
-        this.loadAuctions();
-        this.auction = {} as Auction;
-      },
-      error: (error) => {
-        this.notificationService.showErrorCustom(error.error?.message || 'Error al eliminar la subasta');
-      }
-    });
-  }
-
-  confirmDeleteSelected(): void {
-    this.deleteAuctionsDialog = false;
-    if (!this.selectedAuctions || this.selectedAuctions.length === 0) {
-      this.notificationService.showErrorCustom('No hay subastas seleccionadas');
-      return;
-    }
-
-    const deleteOperations = this.selectedAuctions.map(auction => 
-      this.auctionService.deleteAuction(auction.id)
+  filterAuctions(event: any): void {
+    const value = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filteredActiveAuctions = this.auctions.filter((auction: any) => 
+      auction.project?.project_name?.toLowerCase().includes(value) ||
+      this.getStatusLabel(auction.status).toLowerCase().includes(value)
     );
-
-    forkJoin(deleteOperations).subscribe({
-      next: () => {
-        this.notificationService.showSuccessCustom(`${this.selectedAuctions.length} subastas eliminadas`);
-        this.loadAuctions();
-        this.selectedAuctions = [];
-      },
-      error: (error) => {
-        this.notificationService.showErrorCustom('Error al eliminar algunas subastas');
-      }
-    });
   }
 
-  onGlobalFilter(table: Table, event: Event): void {
-    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
+  // Métodos CRUD
   openNew(): void {
     this.currentAuctionId = undefined;
     this.showAddEditDialog = true;
@@ -162,94 +198,86 @@ export class AuctionsComponent implements OnInit {
 
   onAuctionSaved(): void {
     this.showAddEditDialog = false;
-    this.loadAuctions();
+    this.loadInitialData();
   }
 
-  loadCompany(userId: number): void {
-    this.companiesService.getCompanyByUserId(userId)
-    .subscribe({
-      next: (data: any) => {
-        this.loadProjects(Number(data.id))
-        this.company = data;
+  deleteAuction(auction: Auction): void {
+    this.auction = { ...auction };
+    this.deleteAuctionDialog = true;
+  }
+
+  confirmDelete(): void {
+    this.deleteAuctionDialog = false;
+    const deleteSub = this.auctionService.deleteAuction(this.auction.id).subscribe({
+      next: () => {
+        this.notificationService.showSuccessCustom('Subasta eliminada exitosamente');
+        this.loadInitialData();
+        this.auction = {} as Auction;
       },
-      error: (error: any) => {
-        console.error('Error de carga de la empresa:', error);
+      error: (err) => {
+        this.notificationService.showErrorCustom(err.error?.message || 'Error al eliminar la subasta');
       }
     });
+    
+    this.subscriptions.add(deleteSub);
   }
 
-  loadProjects(id: any): void {
-    this.projectsService.getProjectsByCompany(id)
-    .subscribe({
-        next: (data: any) => {
-            this.projects = data;            
-        },
-        error: (error) => {
-            this.notificationService.showErrorCustom('No se pudo cargar proyectos');
-        }
-    });
-}
+  confirmDeleteSelected(): void {
+    this.deleteAuctionsDialog = false;
+    
+    if (!this.selectedAuctions?.length) {
+      this.notificationService.showErrorCustom('No hay subastas seleccionadas');
+      return;
+    }
 
-  loadDeveloper(id: number): void {
-    this.developerService.getDeveloperByIdUser(id)
-    .subscribe({
-      next: (data: any) => {
-        this.developer = data;
-        this.loadAuctions()
-      },
-      error: (error) => {
-        console.error('Error de carga del desarrollador:', error);
-      }
-    });
-  }
-
-  filterAuctions(event: any): void {
-    this.searchTerm = event.target.value.toLowerCase();
-    this.filteredActiveAuctions = this.auctions.filter(auction => 
-        auction.project?.project_name?.toLowerCase().includes(this.searchTerm) ||
-        this.getStatusLabel(auction.status).toLowerCase().includes(this.searchTerm)
+    const deleteOperations = this.selectedAuctions.map(auction => 
+      this.auctionService.deleteAuction(auction.id)
     );
-  }
 
-  placeBid(auction: Auction): void {
-      this.router.navigate(['/main/auctions/bid', auction.id]);
-  }
-
-  public getUserById(id: any){
-    this.userService.getUsersById(id)
-    .subscribe((next: any) => {
-      if(next){
-        if(next.role_id === 1){
-          this.loadCompany(next.id)
-        }else if(next.role_id === 2){
-          this.loadDeveloper(next.id)
-        }
-      }else{
-        
+    forkJoin(deleteOperations).subscribe({
+      next: () => {
+        this.notificationService.showSuccessCustom(`${this.selectedAuctions.length} subastas eliminadas`);
+        this.loadInitialData();
+        this.selectedAuctions = [];
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al eliminar algunas subastas');
       }
-    })
+    });
   }
 
-    getUserInfo() {
-    const token = this.getTokens();
-    let payload;
-    if (token) {
-      payload = token.split(".")[1];
-      payload = window.atob(payload);
-      return JSON.parse(payload)['id'];
-    } else {
-      return null;
+  // Navegación
+  placeBid(auction: Auction): void {
+    this.router.navigate(['/main/auctions/bid', auction.id]);
+  }
+
+  viewPublicAuction(auction: any): void {
+    this.router.navigate(['/main/auctions/public', auction.id]);
+  }
+
+   onGlobalFilter(table: any, event: any): void {
+    const value = (event.target as HTMLInputElement).value;
+    table.filterGlobal(value, 'contains');
+  }
+
+  // Método alternativo mejorado para filtrado (opcional)
+  private applyGlobalFilter(value: string): void {
+    if (this.dt) {
+      this.dt.filterGlobal(value, 'contains');
     }
   }
-  
-  getTokens() {
-    return localStorage.getItem("login-token");
+
+  // Helpers
+  private getUserInfo(): string {
+    const token = localStorage.getItem("login-token");
+    if (!token) return '';
+    
+    try {
+      const payload = token.split(".")[1];
+      return JSON.parse(window.atob(payload))['id'] || '';
+    } catch (e) {
+      console.error('Error parsing token:', e);
+      return '';
+    }
   }
-
-  id: any = this.getUserInfo();
-
-  viewPublicAuction(auction: Auction): void {
-    this.router.navigate(['/main/auctions/public', auction.id])
-  }
-
 }

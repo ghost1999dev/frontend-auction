@@ -300,9 +300,6 @@ confirmApply(): void {
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
-          },
-          error: (error) => {
-            this.notificationServices.showErrorCustom('No se pudo crear el proyecto')
           }
         });
       }

@@ -5,15 +5,16 @@
         <!--<button pButton pRipple label="Nueva subasta" icon="pi pi-plus" class="p-button-success"></button>-->
     </div>
 
-    <p-table [value]="filteredApplications" [loading]="loading" responsiveLayout="scroll" [rows]="10" 
+    <p-table #dt [value]="filteredApplications" [loading]="loading" responsiveLayout="scroll" [rows]="10" 
             [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
+            [globalFilterFields]="['project.project_name','status']"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas">
       <ng-template pTemplate="caption">
         <div class="flex justify-content-between align-items-center">
           <h5 class="mt-2"></h5>
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input pInputText type="text" placeholder="Buscar aplicaciones..." style="width: 100%"/>
+            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar aplicaciones..." style="width: 100%"/>
           </span>
         </div>
       </ng-template>
@@ -32,7 +33,6 @@
           <td>
             <div class="developer-info">
               <span class="developer-name">{{app.developer?.name || 'N/A'}}</span>
-              <span class="developer-email">{{app.developer?.email || ''}}</span>
             </div>
           </td>
           <td>
@@ -101,10 +101,10 @@
             <span class="detail-label">Última Actualización:</span>
             <span class="detail-value">{{ app.updatedAt | date:'mediumDate' }}</span>
           </div>
-          <div class="detail-item">
+          <!-- <div class="detail-item">
             <span class="detail-label">Email de Contacto:</span>
             <span class="detail-value">{{ app.project?.company_profile?.user?.email || 'No disponible' }}</span>
-          </div>
+          </div> -->
         </div>
       </div>
       

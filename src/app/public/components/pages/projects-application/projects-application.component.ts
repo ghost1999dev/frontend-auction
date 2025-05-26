@@ -1,28 +1,29 @@
-import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription, forkJoin } from 'rxjs';
 import { ProjectApplicationsService } from 'src/app/core/services/project-applications.service';
 import { LayoutService } from 'src/app/core/services/layout.service';
-import { Application } from 'src/app/core/models/applications_projects';
 import { UserService } from 'src/app/core/services/user.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
+import { Table } from 'primeng/table';
 
 @Component({
   selector: 'app-projects-application',
   templateUrl: './projects-application.component.html',
   styleUrls: ['./projects-application.component.scss']
 })
-export class ProjectsApplicationComponent implements OnInit {
+export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   applications: any[] = [];
   filteredApplications: any[] = [];
   loading = false;
-  subscription!: Subscription;
-
-  public company: any;
-  public developer: any;
+  subscriptions: Subscription = new Subscription();
+  
+  company: any;
+  developer: any;
   projects: any[] = [];
+  id: any = this.getUserInfo();
 
   constructor(
     private applicationsService: ProjectApplicationsService,
@@ -38,155 +39,169 @@ export class ProjectsApplicationComponent implements OnInit {
     this.getUserById(this.id);
   }
 
-  loadApplications(id: number): void {
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  private getUserById(id: any): void {
     this.loading = true;
-    this.applicationsService.getApplicationsByDeveloper(id)
-    .subscribe({
-      next: (apps: any) => {
-        this.applications = apps;
-        this.filterApplications(); 
+    const userSub = this.userService.getUsersById(id)
+      .subscribe({
+        next: (user: any) => {
+          if (user) {
+            if (user.role_id === 1) { // Company
+              this.loadCompanyData(user.id);
+            } else if (user.role_id === 2) { // Developer
+              this.loadDeveloperData(user.id);
+            }
+          } else {
+            this.loading = false;
+          }
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar datos del usuario');
+          this.loading = false;
+        }
+      });
+    this.subscriptions.add(userSub);
+  }
+
+  private loadCompanyData(userId: number): void {
+    this.loading = true;
+    
+    const companySub = this.companiesService.getCompanyByUserId(userId)
+      .subscribe({
+        next: (company) => {
+          this.company = company;
+          this.loadProjectsAndApplications(company.id);
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar datos de la empresa');
+          this.loading = false;
+        }
+      });
+    
+    this.subscriptions.add(companySub);
+  }
+
+  private loadProjectsAndApplications(companyId: number): void {
+    forkJoin([
+      this.projectsService.getProjectsByCompany(companyId),
+      this.applicationsService.getAllApplications()
+    ]).subscribe({
+      next: ([projects, applications]) => {
+        this.projects = projects;
+        // Filtrar solo las aplicaciones de los proyectos de esta compañía
+        this.applications = applications.filter((app: any) => 
+          this.projects.some(project => project.id === app.project_id)
+        );
+        this.filteredApplications = [...this.applications];
         this.loading = false;
       },
       error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar proyectos y aplicaciones');
         this.loading = false;
-        this.notificationService.showErrorCustom('Error al cargar aplicaciones');
       }
     });
   }
 
-  loadApplicationsAll(): void {
+  private loadDeveloperData(userId: number): void {
     this.loading = true;
-    this.applicationsService.getAllApplications()
-    .subscribe({
-      next: (apps: any) => {
-        this.applications = apps;
-        this.filterApplications(); 
-        this.loading = false;
-      },
-      error: (err) => {
-        this.loading = false;
-        this.notificationService.showErrorCustom('Error al cargar aplicaciones');
-      }
-    });
+    
+    const devSub = this.developerService.getDeveloperByIdUser(userId)
+      .subscribe({
+        next: (developer) => {
+          if (developer) {
+            this.developer = developer;
+            this.loadApplications(Number(developer.id));
+          }
+          this.loading = false;
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar datos del desarrollador');
+          this.loading = false;
+        }
+      });
+    
+    this.subscriptions.add(devSub);
+  }
+
+  private loadApplications(developerId: number): void {
+    this.loading = true;
+    const appsSub = this.applicationsService.getApplicationsByDeveloper(developerId)
+      .subscribe({
+        next: (apps) => {
+          this.applications = apps;
+          this.filteredApplications = [...this.applications];
+          this.loading = false;
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar aplicaciones');
+          this.loading = false;
+        }
+      });
+    
+    this.subscriptions.add(appsSub);
   }
 
   filterApplications(): void {
     if (this.projects.length > 0) {
-      this.filteredApplications = this.applications.filter(app => {
-        return this.projects.some(project => project.id === app.project_id);
-      });
+      this.filteredApplications = this.applications.filter(app => 
+        this.projects.some(project => project.id === app.project_id)
+      );
     } else {
       this.filteredApplications = [...this.applications];
     }
   }
 
   getStatusClass(status: number): string {
-    switch (status) {
-      case 0: return 'status-pending';
-      case 1: return 'status-accepted';
-      case 2: return 'status-rejected';
-      default: return '';
-    }
+    const statusClasses: Record<number, string> = {
+      0: 'status-pending',
+      1: 'status-accepted',
+      2: 'status-rejected'
+    };
+    return statusClasses[status] || '';
   }
 
-  getStatusText(status: number): string {
-    switch (status) {
-      case 0: return 'Pendiente';
-      case 1: return 'Activa';
-      case 2: return 'Rechazada';
-      default: return 'Desconocido';
-    }
+  getStatusText(status: any): any {
+    const statusTexts: Record<number, string> = {
+      0: 'Pendiente',
+      1: 'Activa',
+      2: 'Rechazada'
+    };
+    return statusTexts[status] || 'Desconocido';
   }
-
-  loadDeveloper(id: number): void {
-    this.loading = true;
-    this.developerService.getDeveloperByIdUser(id)
-    .subscribe({
-      next: (data) => {
-        if(data){
-          this.developer = data;
-          this.loadApplications(Number(data.id));
-        }
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading developer:', error);
-        this.loading = false;
-      }
-    });
-  }
-
-  loadCompany(userId: number): void {
-    this.companiesService.getCompanyByUserId(userId)
-    .subscribe({
-      next: (data: any) => {
-        this.loadProjects(Number(data.id));
-        this.loadApplicationsAll()
-        this.company = data;
-      },
-      error: (error: any) => {
-        console.error('Error de carga de la empresa:', error);
-      }
-    });
-  }
-
-  loadProjects(id: any): void {
-    this.projectsService.getProjectsByCompany(id)
-    .subscribe({
-      next: (data: any) => {
-        this.projects = data;
-        this.filterApplications();
-      },
-      error: (error: any) => {
-        this.notificationService.showErrorCustom('No se pudo cargar proyectos');
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-
-  public getUserById(id: any) {
-    this.userService.getUsersById(id)
-    .subscribe((next: any) => {
-      if(next) {
-        if(next.role_id === 1) {
-          this.loadCompany(next.id);
-        } else if(next.role_id === 2) {
-          this.loadDeveloper(next.id);
-        }
-      }
-    });
-  }
-
-  getUserInfo() {
-    const token = this.getTokens();
-    let payload;
-    if (token) {
-      payload = token.split(".")[1];
-      payload = window.atob(payload);
-      return JSON.parse(payload)['id'];
-    } else {
-      return null;
-    }
-  }
-  
-  getTokens() {
-    return localStorage.getItem("login-token");
-  }
-
-  id: any = this.getUserInfo();
-
 
   getStatusSeverity(status: any): any {
-    switch(status) {
-      case 0: return 'warning';
-      case 1: return 'success';
-      case 2: return 'danger';
-      default: return 'info';
+    const severityMap: Record<number, string> = {
+      0: 'warning',
+      1: 'success',
+      2: 'danger'
+    };
+    return severityMap[status] || 'info';
+  }
+
+  onGlobalFilter(table: any, event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    table.filterGlobal(value, 'contains');
+  }
+
+  private getUserInfo(): any {
+    const token = this.getTokens();
+    if (token) {
+      try {
+        const payload = token.split(".")[1];
+        const decodedPayload = window.atob(payload);
+        return JSON.parse(decodedPayload)['id'];
+      } catch (e) {
+        console.error('Error parsing token:', e);
+        return null;
+      }
     }
+    return null;
+  }
+
+  private getTokens(): string | null {
+    return localStorage.getItem("login-token");
   }
 }

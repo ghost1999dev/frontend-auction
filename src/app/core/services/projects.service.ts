@@ -105,8 +105,10 @@ export class ProjectsService {
       default:
         this.notificationServices.showErrorCustom(err.message .message);
     }
-
+  
+    console.log(err.error)
     for (let i = 0; i < err.error.details.length; i++) {
+      console.log(err.error.details[i])
       this.notificationServices.showErrorCustom(err.error.details[i])
     }
   
