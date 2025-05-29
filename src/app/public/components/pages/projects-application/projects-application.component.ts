@@ -8,11 +8,16 @@ import { CompaniesService } from 'src/app/core/services/companies.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { Table } from 'primeng/table';
+import { RatingService } from 'src/app/core/services/rating.service'; // Añadir esto
+import { Rating } from 'src/app/core/models/ratings';
+import { ConfirmationService } from 'primeng/api';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-projects-application',
   templateUrl: './projects-application.component.html',
-  styleUrls: ['./projects-application.component.scss']
+  styleUrls: ['./projects-application.component.scss'],
+  providers: [ConfirmationService]
 })
 export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   applications: any[] = [];
@@ -25,6 +30,23 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   projects: any[] = [];
   id: any = this.getUserInfo();
 
+  displayRatingsDialog = false;
+  selectedDeveloper: any;
+  developerRatings: Rating[] = [];
+  averageRating: number = 0;
+  totalRatings: number = 0;
+  loadingRatings = false;
+
+  displayProjectDialog = false;
+  selectedProject: any;
+  loadingProject = false;
+
+  displayWithdrawDialog = false;
+  selectedApplicationId: number | null = null;
+  withdrawLoading = false;
+
+  sanitizedLongDescription: any;
+
   constructor(
     private applicationsService: ProjectApplicationsService,
     public layoutService: LayoutService,
@@ -33,6 +55,9 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     private companiesService: CompaniesService,
     private notificationService: NotificationService,
     private projectsService: ProjectsService,
+    private ratingService: RatingService,
+    private sanitizer: DomSanitizer, // Añade esto
+    private confirmationService: ConfirmationService // Añade esto
   ) { }
 
   ngOnInit(): void {
@@ -42,6 +67,37 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
+
+  showDeveloperRatings(developer: any): void {
+    this.selectedDeveloper = developer;
+    this.loadingRatings = true;
+    this.displayRatingsDialog = true;
+
+    forkJoin([
+      this.ratingService.getAverageRatingByDeveloper(developer.id),
+      this.ratingService.getAllRatings({ developer_id: developer.id })
+    ]).subscribe({
+      next: ([averageResponse, ratingsResponse]) => {
+        this.averageRating = averageResponse.averageScore;
+        this.totalRatings = averageResponse.totalRatings;
+        this.developerRatings = ratingsResponse.ratings || [];
+        this.loadingRatings = false;
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar los ratings del desarrollador');
+        this.loadingRatings = false;
+      }
+    });
+  }
+
+  getStarRating(score: number): string {
+    const fullStars = Math.floor(score);
+    const halfStar = score % 1 >= 0.5 ? 1 : 0;
+    const emptyStars = 5 - fullStars - halfStar;
+    
+    return '★'.repeat(fullStars) + '½'.repeat(halfStar) + '☆'.repeat(emptyStars);
+  }
+
 
   private getUserById(id: any): void {
     this.loading = true;
@@ -152,6 +208,51 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     } else {
       this.filteredApplications = [...this.applications];
     }
+  }
+
+  showProjectDetails(projectId: number): void {
+    this.loadingProject = true;
+    this.displayProjectDialog = true;
+    
+    this.projectsService.getProjectById(projectId).subscribe({
+      next: (project) => {
+        this.selectedProject = project;
+        // Sanitiza el HTML para seguridad
+        this.sanitizedLongDescription = this.sanitizer.bypassSecurityTrustHtml(
+          project.long_description || project.full_description || 'No hay descripción disponible'
+        );
+        this.loadingProject = false;
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar los detalles del proyecto');
+        this.loadingProject = false;
+        this.displayProjectDialog = false;
+      }
+    });
+  }
+
+
+  openWithdrawDialog(applicationId: number): void {
+    this.selectedApplicationId = applicationId;
+    this.displayWithdrawDialog = true;
+  }
+
+  confirmWithdraw(): void {
+    if (!this.selectedApplicationId) return;
+    
+    this.withdrawLoading = true;
+    this.applicationsService.deleteApplication(this.selectedApplicationId).subscribe({
+      next: () => {
+        this.notificationService.showSuccessCustom('Aplicación retirada correctamente');
+        this.loadApplications(Number(this.developer.id));
+        this.displayWithdrawDialog = false;
+        this.withdrawLoading = false;
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al retirar la aplicación');
+        this.withdrawLoading = false;
+      }
+    });
   }
 
   getStatusClass(status: number): string {

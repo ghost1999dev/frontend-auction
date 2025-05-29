@@ -124,29 +124,76 @@ confirmApply(): void {
     });
 }
 
-  loadApplications(id: number): void {
-    this.projectApplicationsService.getApplicationsByDeveloper(id).subscribe({
-      next: (apps: any) => {
-        this.applications = apps;
-      },
-      error: (err) => {
-        console.error('Error de carga del application Projects:', err);
-      }
-    });
-  }
+loadApplications(id: number): void {
+  this.projectApplicationsService.getApplicationsByDeveloper(id).subscribe({
+    next: (apps: any) => {
+      this.applications = apps;
+      this.filterProjects(); // Vuelve a filtrar cuando se cargan las aplicaciones
+    },
+    error: (err) => {
+      console.error('Error de carga del application Projects:', err);
+    }
+  });
+}
 
-  loadDeveloper(id: number): void {
-    this.developerService.getDeveloperByIdUser(id)
-    .subscribe({
-      next: (data: any) => {
-        this.loadApplications(Number(data.id))
-        this.developer = data;
-      },
-      error: (error) => {
-        console.error('Error de carga del desarrollador:', error);
-      }
-    });
-  }
+  // project.component.ts
+// project.component.ts
+filterProjects() {
+  if (!this.projects || !this.applications) return;
+
+  this.filteredProjects = this.projects.filter(project => {
+    // Verificar si el desarrollador ya aplicó a este proyecto
+    const alreadyApplied = this.applications.some(app => 
+      app.project_id === project.id
+    );
+
+    // Search term filter
+    const matchesSearch = !this.searchTerm || 
+      project.project_name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      project.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      (project.company?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+      (project.category?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()));
+    
+    // Status filter (mostrar solo activos para desarrolladores)
+    const matchesStatus = this.developer ? project.status === 1 : 
+                         (this.selectedStatus === null || project.status === this.selectedStatus);
+    
+    // Para desarrolladores: no mostrar proyectos ya aplicados
+    const shouldShow = this.developer ? !alreadyApplied : true;
+    
+    return matchesSearch && matchesStatus && shouldShow;
+  });
+
+  // Sorting
+  this.sortProjects();
+  
+  // Reset pagination
+  this.page = 1;
+  this.first = 0;
+}
+
+loadDeveloper(id: number): void {
+  this.developerService.getDeveloperByIdUser(id)
+  .subscribe({
+    next: (data: any) => {
+      this.developer = data;
+      // Cargar aplicaciones primero
+      this.projectApplicationsService.getApplicationsByDeveloper(Number(data.id)).subscribe({
+        next: (apps: any) => {
+          this.applications = apps;
+          // Luego cargar proyectos y aplicar filtros
+          this.loadAllProjects();
+        },
+        error: (err) => {
+          console.error('Error loading applications:', err);
+        }
+      });
+    },
+    error: (error) => {
+      console.error('Error loading developer:', error);
+    }
+  });
+}
 
   public getUserById(id: any){
     this.userService.getUsersById(id)
@@ -182,22 +229,28 @@ confirmApply(): void {
     this.isRepublishing = true; // Añade esta propiedad en la clase
   }
 
-  loadAllProjects(): void {
-    this.projectsService.getAllProjects()
-    .subscribe({
-      next: (data) => {
-        for(let project of data){
-          if(project.status === 1){
-            this.projects.push(project)
-          }
-        }        
-        this.clearFilters()
-      },
-      error: (error) => {
-        this.notificationServices.showErrorCustom('No se pudo cargar proyectos')
-      }
-    });
-  }
+loadAllProjects(): void {
+  this.projectsService.getAllProjects()
+  .subscribe({
+    next: (data) => {
+      // Solo mantener proyectos activos para desarrolladores
+      this.projects = this.developer 
+        ? data.filter(project => project.status === 1)
+        : data;
+      
+      // Aplicar filtros después de cargar
+      this.filterProjects();
+    },
+    error: (error) => {
+      this.notificationServices.showErrorCustom('No se pudo cargar proyectos');
+    }
+  });
+}
+
+// project.component.ts
+hasApplied(projectId: number): boolean {
+  return this.applications?.some(app => app.project_id === projectId) || false;
+}
 
 /*   openNew(): void {
     this.project = {} as Project;
@@ -333,29 +386,6 @@ confirmApply(): void {
         this.notificationServices.showErrorCustom('No se pudo desactivar algunos proyectos')
       }
     });
-  }
-
-  filterProjects() {
-    this.filteredProjects = this.projects.filter(project => {
-      // Search term filter
-      const matchesSearch = !this.searchTerm || 
-        project.project_name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        (project.company?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-        (project.category?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()));
-      
-      // Status filter
-      const matchesStatus = this.selectedStatus === null || project.status === this.selectedStatus;
-      
-      return matchesSearch && matchesStatus;
-    });
-
-    // Sorting
-    this.sortProjects();
-    
-    // Reset pagination
-    this.page = 1;
-    this.first = 0;
   }
 
   sortProjects() {

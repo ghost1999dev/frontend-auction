@@ -176,3 +176,199 @@
   color: #6c757d;
   font-size: 1.1rem;
 }
+
+/* projects-application.component.scss */
+/* ... (estilos existentes se mantienen) ... */
+
+.confirmation-content {
+  padding: 1rem;
+}
+
+/* Estilo para el diálogo de confirmación */
+.p-dialog {
+  .p-dialog-header {
+    border-bottom: 1px solid var(--surface-border);
+  }
+  
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+  
+  .p-dialog-footer {
+    border-top: 1px solid var(--surface-border);
+    padding: 1rem 1.5rem;
+    text-align: right;
+  }
+}
+
+/* Ajustes para móviles */
+@media (max-width: 600px) {
+  .p-dialog {
+    width: 90vw !important;
+    
+    .p-dialog-content {
+      padding: 1rem;
+    }
+  }
+}
+
+:host ::ng-deep {
+  .p-dialog {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+    
+    .p-dialog-header {
+      background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+      color: white;
+      padding: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      
+      .p-dialog-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+      }
+      
+      .p-dialog-header-icon {
+        color: white;
+        transition: all 0.2s;
+        
+        &:hover {
+          color: #f8f9fa;
+          transform: scale(1.1);
+        }
+      }
+    }
+    
+    .p-dialog-content {
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      
+      .project-dialog-content {
+        animation: fadeIn 0.4s ease-out;
+        
+        .project-details {
+          h3 {
+            color: #2c3e50;
+            position: relative;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            
+            &::after {
+              content: '';
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              width: 60px;
+              height: 3px;
+              background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+              border-radius: 3px;
+            }
+          }
+          
+          .detail-item {
+            margin-bottom: 1.25rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid #e9ecef;
+            
+            &:last-child {
+              border-bottom: none;
+            }
+            
+            .detail-label {
+              color: #4b6cb7;
+              display: block;
+              margin-bottom: 0.5rem;
+              font-size: 0.9rem;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            
+            p {
+              color: #495057;
+              margin: 0;
+              line-height: 1.6;
+            }
+            
+            .prose {
+              color: #495057;
+              line-height: 1.7;
+              
+              h1, h2, h3, h4 {
+                color: #2c3e50;
+                margin-top: 1.5rem;
+                margin-bottom: 1rem;
+              }
+              
+              p {
+                margin-bottom: 1rem;
+              }
+              
+              ul, ol {
+                padding-left: 1.5rem;
+                margin-bottom: 1rem;
+              }
+            }
+          }
+          
+          .p-tag {
+            padding: 0.35rem 0.75rem;
+            font-weight: 500;
+            border-radius: 6px;
+          }
+        }
+        
+        .text-center {
+          .p-progress-spinner {
+            margin: 0 auto 1rem;
+          }
+          
+          p {
+            color: #6c757d;
+            font-style: italic;
+          }
+        }
+      }
+    }
+    
+    .p-dialog-footer {
+      border-top: 1px solid #e9ecef;
+      padding: 1rem 1.5rem;
+      background-color: #f8f9fa;
+      
+      .p-button {
+        transition: all 0.2s;
+        
+        &:hover {
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
+
+// Animación de entrada
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  :host ::ng-deep {
+    .p-dialog {
+      width: 95vw !important;
+      
+      .p-dialog-content {
+        padding: 1rem;
+      }
+    }
+  }
+}

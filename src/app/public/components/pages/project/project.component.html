@@ -111,6 +111,15 @@
                 <h2 class="text-900 font-normal mb-2">Proyectos</h2>
                 <span class="text-600 text-2xl">Explora y haz ofertas en proyectos de programación</span>
               </div>
+
+              <div *ngIf="applications.length > 0 && filteredProjects.length === 0" class="col-12 text-center mt-5">
+                <p class="text-600 text-xl">Ya has aplicado a todos los proyectos disponibles</p>
+                <button pButton pRipple type="button" 
+                        label="Ver mis aplicaciones" 
+                        icon="pi pi-list"
+                        class="p-button-outlined mt-3"
+                        routerLink="/projects/applications"></button>
+              </div>
           
               <!-- Barra de búsqueda y filtros -->
               <div class="col-12 mb-5">
@@ -165,13 +174,18 @@
                         <i class="pi pi-clock text-600 mr-1"></i>
                         <span class="text-sm text-600">{{project.days_remaining || '0'}} días</span>
                       </div>
-                    <button *ngIf="project.status === 1 && applications.length < 5" pButton pRipple 
-                            type="button" 
-                            label="Aplicar a este Proyecto" 
-                            icon="pi pi-arrow-right"
-                            iconPos="right"
-                            class="p-button-sm p-button-text"
-                            (click)="showApplyDialog(project)"></button>
+                    <button *ngIf="project.status === 1 && !hasApplied(project.id) && applications.length < 5" 
+                                pButton pRipple 
+                                type="button" 
+                                label="Aplicar a este Proyecto" 
+                                icon="pi pi-arrow-right"
+                                iconPos="right"
+                                class="p-button-sm p-button-text"
+                                (click)="showApplyDialog(project)"></button>
+                                
+                        <span *ngIf="hasApplied(project.id)" class="text-sm font-medium text-green-500">
+                          <i class="pi pi-check-circle"></i> Ya aplicaste
+                        </span>
                     <h6 *ngIf="project.status === 1 && applications.length >= 5"  class="text-700 font-normal " style="color: red !important; margin-top: 03px;">Aplicar a 5 Proyectos Maximo</h6>
 
                     </div>

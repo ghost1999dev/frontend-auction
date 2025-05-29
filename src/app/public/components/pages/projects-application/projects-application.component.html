@@ -41,8 +41,8 @@
           <td>{{app.createdAt | date:'mediumDate'}}</td>
           <td>
             <div class="flex gap-2">
-              <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info" 
-                      tooltip="Ver detalles" tooltipPosition="top"></button>
+              <button pButton pRipple icon="pi pi-star" class="p-button-rounded p-button-help" 
+                      tooltip="Ver ratings" tooltipPosition="top" (click)="showDeveloperRatings(app.developer)"></button>
               <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success" 
                       *ngIf="app.status === 0" tooltip="Aceptar" tooltipPosition="top"></button>
               <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger" 
@@ -53,6 +53,9 @@
       </ng-template>
     </p-table>
   </div>
+
+  
+
 }@else if (this.developer){ 
 <div class="applications-container">
   <h2 class="title">Mis Aplicaciónes a Proyectos</h2>
@@ -108,12 +111,93 @@
         </div>
       </div>
       
-      <div class="application-actions" *ngIf="app.status === 0">
-        <button mat-stroked-button color="warn" class="withdraw-btn">
-          Retirar Postulación
-        </button>
+ <div class="application-actions p-card-footer">
+        <div class="flex justify-content-end gap-2">
+          <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" 
+                  (click)="showProjectDetails(app.project_id)" pTooltip="Ver proyecto" tooltipPosition="top"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" 
+                  (click)="openWithdrawDialog(app.id)" pTooltip="Retirar aplicación" tooltipPosition="top"></button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<p-dialog [(visible)]="displayProjectDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '1200px'}" 
+          [draggable]="false" [resizable]="false" header="Detalles del Proyecto">
+  <div class="project-dialog-content">
+    @if (loadingProject) {
+      <div class="text-center p-5">
+        <p-progressSpinner></p-progressSpinner>
+        <p>Cargando detalles del proyecto...</p>
+      </div>
+    } @else if (selectedProject) {
+      <div class="project-details">
+        <h3 class="text-xl font-semibold mb-3">{{selectedProject.project_name}}</h3>
+        
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <div class="detail-item mb-3">
+              <span class="detail-label font-medium">Empresa:</span>
+              <p>{{selectedProject.company.name || 'No especificada'}}</p>
+            </div>
+            
+            <div class="detail-item mb-3">
+              <span class="detail-label font-medium">Categoría:</span>
+              <p>{{selectedProject.category.name || 'No especificada'}}</p>
+            </div>
+            
+            <div class="detail-item mb-3">
+              <span class="detail-label font-medium">Presupuesto:</span>
+              <p>{{selectedProject.budget ? (selectedProject.budget | currency) : 'No especificado'}}</p>
+            </div>
+          </div>
+          
+          <div class="col-12 md:col-6">
+            <div class="detail-item mb-3">
+              <span class="detail-label font-medium">Días disponibles:</span>
+              <p>{{selectedProject.days_available || 'No especificados'}}</p>
+            </div>
+            
+            <div class="detail-item mb-3">
+              <span class="detail-label font-medium">Estado:</span>
+              <p-tag [severity]="selectedProject.status === 1 ? 'success' : 'danger'" 
+                     [value]="selectedProject.status === 1 ? 'Activo' : 'Inactivo'"></p-tag>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-item mb-3">
+          <span class="detail-label font-medium">Descripción corta:</span>
+          <p>{{selectedProject.description || 'No disponible'}}</p>
+        </div>
+        
+       <div class="detail-item">
+          <span class="detail-label font-medium">Descripción completa:</span>
+          <div class="prose" [innerHTML]="sanitizedLongDescription"></div>
+        </div>
+      </div>
+    }
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayProjectDialog = false" 
+            class="p-button-text"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="displayWithdrawDialog" [modal]="true" [style]="{width: '450px'}" 
+          [draggable]="false" [resizable]="false" header="Confirmar">
+  <div class="confirmation-content">
+    <div class="flex align-items-center gap-3 mb-3">
+      <i class="pi pi-exclamation-triangle text-2xl text-yellow-500"></i>
+      <span>¿Estás seguro de que quieres retirar tu aplicación?</span>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" 
+            (click)="displayWithdrawDialog = false" class="p-button-text"></button>
+    <button pButton pRipple label="Sí, retirar" icon="pi pi-check" 
+            (click)="confirmWithdraw()" class="p-button-danger" [loading]="withdrawLoading"></button>
+  </ng-template>
+</p-dialog>
 }
