@@ -46,6 +46,8 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   withdrawLoading = false;
 
   sanitizedLongDescription: any;
+  selectedProjectFilter: any = null;
+  projectOptions: any[] = [];
 
   constructor(
     private applicationsService: ProjectApplicationsService,
@@ -66,6 +68,48 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+  }
+
+  // Modify the loadProjectsAndApplications method
+  private loadProjectsAndApplications(companyId: number): void {
+    forkJoin([
+      this.projectsService.getProjectsByCompany(companyId),
+      this.applicationsService.getAllApplications()
+    ]).subscribe({
+      next: ([projects, applications]) => {
+        this.projects = projects;
+        // Create project options for dropdown
+        this.projectOptions = [
+          { label: 'Todos los proyectos', value: null },
+          ...projects.map((project: any) => ({
+            label: project.project_name,
+            value: project.id
+          }))
+        ];
+        
+        // Filter applications for this company's projects
+        this.applications = applications.filter((app: any) => 
+          this.projects.some(project => project.id === app.project_id)
+        );
+        this.filteredApplications = [...this.applications];
+        this.loading = false;
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar proyectos y aplicaciones');
+        this.loading = false;
+      }
+    });
+  }
+
+  // Add this method to filter by selected project
+  onProjectFilterChange(): void {
+    if (!this.selectedProjectFilter) {
+      this.filteredApplications = [...this.applications];
+    } else {
+      this.filteredApplications = this.applications.filter(
+        app => app.project_id === this.selectedProjectFilter
+      );
+    }
   }
 
   showDeveloperRatings(developer: any): void {
@@ -138,27 +182,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
       });
     
     this.subscriptions.add(companySub);
-  }
-
-  private loadProjectsAndApplications(companyId: number): void {
-    forkJoin([
-      this.projectsService.getProjectsByCompany(companyId),
-      this.applicationsService.getAllApplications()
-    ]).subscribe({
-      next: ([projects, applications]) => {
-        this.projects = projects;
-        // Filtrar solo las aplicaciones de los proyectos de esta compañía
-        this.applications = applications.filter((app: any) => 
-          this.projects.some(project => project.id === app.project_id)
-        );
-        this.filteredApplications = [...this.applications];
-        this.loading = false;
-      },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar proyectos y aplicaciones');
-        this.loading = false;
-      }
-    });
   }
 
   private loadDeveloperData(userId: number): void {
