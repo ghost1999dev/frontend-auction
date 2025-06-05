@@ -158,7 +158,7 @@
 </p-dialog>
 
 }@else if (this.developer){ 
-<div class="applications-container">
+<div class="applications-container" [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
   <h2 class="title">Mis Aplicaciónes a Proyectos</h2>
   
   <div *ngIf="loading" class="loading-spinner">

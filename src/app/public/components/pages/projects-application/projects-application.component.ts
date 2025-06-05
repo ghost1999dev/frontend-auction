@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription, forkJoin } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { ProjectApplicationsService } from 'src/app/core/services/project-applications.service';
 import { LayoutService } from 'src/app/core/services/layout.service';
 import { UserService } from 'src/app/core/services/user.service';
@@ -8,47 +9,77 @@ import { CompaniesService } from 'src/app/core/services/companies.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { Table } from 'primeng/table';
-import { RatingService } from 'src/app/core/services/rating.service'; // Añadir esto
+import { RatingService } from 'src/app/core/services/rating.service';
 import { Rating } from 'src/app/core/models/ratings';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { DomSanitizer } from '@angular/platform-browser';
+
+interface Application {
+  id: number;
+  project_id: number;
+  project?: {
+    project_name: string;
+    [key: string]: any;
+  };
+  developer?: {
+    id: number;
+    name: string;
+    [key: string]: any;
+  };
+  status: number;
+  createdAt: string;
+  updatedAt: string;
+  [key: string]: any;
+}
+
+interface Project {
+  id: number;
+  project_name: string;
+  description: string;
+  long_description?: string;
+  [key: string]: any;
+}
 
 @Component({
   selector: 'app-projects-application',
   templateUrl: './projects-application.component.html',
   styleUrls: ['./projects-application.component.scss'],
-  providers: [ConfirmationService]
+  providers: [ConfirmationService, MessageService]
 })
 export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   applications: any[] = [];
-  filteredApplications: any[] = [];
+  filteredApplications: Application[] = [];
   loading = false;
   subscriptions: Subscription = new Subscription();
   
   company: any;
   developer: any;
-  projects: any[] = [];
+  projects: Project[] = [];
   id: any = this.getUserInfo();
-  chartData: any;
-  chartOptions: any;
 
+  // Ratings dialog properties
   displayRatingsDialog = false;
   selectedDeveloper: any;
-  developerRatings: Rating[] = [];
+  developerRatings: any[] = [];
   averageRating: number = 0;
   totalRatings: number = 0;
   loadingRatings = false;
+  chartData: any;
+  chartOptions: any;
 
+  // Project dialog properties
   displayProjectDialog = false;
-  selectedProject: any;
+  selectedProject: any | null = null;
   loadingProject = false;
+  sanitizedLongDescription: any;
 
+  // Withdraw dialog properties
   displayWithdrawDialog = false;
   selectedApplicationId: number | null = null;
   withdrawLoading = false;
 
-  sanitizedLongDescription: any;
-  selectedProjectFilter: any = null;
+  // Filter properties
+  selectedProjectFilter: number | null = null;
   projectOptions: any[] = [];
 
   constructor(
@@ -60,92 +91,171 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private projectsService: ProjectsService,
     private ratingService: RatingService,
-    private sanitizer: DomSanitizer, // Añade esto
-    private confirmationService: ConfirmationService // Añade esto
+    private sanitizer: DomSanitizer,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
     this.getUserById(this.id);
+    this.initializeChartOptions();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
 
-  // Modify the loadProjectsAndApplications method
-  private loadProjectsAndApplications(companyId: number): void {
-    forkJoin([
-      this.projectsService.getProjectsByCompany(companyId),
-      this.applicationsService.getAllApplications()
-    ]).subscribe({
-      next: ([projects, applications]) => {
-        this.projects = projects;
-        // Create project options for dropdown
-        this.projectOptions = [
-          { label: 'Todos los proyectos', value: null },
-          ...projects.map((project: any) => ({
-            label: project.project_name,
-            value: project.id
-          }))
-        ];
-        
-        // Filter applications for this company's projects
-        this.applications = applications.filter((app: any) => 
-          this.projects.some(project => project.id === app.project_id)
-        );
-        this.filteredApplications = [...this.applications];
-        this.loading = false;
-      },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar proyectos y aplicaciones');
-        this.loading = false;
-      }
-    });
+  // Improved method with better typing and error handling
+  private getUserById(id: any): void {
+    if (!id) {
+      this.notificationService.showErrorCustom('No se pudo obtener el ID del usuario');
+      return;
+    }
+
+    this.loading = true;
+    this.subscriptions.add(
+      this.userService.getUsersById(id).pipe(
+        finalize(() => this.loading = false)
+      ).subscribe({
+        next: (user: any) => {
+          if (!user) {
+            this.notificationService.showErrorCustom('Usuario no encontrado');
+            return;
+          }
+
+          if (user.role_id === 1) { // Company
+            this.loadCompanyData(user.id);
+          } else if (user.role_id === 2) { // Developer
+            this.loadDeveloperData(user.id);
+          }
+        },
+        error: (err: any) => {
+          this.notificationService.showErrorCustom('Error al cargar datos del usuario'+err.message);
+        }
+      })
+    );
   }
 
-  // Add this method to filter by selected project
-  onProjectFilterChange(): void {
-    if (!this.selectedProjectFilter) {
-      this.filteredApplications = [...this.applications];
-    } else {
-      this.filteredApplications = this.applications.filter(
-        app => app.project_id === this.selectedProjectFilter
-      );
-    }
+  private loadCompanyData(userId: number): void {
+    this.loading = true;
+    this.subscriptions.add(
+      this.companiesService.getCompanyByUserId(userId).pipe(
+        finalize(() => this.loading = false)
+      ).subscribe({
+        next: (company) => {
+          this.company = company;
+          this.loadProjectsAndApplications(company.id);
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar datos de la empresa'+err.message);
+        }
+      })
+    );
+  }
+
+  private loadDeveloperData(userId: number): void {
+    this.loading = true;
+    this.subscriptions.add(
+      this.developerService.getDeveloperByIdUser(userId).pipe(
+        finalize(() => this.loading = false)
+      ).subscribe({
+        next: (developer) => {
+          this.developer = developer;
+          if (developer) {
+            this.loadApplications(Number(developer.id));
+          }
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar datos del desarrollador'+err.message);
+        }
+      })
+    );
+  }
+
+  private loadProjectsAndApplications(companyId: number): void {
+    this.loading = true;
+    this.subscriptions.add(
+      forkJoin([
+        this.projectsService.getProjectsByCompany(companyId),
+        this.applicationsService.getAllApplications()
+      ]).pipe(
+        finalize(() => this.loading = false)
+      ).subscribe({
+        next: ([projects, applications]) => {
+          this.projects = projects;
+          this.projectOptions = [
+            { label: 'Todos los proyectos', value: null },
+            ...projects.map((project: Project) => ({
+              label: project.project_name,
+              value: project.id
+            }))
+          ];
+          
+          this.applications = applications.filter((app: any) => 
+            this.projects.some(project => project.id === app.project_id)
+          );
+          this.filteredApplications = [...this.applications];
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar proyectos y aplicaciones'+ err.message);
+        }
+      })
+    );
+  }
+
+  private loadApplications(developerId: number): void {
+    this.loading = true;
+    this.subscriptions.add(
+      this.applicationsService.getApplicationsByDeveloper(developerId).pipe(
+        finalize(() => this.loading = false)
+      ).subscribe({
+        next: (apps) => {
+          this.applications = apps;
+          this.filteredApplications = [...this.applications];
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar aplicaciones'+ err.message);
+        }
+      })
+    );
   }
 
   showDeveloperRatings(developer: any): void {
+    if (!developer || !developer.id) {
+      this.notificationService.showErrorCustom('Desarrollador no válido');
+      return;
+    }
+
     this.selectedDeveloper = developer;
     this.loadingRatings = true;
     this.displayRatingsDialog = true;
 
-    forkJoin([
-      this.ratingService.getAverageRatingByDeveloper(developer.id),
-      this.ratingService.getAllRatings({ developer_id: developer.id })
-    ]).subscribe({
-      next: ([averageResponse, ratingsResponse]) => {
-        this.averageRating = averageResponse.averageScore;
-        this.totalRatings = averageResponse.totalRatings;
-        this.developerRatings = ratingsResponse.ratings || [];
-        
-        // Inicializar opciones del gráfico
-        this.initializeChartOptions();
-        // Actualizar datos del gráfico
-        this.updateChartData();
-        
-        this.loadingRatings = false;
-      },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar los ratings del desarrollador');
-        this.loadingRatings = false;
-      }
-    });
+    this.subscriptions.add(
+      forkJoin([
+        this.ratingService.getAverageRatingByDeveloper(developer.id),
+        this.ratingService.getAllRatings({ developer_id: developer.id })
+      ]).pipe(
+        finalize(() => this.loadingRatings = false)
+      ).subscribe({
+        next: ([averageResponse, ratingsResponse]: any) => {
+          this.averageRating = averageResponse.averageScore;
+          this.totalRatings = averageResponse.totalRatings || 0;
+          this.developerRatings = ratingsResponse.data || [];
+          console.log(this.averageRating)
+          console.log(this.totalRatings)
+          console.log(this.developerRatings)
+
+          this.updateChartData();
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar los ratings del desarrollador'+err.message);
+        }
+      })
+    );
   }
 
-  // Agrega estos nuevos métodos
   private initializeChartOptions(): void {
     const isDark = this.layoutService.config.colorScheme === 'dark';
-    
     const textColor = isDark ? '#e0e0e0' : '#495057';
     const surfaceBorder = isDark ? '#4a4a4a' : '#dfe7ef';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
@@ -154,9 +264,7 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          display: false
-        },
+        legend: { display: false },
         tooltip: {
           backgroundColor: isDark ? '#3e4858' : '#ffffff',
           titleColor: textColor,
@@ -169,30 +277,17 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
       },
       scales: {
         x: {
-          ticks: {
-            color: textColor,
-            font: {
-              weight: 500
-            }
-          },
-          grid: {
-            color: gridColor,
-            drawBorder: false
-          }
+          ticks: { color: textColor, font: { weight: 500 } },
+          grid: { color: gridColor, drawBorder: false }
         },
         y: {
-          ticks: {
-            color: textColor,
-            font: {
-              weight: 500
-            },
+          ticks: { 
+            color: textColor, 
+            font: { weight: 500 },
             stepSize: 1,
             precision: 0
           },
-          grid: {
-            color: gridColor,
-            drawBorder: false
-          },
+          grid: { color: gridColor, drawBorder: false },
           beginAtZero: true
         }
       },
@@ -204,9 +299,8 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   }
 
   private updateChartData(): void {
-    // Calcular distribución de ratings
     const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
-    this.developerRatings.forEach(rating => {
+    this.developerRatings.forEach((rating: any) => {
       const score = Math.round(rating.score);
       distribution[score.toString() as keyof typeof distribution]++;
     });
@@ -257,134 +351,29 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     };
   }
 
-  getRandomColor(): string {
-    const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
-      '#98D8C8', '#F06292', '#7986CB', '#9575CD'
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-  }
-
-  getStarRating(score: number): string {
-    const fullStars = Math.floor(score);
-    const halfStar = score % 1 >= 0.5 ? 1 : 0;
-    const emptyStars = 5 - fullStars - halfStar;
-    
-    return '★'.repeat(fullStars) + '½'.repeat(halfStar) + '☆'.repeat(emptyStars);
-  }
-
-
-  private getUserById(id: any): void {
-    this.loading = true;
-    const userSub = this.userService.getUsersById(id)
-      .subscribe({
-        next: (user: any) => {
-          if (user) {
-            if (user.role_id === 1) { // Company
-              this.loadCompanyData(user.id);
-            } else if (user.role_id === 2) { // Developer
-              this.loadDeveloperData(user.id);
-            }
-          } else {
-            this.loading = false;
-          }
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar datos del usuario');
-          this.loading = false;
-        }
-      });
-    this.subscriptions.add(userSub);
-  }
-
-  private loadCompanyData(userId: number): void {
-    this.loading = true;
-    
-    const companySub = this.companiesService.getCompanyByUserId(userId)
-      .subscribe({
-        next: (company) => {
-          this.company = company;
-          this.loadProjectsAndApplications(company.id);
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar datos de la empresa');
-          this.loading = false;
-        }
-      });
-    
-    this.subscriptions.add(companySub);
-  }
-
-  private loadDeveloperData(userId: number): void {
-    this.loading = true;
-    
-    const devSub = this.developerService.getDeveloperByIdUser(userId)
-      .subscribe({
-        next: (developer) => {
-          if (developer) {
-            this.developer = developer;
-            this.loadApplications(Number(developer.id));
-          }
-          this.loading = false;
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar datos del desarrollador');
-          this.loading = false;
-        }
-      });
-    
-    this.subscriptions.add(devSub);
-  }
-
-  private loadApplications(developerId: number): void {
-    this.loading = true;
-    const appsSub = this.applicationsService.getApplicationsByDeveloper(developerId)
-      .subscribe({
-        next: (apps) => {
-          this.applications = apps;
-          this.filteredApplications = [...this.applications];
-          this.loading = false;
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar aplicaciones');
-          this.loading = false;
-        }
-      });
-    
-    this.subscriptions.add(appsSub);
-  }
-
-  filterApplications(): void {
-    if (this.projects.length > 0) {
-      this.filteredApplications = this.applications.filter(app => 
-        this.projects.some(project => project.id === app.project_id)
-      );
-    } else {
-      this.filteredApplications = [...this.applications];
-    }
-  }
-
   showProjectDetails(projectId: number): void {
+    if (!projectId) return;
+
     this.loadingProject = true;
     this.displayProjectDialog = true;
     
-    this.projectsService.getProjectById(projectId).subscribe({
-      next: (project) => {
-        this.selectedProject = project;
-        // Sanitiza el HTML para seguridad
-        this.sanitizedLongDescription = this.sanitizer.bypassSecurityTrustHtml(
-          project.long_description || project.full_description || 'No hay descripción disponible'
-        );
-        this.loadingProject = false;
-      },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar los detalles del proyecto');
-        this.loadingProject = false;
-        this.displayProjectDialog = false;
-      }
-    });
+    this.subscriptions.add(
+      this.projectsService.getProjectById(projectId).pipe(
+        finalize(() => this.loadingProject = false)
+      ).subscribe({
+        next: (project) => {
+          this.selectedProject = project;
+          this.sanitizedLongDescription = this.sanitizer.bypassSecurityTrustHtml(
+            project.long_description || project.full_description || 'No hay descripción disponible'
+          );
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar los detalles del proyecto'+err.message);
+          this.displayProjectDialog = false;
+        }
+      })
+    );
   }
-
 
   openWithdrawDialog(applicationId: number): void {
     this.selectedApplicationId = applicationId;
@@ -392,21 +381,33 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   }
 
   confirmWithdraw(): void {
-    if (!this.selectedApplicationId) return;
+    if (!this.selectedApplicationId || !this.developer) return;
     
     this.withdrawLoading = true;
-    this.applicationsService.deleteApplication(this.selectedApplicationId).subscribe({
-      next: () => {
-        this.notificationService.showSuccessCustom('Aplicación retirada correctamente');
-        this.loadApplications(Number(this.developer.id));
-        this.displayWithdrawDialog = false;
-        this.withdrawLoading = false;
-      },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al retirar la aplicación');
-        this.withdrawLoading = false;
-      }
-    });
+    this.subscriptions.add(
+      this.applicationsService.deleteApplication(this.selectedApplicationId).pipe(
+        finalize(() => this.withdrawLoading = false)
+      ).subscribe({
+        next: () => {
+          this.notificationService.showSuccessCustom('Aplicación retirada correctamente');
+          this.loadApplications(Number(this.developer.id));
+          this.displayWithdrawDialog = false;
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al retirar la aplicación'+err.message);
+        }
+      })
+    );
+  }
+
+  onProjectFilterChange(): void {
+    if (!this.selectedProjectFilter) {
+      this.filteredApplications = [...this.applications];
+    } else {
+      this.filteredApplications = this.applications.filter(
+        app => app.project_id === this.selectedProjectFilter
+      );
+    }
   }
 
   getStatusClass(status: number): string {
@@ -418,7 +419,7 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     return statusClasses[status] || '';
   }
 
-  getStatusText(status: any): any {
+  getStatusText(status: number): string {
     const statusTexts: Record<number, string> = {
       0: 'Pendiente',
       1: 'Activa',
@@ -436,24 +437,39 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     return severityMap[status] || 'info';
   }
 
-  onGlobalFilter(table: any, event: Event): void {
+  getStarRating(score: number): string {
+    const fullStars = Math.floor(score);
+    const halfStar = score % 1 >= 0.5 ? 1 : 0;
+    const emptyStars = 5 - fullStars - halfStar;
+    
+    return '★'.repeat(fullStars) + '½'.repeat(halfStar) + '☆'.repeat(emptyStars);
+  }
+
+  getRandomColor(): string {
+    const colors = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+      '#98D8C8', '#F06292', '#7986CB', '#9575CD'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  onGlobalFilter(table: Table, event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     table.filterGlobal(value, 'contains');
   }
 
   private getUserInfo(): any {
     const token = this.getTokens();
-    if (token) {
-      try {
-        const payload = token.split(".")[1];
-        const decodedPayload = window.atob(payload);
-        return JSON.parse(decodedPayload)['id'];
-      } catch (e) {
-        console.error('Error parsing token:', e);
-        return null;
-      }
+    if (!token) return null;
+
+    try {
+      const payload = token.split(".")[1];
+      const decodedPayload = window.atob(payload);
+      return JSON.parse(decodedPayload)['id'];
+    } catch (e) {
+      console.error('Error parsing token:', e);
+      return null;
     }
-    return null;
   }
 
   private getTokens(): string | null {
