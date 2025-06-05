@@ -298,7 +298,7 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     };
   }
 
-  private updateChartData(): void {
+private updateChartData(): void {
     const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
     this.developerRatings.forEach((rating: any) => {
       const score = Math.round(rating.score);
@@ -307,38 +307,44 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
 
     const isDark = this.layoutService.config.colorScheme === 'dark';
 
+    // Definimos los colores base para cada nivel de rating
+    const colorPalette = {
+      1: isDark ? 'rgba(220, 53, 69, 0.8)' : 'rgba(220, 53, 69, 0.8)',    // Rojo
+      2: isDark ? 'rgba(255, 152, 0, 0.8)' : 'rgba(255, 152, 0, 0.8)',    // Naranja
+      3: isDark ? 'rgba(255, 193, 7, 0.8)' : 'rgba(255, 193, 7, 0.8)',    // Amarillo
+      4: isDark ? 'rgba(40, 167, 69, 0.8)' : 'rgba(40, 167, 69, 0.8)',    // Verde claro
+      5: isDark ? 'rgba(25, 135, 84, 0.8)' : 'rgba(25, 135, 84, 0.8)'     // Verde oscuro
+    };
+
+    // Colores para hover (más intensos)
+    const hoverColorPalette = {
+      1: isDark ? 'rgba(220, 53, 69, 1)' : 'rgba(220, 53, 69, 1)',
+      2: isDark ? 'rgba(255, 152, 0, 1)' : 'rgba(255, 152, 0, 1)',
+      3: isDark ? 'rgba(255, 193, 7, 1)' : 'rgba(255, 193, 7, 1)',
+      4: isDark ? 'rgba(40, 167, 69, 1)' : 'rgba(40, 167, 69, 1)',
+      5: isDark ? 'rgba(25, 135, 84, 1)' : 'rgba(25, 135, 84, 1)'
+    };
+
     this.chartData = {
       labels: ['1 estrella', '2 estrellas', '3 estrellas', '4 estrellas', '5 estrellas'],
       datasets: [{
         label: 'Distribución de Ratings',
-        backgroundColor: isDark ? [
-          'rgba(110, 142, 251, 0.7)',
-          'rgba(110, 142, 251, 0.8)',
-          'rgba(110, 142, 251, 0.9)',
-          'rgba(110, 142, 251, 1.0)',
-          'rgba(167, 119, 227, 1.0)'
-        ] : [
-          'rgba(66, 165, 245, 0.7)',
-          'rgba(66, 165, 245, 0.8)',
-          'rgba(66, 165, 245, 0.9)',
-          'rgba(66, 165, 245, 1.0)',
-          'rgba(126, 87, 194, 1.0)'
+        backgroundColor: [
+          colorPalette[1],
+          colorPalette[2],
+          colorPalette[3],
+          colorPalette[4],
+          colorPalette[5]
         ],
         borderColor: isDark ? '#4a4a4a' : '#dfe7ef',
         borderWidth: 1,
         borderRadius: 6,
-        hoverBackgroundColor: isDark ? [
-          'rgba(110, 142, 251, 0.9)',
-          'rgba(110, 142, 251, 1.0)',
-          'rgba(110, 142, 251, 1.1)',
-          'rgba(110, 142, 251, 1.2)',
-          'rgba(167, 119, 227, 1.2)'
-        ] : [
-          'rgba(66, 165, 245, 0.9)',
-          'rgba(66, 165, 245, 1.0)',
-          'rgba(66, 165, 245, 1.1)',
-          'rgba(66, 165, 245, 1.2)',
-          'rgba(126, 87, 194, 1.2)'
+        hoverBackgroundColor: [
+          hoverColorPalette[1],
+          hoverColorPalette[2],
+          hoverColorPalette[3],
+          hoverColorPalette[4],
+          hoverColorPalette[5]
         ],
         data: [
           distribution['1'] || 0,
@@ -349,7 +355,7 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
         ]
       }]
     };
-  }
+}
 
   showProjectDetails(projectId: number): void {
     if (!projectId) return;

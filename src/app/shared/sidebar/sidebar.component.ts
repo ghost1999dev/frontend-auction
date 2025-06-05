@@ -45,7 +45,7 @@ export class SidebarComponent implements OnInit {
             { label: 'Proyectos', icon: 'pi pi-fw pi-folder-open', routerLink: ['/main/projects'] },
             { label: `Aplicación a Proyectos`, icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects-application'] },
             //{ label: 'Subastas', icon: 'pi pi-fw pi-tag', routerLink: ['/main/auctions'] },
-            { label: 'Aplicaciones Favoritas', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
+            { label: 'Mis aplicaciones Favoritas', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
             //{ label: 'Users', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/users'] }
           ]
         },
