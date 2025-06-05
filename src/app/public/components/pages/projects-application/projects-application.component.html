@@ -212,8 +212,10 @@
         </div>
       </div>
       
- <div class="application-actions p-card-footer">
+      <div class="application-actions p-card-footer">
         <div class="flex justify-content-end gap-2">
+          <button pButton pRipple icon="pi pi-bookmark" class="p-button-rounded p-button-primary p-button-sm" 
+                  (click)="saveApplicationToLocalStorage(app)" pTooltip="Guardar aplicación" tooltipPosition="top"></button>
           <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" 
                   (click)="showProjectDetails(app.project_id)" pTooltip="Ver proyecto" tooltipPosition="top"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" 
@@ -225,64 +227,97 @@
 </div>
 
 <p-dialog [(visible)]="displayProjectDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '1200px'}" 
-          [draggable]="false" [resizable]="false" header="Detalles del Proyecto">
+          [draggable]="false" [resizable]="false" [breakpoints]="{'960px': '75vw', '640px': '90vw'}" header="Detalles del Proyecto"
+          styleClass="project-dialog">
   <div class="project-dialog-content">
     @if (loadingProject) {
-      <div class="text-center p-5">
-        <p-progressSpinner></p-progressSpinner>
-        <p>Cargando detalles del proyecto...</p>
+      <div class="text-center p-5 flex flex-column align-items-center gap-3">
+        <p-progressSpinner strokeWidth="4" animationDuration=".5s"></p-progressSpinner>
+        <p class="text-600">Cargando detalles del proyecto...</p>
       </div>
     } @else if (selectedProject) {
       <div class="project-details">
-        <h3 class="text-xl font-semibold mb-3">{{selectedProject.project_name}}</h3>
+        <div class="project-header mb-5">
+          <div class="flex align-items-center gap-3 mb-2">
+            <i class="pi pi-folder-open text-primary" style="font-size: 1.5rem"></i>
+            <h3 class="text-3xl font-semibold m-0 text-900">{{selectedProject.project_name}}</h3>
+          </div>
+          <p-tag [severity]="selectedProject.status === 1 ? 'success' : 'danger'" 
+                 [value]="selectedProject.status === 1 ? 'Activo' : 'Inactivo'"
+                 icon="pi pi-circle-fill" iconPos="left" styleClass="mr-2"></p-tag>
+          <p-tag value="{{selectedProject.category.name || 'Sin categoría'}}" 
+                 icon="pi pi-tag" iconPos="left" severity="info"></p-tag>
+        </div>
         
         <div class="grid">
+          <!-- Columna izquierda -->
           <div class="col-12 md:col-6">
-            <div class="detail-item mb-3">
-              <span class="detail-label font-medium">Empresa:</span>
-              <p>{{selectedProject.company.name || 'No especificada'}}</p>
+            <div class="detail-card mb-4">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-building text-primary"></i>
+                <span class="detail-label font-medium text-600">Empresa</span>
+              </div>
+              <p class="text-900 m-0">{{selectedProject.company.name || 'No especificada'}}</p>
             </div>
             
-            <div class="detail-item mb-3">
-              <span class="detail-label font-medium">Categoría:</span>
-              <p>{{selectedProject.category.name || 'No especificada'}}</p>
-            </div>
-            
-            <div class="detail-item mb-3">
-              <span class="detail-label font-medium">Presupuesto:</span>
-              <p>{{selectedProject.budget ? (selectedProject.budget | currency) : 'No especificado'}}</p>
+            <div class="detail-card mb-4">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-wallet text-primary"></i>
+                <span class="detail-label font-medium text-600">Presupuesto</span>
+              </div>
+              <p class="text-900 m-0">{{selectedProject.budget ? (selectedProject.budget | currency) : 'No especificado'}}</p>
             </div>
           </div>
           
+          <!-- Columna derecha -->
           <div class="col-12 md:col-6">
-            <div class="detail-item mb-3">
-              <span class="detail-label font-medium">Días disponibles:</span>
-              <p>{{selectedProject.days_available || 'No especificados'}}</p>
+            <div class="detail-card mb-4">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-calendar text-primary"></i>
+                <span class="detail-label font-medium text-600">Días disponibles</span>
+              </div>
+              <p class="text-900 m-0">{{selectedProject.days_available || 'No especificados'}}</p>
             </div>
             
-            <div class="detail-item mb-3">
-              <span class="detail-label font-medium">Estado:</span>
-              <p-tag [severity]="selectedProject.status === 1 ? 'success' : 'danger'" 
-                     [value]="selectedProject.status === 1 ? 'Activo' : 'Inactivo'"></p-tag>
+            <div class="detail-card mb-4">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-clock text-primary"></i>
+                <span class="detail-label font-medium text-600">Última actualización</span>
+              </div>
+              <p class="text-900 m-0">{{selectedProject.updated_at || 'No disponible'}}</p>
             </div>
           </div>
         </div>
         
-        <div class="detail-item mb-3">
-          <span class="detail-label font-medium">Descripción corta:</span>
-          <p>{{selectedProject.description || 'No disponible'}}</p>
+        <!-- Descripción corta -->
+        <div class="detail-card mb-4">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-comment text-primary"></i>
+            <span class="detail-label font-medium text-600">Descripción corta</span>
+          </div>
+          <p class="text-900 m-0">{{selectedProject.description || 'No disponible'}}</p>
         </div>
         
-       <div class="detail-item">
-          <span class="detail-label font-medium">Descripción completa:</span>
-          <div class="prose" [innerHTML]="sanitizedLongDescription"></div>
+        <!-- Descripción completa -->
+        <div class="detail-card">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-file text-primary"></i>
+            <span class="detail-label font-medium text-600">Descripción completa</span>
+          </div>
+          <div class="prose border-round p-3" [innerHTML]="sanitizedLongDescription"></div>
         </div>
+        
+        <!-- Sección de acciones (opcional) -->
+       <!--  <div class="flex justify-content-end gap-2 mt-5 pt-3 border-top-1 surface-border">
+          <button pButton pRipple icon="pi pi-download" label="Exportar PDF" class="p-button-outlined p-button-secondary"></button>
+          <button pButton pRipple icon="pi pi-share-alt" label="Compartir" class="p-button-outlined"></button>
+        </div> -->
       </div>
     }
   </div>
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayProjectDialog = false" 
-            class="p-button-text"></button>
+            class="p-button-outlined p-button-secondary"></button>
   </ng-template>
 </p-dialog>
 

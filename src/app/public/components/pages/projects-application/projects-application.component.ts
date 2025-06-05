@@ -475,4 +475,27 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   private getTokens(): string | null {
     return localStorage.getItem("login-token");
   }
+
+  saveApplicationToLocalStorage(application: any): void {
+    if (!application) return;
+
+    // Obtener aplicaciones guardadas actualmente o inicializar array vacío
+    const savedApplications = JSON.parse(localStorage.getItem('savedApplications') || '[]');
+
+    // Verificar si la aplicación ya está guardada
+    const isAlreadySaved = savedApplications.some((app: any) => app.id === application.id);
+    
+    if (isAlreadySaved) {
+      this.notificationService.showSuccessCustom('Esta aplicación ya está guardada en tus marcadores');
+      return;
+    }
+
+    // Agregar la nueva aplicación
+    savedApplications.push(application);
+    
+    // Guardar en localStorage
+    localStorage.setItem('savedApplications', JSON.stringify(savedApplications));
+    
+    this.notificationService.showSuccessCustom('Aplicación guardada en marcadores');
+  }
 }

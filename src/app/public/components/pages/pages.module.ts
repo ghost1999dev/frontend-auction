@@ -96,7 +96,7 @@ const routes: Routes = [
         path: 'favorites',
         component: FavoritesComponent,
         canActivate: [RoleGuard],
-        data: { allowedRoles: [1] } 
+        data: { allowedRoles: [2] } 
       },
       {
         path: 'users',

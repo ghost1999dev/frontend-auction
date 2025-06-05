@@ -31,7 +31,7 @@ $dark-colors: (
 @mixin theme($theme) {
   $colors: if($theme == light, $light-colors, $dark-colors);
 
-  background-color: map-get($colors, background);
+  //background-color: map-get($colors, background);
   color: map-get($colors, text);
 
   .applications-container {
@@ -55,14 +55,6 @@ $dark-colors: (
 
   .project-name {
     color: map-get($colors, text);
-  }
-
-  .company-name {
-    color: map-get($colors, text-secondary);
-  }
-
-  .detail-label {
-    color: map-get($colors, text-secondary);
   }
 
   .detail-value, .project-description {
@@ -568,4 +560,49 @@ $dark-colors: (
   .detail-row {
     flex-direction: column;
   }
+}
+
+/* Estilos para el diálogo */
+.project-dialog .p-dialog-header {
+  //background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-600) 100%);
+  color: white;
+}
+
+.project-dialog .p-dialog-content {
+  padding: 2rem;
+}
+
+/* Estilos para las tarjetas de detalle */
+.detail-card {
+  //background: white;
+  padding: 1.25rem;
+  border-radius: 10px;
+  border: var(--bluegray-700) solid 1px;  
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border-left: 4px solid var(--primary-color);
+  transition: transform 0.2s;
+}
+
+.detail-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilos para el texto de descripción */
+.prose {
+  line-height: 1.6;
+}
+
+.prose ::ng-deep h3 {
+  color: var(--primary-color);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose ::ng-deep ul {
+  padding-left: 1.5rem;
+}
+
+.prose ::ng-deep li {
+  margin-bottom: 0.5rem;
 }

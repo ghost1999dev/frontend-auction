@@ -1,0 +1,254 @@
+/* ========== VARIABLES ========== */
+$light-colors: (
+  background: #ffffff,
+  text: #2c3e50,
+  text-secondary: #7f8c8d,
+  card-bg: #ffffff,
+  card-border: #e0e0e0,
+  header-bg: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%),
+  status-pending: (#fff3cd, #856404),
+  status-accepted: (#d4edda, #155724),
+  status-rejected: (#f8d7da, #721c24),
+  divider: #dee2e6,
+  surface-border: #e9ecef
+);
+
+$dark-colors: (
+  background: #2b323d,
+  text: #f5f5f5,
+  text-secondary: #b0b0b0,
+  card-bg: #3e4858,
+  card-border: #4a4a4a,
+  header-bg: linear-gradient(135deg, #3e4858 0%, #2b323d 100%),
+  status-pending: (rgba(255, 193, 7, 0.2), #FFC107),
+  status-accepted: (rgba(40, 167, 69, 0.2), #28a745),
+  status-rejected: (rgba(220, 53, 69, 0.2), #dc3545),
+  divider: #4a4a4a,
+  surface-border: #4a4a4a
+);
+
+/* ========== MIXINS ========== */
+@mixin theme($theme) {
+  $colors: if($theme == light, $light-colors, $dark-colors);
+
+  color: map-get($colors, text);
+
+  .applications-container {
+    background-color: map-get($colors, background);
+    color: map-get($colors, text);
+  }
+
+  .application-card {
+    background-color: map-get($colors, card-bg);
+    border-color: map-get($colors, card-border);
+    
+    &:hover {
+      box-shadow: 0 15px 30px rgba(0, 0, 0, if($theme == light, 0.12, 0.4));
+    }
+  }
+
+  .application-header {
+    background: map-get($colors, header-bg);
+    border-bottom-color: map-get($colors, card-border);
+  }
+
+  .project-name {
+    color: map-get($colors, text);
+  }
+
+  .detail-value, .project-description {
+    color: map-get($colors, text);
+  }
+
+  .no-applications {
+    background-color: map-get($colors, card-bg);
+    color: map-get($colors, text-secondary);
+    border: 1px dashed map-get($colors, card-border);
+  }
+
+  .status-pending {
+    background-color: nth(map-get($colors, status-pending), 1);
+    color: nth(map-get($colors, status-pending), 2);
+  }
+
+  .status-accepted {
+    background-color: nth(map-get($colors, status-accepted), 1);
+    color: nth(map-get($colors, status-accepted), 2);
+  }
+
+  .status-rejected {
+    background-color: nth(map-get($colors, status-rejected), 1);
+    color: nth(map-get($colors, status-rejected), 2);
+  }
+
+  .title {
+    &::after {
+      background: if($theme == light, 
+        linear-gradient(90deg, #3498db, #9b59b6), 
+        linear-gradient(90deg, #6e8efb, #a777e3));
+    }
+  }
+}
+
+/* ========== BASE STYLES ========== */
+.applications-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 600;
+  position: relative;
+  transition: color 0.3s;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    margin: 0.5rem auto 0;
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+}
+
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.application-card {
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.application-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid;
+  transition: all 0.3s;
+}
+
+.project-info {
+  flex: 1;
+}
+
+.project-name {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.company-name {
+  font-size: 0.9rem;
+  display: block;
+  transition: color 0.3s;
+}
+
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 1rem;
+}
+
+.application-details {
+  padding: 1.5rem;
+}
+
+.detail-item {
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.detail-row .detail-item {
+  flex: 1;
+  min-width: 120px;
+}
+
+.detail-label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.detail-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.project-description {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0.5rem 0 0;
+  transition: color 0.3s;
+}
+
+.application-actions {
+  padding: 0 1.5rem 1.5rem;
+  text-align: right;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.no-applications {
+  text-align: center;
+  padding: 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  transition: all 0.3s;
+}
+
+/* ========== THEMES ========== */
+:root, .light-theme {
+  @include theme(light);
+}
+
+.dark-theme {
+  @include theme(dark);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .applications-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+  }
+}
