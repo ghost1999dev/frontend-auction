@@ -4,6 +4,8 @@ import { Project } from 'src/app/core/models/projects';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { AuctionService } from 'src/app/core/services/auction.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
+import { CompaniesService } from 'src/app/core/services/companies.service';
+import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
   selector: 'app-add-edit-auction',
@@ -14,6 +16,8 @@ export class AddEditAuctionComponent implements OnInit {
   @Input() auctionId?: number | any;
   @Output() saved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
+
+  id: string = this.getUserInfo();
 
   auctionForm: FormGroup;
   loading = false;
@@ -34,26 +38,65 @@ export class AddEditAuctionComponent implements OnInit {
     private fb: FormBuilder,
     private auctionService: AuctionService,
     private projectService: ProjectsService,
+    private companiesService: CompaniesService,
+    private userService: UserService,
     private notificationService: NotificationService,
+    
   ) {
     this.auctionForm = this.fb.group({
       project_id: ['', Validators.required],
-      bidding_started_at: [null, Validators.required], // Inicializar como null
-      bidding_deadline: [null, Validators.required],  // Inicializar como null
+      bidding_started_at_date: [null, Validators.required],
+      bidding_started_at_time: ['00:00', Validators.required],
+      bidding_deadline_date: [null, Validators.required],
+      bidding_deadline_time: ['00:00', Validators.required],
       status: [0]
-    }, { validators: this.validateDates });
+    })
   }
 
   ngOnInit(): void {
-    this.loadProjects();
+    this.loadInitialData();
     
     if (this.auctionId) {
       this.loadAuction(this.auctionId);
     }
+
+    this.auctionForm.get('bidding_started_at_date')?.valueChanges.subscribe(() => {
+      this.onStartDateChange();
+    });
   }
 
-  loadProjects(): void {
-    this.projectService.getAllProjects().subscribe({
+    private loadInitialData(): void {
+      this.loading = true;
+      this.userService.getUsersById(this.id).subscribe({
+        next: (user: any) => {
+          if (!user) return;
+          
+          if (user.role_id === 1) {
+            this.loading = false
+            this.loadCompanyData(user.id);
+          }
+        },
+        error: (err) => {
+          this.notificationService.showErrorCustom('Error al cargar datos del usuario');
+          this.loading = false;
+        }
+      });
+  }
+
+  private loadCompanyData(userId: number): void {
+    this.companiesService.getCompanyByUserId(userId).subscribe({
+      next: (company) => {
+        this.loadProjects(company.id);
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar datos de la empresa');
+        this.loading = false;
+      }
+    });
+  }
+
+  loadProjects(id: number): void {
+    this.projectService.getProjectsByCompany(id).subscribe({
       next: (projects) => {
         this.projects = projects;
       },
@@ -63,24 +106,31 @@ export class AddEditAuctionComponent implements OnInit {
     });
   }
 
-loadAuction(id: number): void {
+  loadAuction(id: number): void {
     this.loading = true;
     this.auctionService.getAuctionById(id)
     .subscribe({
       next: (auction: any) => {
-        // Convertir las fechas ISO a formato yyyy-MM-dd para los inputs
-        const startDate = new Date(auction.bidding_started_at).toISOString().split('T')[0];
-        const deadlineDate = new Date(auction.bidding_deadline).toISOString().split('T')[0];
+        const startDate = new Date(auction.bidding_started_at);
+        const deadlineDate = new Date(auction.bidding_deadline);
+        
+        // Formatear fechas y horas para los inputs
+        const startDateStr = startDate.toISOString().split('T')[0];
+        const startTimeStr = this.formatTime(startDate);
+        const deadlineDateStr = deadlineDate.toISOString().split('T')[0];
+        const deadlineTimeStr = this.formatTime(deadlineDate);
         
         this.auctionForm.patchValue({
           project_id: auction.project_id,
-          bidding_started_at: startDate,
-          bidding_deadline: deadlineDate,
+          bidding_started_at_date: startDateStr,
+          bidding_started_at_time: startTimeStr,
+          bidding_deadline_date: deadlineDateStr,
+          bidding_deadline_time: deadlineTimeStr,
           status: auction.status
         });
         
         // Actualizar la fecha mínima para el deadline
-        this.minDeadlineDate = new Date(auction.bidding_started_at);
+        this.minDeadlineDate = startDate;
         this.loading = false;
       },
       error: (error) => {
@@ -88,9 +138,15 @@ loadAuction(id: number): void {
         this.loading = false;
       }
     });
-}
+  }
 
-onSubmit(): void {
+  private formatTime(date: Date): string {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  onSubmit(): void {
     this.submitted = true;
 
     if (this.auctionForm.invalid) {
@@ -100,15 +156,37 @@ onSubmit(): void {
     this.loading = true;
     const formData = this.auctionForm.value;
 
-    // Convertir las fechas a formato ISO antes de enviar
-    if (formData.bidding_started_at) {
-      formData.bidding_started_at = new Date(formData.bidding_started_at).toISOString();
-    }
-    if (formData.bidding_deadline) {
-      formData.bidding_deadline = new Date(formData.bidding_deadline).toISOString();
+    // Combinar fecha y hora para bidding_started_at
+    if (formData.bidding_started_at_date && formData.bidding_started_at_time) {
+      formData.bidding_started_at = this.combineDateTimeToISO(
+        formData.bidding_started_at_date, 
+        formData.bidding_started_at_time
+      );
     }
 
+    // Combinar fecha y hora para bidding_deadline
+    if (formData.bidding_deadline_date && formData.bidding_deadline_time) {
+      formData.bidding_deadline = this.combineDateTimeToISO(
+        formData.bidding_deadline_date, 
+        formData.bidding_deadline_time
+      );
+    }
+
+    console.log('Datos a enviar:', {
+      ...formData,
+      bidding_started_at: formData.bidding_started_at,
+      bidding_deadline: formData.bidding_deadline
+    });
+
+    // Eliminar los campos temporales que ya no necesitamos
+    delete formData.bidding_started_at_date;
+    delete formData.bidding_started_at_time;
+    delete formData.bidding_deadline_date;
+    delete formData.bidding_deadline_time;
+
+
     if (this.auctionId) {
+
       // Update auction
       this.auctionService.updateAuction(this.auctionId, formData).subscribe({
         next: () => {
@@ -133,34 +211,45 @@ onSubmit(): void {
         }
       });
     }
-}
-
-validateDates(group: FormGroup): { [key: string]: any } | null {
-  const start = group.get('bidding_started_at')?.value;
-  const deadline = group.get('bidding_deadline')?.value;
-  
-  if (start && deadline && deadline <= start) {
-    return { deadlineBeforeStart: true };
   }
-  return null;
+
+  // Cambia la definición del validador a:
+
+
+private combineDateTimeToISO(dateStr: string, timeStr: string): string {
+  const [hours, minutes] = timeStr.split(':');
+  return `${dateStr}T${hours}:${minutes}:00.000Z`;
 }
 
-onStartDateChange(): void {
-  const startDate = this.auctionForm.get('bidding_started_at')?.value;
-  if (startDate) {
-    this.minDeadlineDate = startDate;
-    
-    // Si el deadline actual es anterior a la nueva fecha de inicio, lo reseteamos
-    const currentDeadline = this.auctionForm.get('bidding_deadline')?.value;
-    if (currentDeadline && currentDeadline <= startDate) {
-      this.auctionForm.get('bidding_deadline')?.setValue(null);
+  onStartDateChange(): void {
+    const startDate = this.auctionForm.get('bidding_started_at_date')?.value;
+    if (startDate) {
+      this.minDeadlineDate = new Date(startDate);
+      
+      // Si el deadline actual es anterior a la nueva fecha de inicio, lo reseteamos
+      const currentDeadlineDate = this.auctionForm.get('bidding_deadline_date')?.value;
+      if (currentDeadlineDate && currentDeadlineDate <= startDate) {
+        this.auctionForm.get('bidding_deadline_date')?.setValue(null);
+      }
     }
   }
-}
 
   onCancel(): void {
     this.cancelled.emit();
   }
 
   get f() { return this.auctionForm.controls; }
+
+  private getUserInfo(): string {
+    const token = localStorage.getItem("login-token");
+    if (!token) return '';
+    
+    try {
+      const payload = token.split(".")[1];
+      return JSON.parse(window.atob(payload))['id'] || '';
+    } catch (e) {
+      console.error('Error parsing token:', e);
+      return '';
+    }
+  }
 }

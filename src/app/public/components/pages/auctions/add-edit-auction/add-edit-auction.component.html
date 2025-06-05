@@ -31,7 +31,7 @@
             </small>
         </div>
             
-        <div class="field mb-4" *ngIf="auctionId">
+<!--         <div class="field mb-4" *ngIf="!auctionId">
           <label for="status" class="block mb-2 font-medium">Estado*</label>
           <p-dropdown [style]="{'width':'100%'}" id="status" formControlName="status" [options]="statuses" 
                       optionLabel="label" optionValue="value" placeholder="Seleccione un estado" class="w-full"
@@ -40,8 +40,28 @@
           <small class="p-error block mt-1" *ngIf="submitted && f['status'].errors?.['required']">
             Se requiere estado
           </small>
-        </div>
+        </div> -->
   
+        </div>
+
+        <div class="col-12" *ngIf="auctionId">
+           <div class="field mb-4">
+            <label for="bidding_deadline_date" class="block mb-2 font-medium">Fecha con Hora militar límite*</label>
+            <div class="flex gap-2">
+              <input type="date" id="bidding_deadline_date" formControlName="bidding_deadline_date" 
+                     [min]="minDeadlineDate | date:'yyyy-MM-dd'" class="w-full"
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline_date'].errors}"/>
+              <input type="time" id="bidding_deadline_time" formControlName="bidding_deadline_time" 
+                     class="w-full"
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline_time'].errors}"/>
+            </div>
+            <small class="p-error block mt-1" *ngIf="submitted && f['bidding_deadline_date'].errors?.['required']">
+              Se requiere fecha límite
+            </small>
+            <small class="p-error block mt-1" *ngIf="auctionForm.errors?.['deadlineBeforeStart']">
+              La fecha límite debe ser posterior a la fecha de inicio
+            </small>
+          </div>
         </div>
 
         <!-- Right Column -->
@@ -49,22 +69,34 @@
 
           <!-- Start Date Field -->
           <div class="field mb-4" *ngIf="!auctionId">
-            <label for="bidding_started_at" class="block mb-2 font-medium">Fecha de inicio*</label>
-            <input [disabled]="auctionId > 0" type="date" id="bidding_started_at" formControlName="bidding_started_at"  
-                       [minDate]="minStartDate" [maxDate]="maxStartDate" class="w-full"
-                       [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_started_at'].errors}"/>
-            <small class="p-error block mt-1" *ngIf="submitted && f['bidding_started_at'].errors?.['required']">
+            <label for="bidding_started_at_date" class="block mb-2 font-medium">Fecha con Hora militar de inicio*</label>
+            <div class="flex gap-2">
+              <input [disabled]="auctionId > 0" type="date" id="bidding_started_at_date" 
+                     formControlName="bidding_started_at_date"  
+                     [min]="minStartDate | date:'yyyy-MM-dd'" 
+                     [max]="maxStartDate | date:'yyyy-MM-dd'" class="w-full"
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_started_at_date'].errors}"/>
+              <input [disabled]="auctionId > 0" type="time" id="bidding_started_at_time" 
+                     formControlName="bidding_started_at_time" class="w-full"
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_started_at_time'].errors}"/>
+            </div>
+            <small class="p-error block mt-1" *ngIf="submitted && f['bidding_started_at_date'].errors?.['required']">
               Se requiere fecha de inicio
             </small>
           </div>
 
           <!-- Deadline Field -->
           <div class="field mb-4" *ngIf="!auctionId">
-            <label for="bidding_deadline" class="block mb-2 font-medium">Fecha límite*</label>
-            <input type="date" id="bidding_deadline" formControlName="bidding_deadline" 
-                       [minDate]="minDeadlineDate" class="w-full"
-                       [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline'].errors}"/>
-            <small class="p-error block mt-1" *ngIf="submitted && f['bidding_deadline'].errors?.['required']">
+            <label for="bidding_deadline_date" class="block mb-2 font-medium">Fecha y Hora límite*</label>
+            <div class="flex gap-2">
+              <input type="date" id="bidding_deadline_date" formControlName="bidding_deadline_date" 
+                     [min]="minDeadlineDate | date:'yyyy-MM-dd'" class="w-full"
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline_date'].errors}"/>
+              <input type="time" id="bidding_deadline_time" formControlName="bidding_deadline_time" 
+                     class="w-full"
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline_time'].errors}"/>
+            </div>
+            <small class="p-error block mt-1" *ngIf="submitted && f['bidding_deadline_date'].errors?.['required']">
               Se requiere fecha límite
             </small>
             <small class="p-error block mt-1" *ngIf="auctionForm.errors?.['deadlineBeforeStart']">

@@ -2,7 +2,7 @@
     <div class="card" *ngIf="!showAddEditDialog">
     <div class="flex justify-content-between align-items-center mb-4">
         <h1>Mis subastas</h1>
-        <!--<button pButton pRipple label="Nueva subasta" icon="pi pi-plus" class="p-button-success" (click)="openNew()"></button>-->
+        <button pButton pRipple label="Nueva subasta" icon="pi pi-plus" class="p-button-success" (click)="openNew()"></button>
     </div>
 
     <p-table #dt [value]="auctions" [loading]="loading" responsiveLayout="scroll" [rows]="10" 
@@ -51,7 +51,7 @@
                         <!-- En la sección de acciones de la tabla, agrega este botón -->
                         <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" 
                                 (click)="viewPublicAuction(auction)"></button>
-                        <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
+<!--                         <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" 
                                 (click)="editAuction(auction)"></button> -->
                         <!-- <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" 
                                 (click)="deleteAuction(auction)"></button> -->
