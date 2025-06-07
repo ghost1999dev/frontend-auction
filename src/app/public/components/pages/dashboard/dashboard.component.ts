@@ -78,9 +78,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           updateOn: 'blur' // Opcional: para que no valide con cada tecla presionada
         }],           
         web_site: ['', Validators.required],
-        nit_number: ['', [
-          Validators.required,
-        ]],       
+        nit_number: [''],       
       });
   } 
 
