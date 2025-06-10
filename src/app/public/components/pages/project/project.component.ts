@@ -284,7 +284,6 @@ hasApplied(projectId: number): boolean {
 
   deleteProject(project: Project): void {
     this.project = { ...project };
-    this.deleteProjectDialog = true;
   }
 
   confirmDelete(): void {
