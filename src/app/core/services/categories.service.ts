@@ -15,14 +15,14 @@ import { NotificationService } from "./notification.service";
     constructor(
       private http: HttpClient,
       private notificationServices: NotificationService,
-      private handlerErrorService: HandlerErrorService
+      private HandlerErrorSrv: HandlerErrorService
     ) { }
   
     getAllCategories(): Observable<Category[]> {
       return this.http.get<CategoryResponse>(`${environment.server_url}categories/show/all`)
         .pipe(
           map(response => response.categories),
-          catchError((err) => this.handlerError(err))
+          catchError((err) => this.HandlerErrorSrv.handlerError(err))
         );
     }
   
@@ -30,7 +30,7 @@ import { NotificationService } from "./notification.service";
       return this.http.get<CategoryResponseById>(`${environment.server_url}categories/show/${id}`)
         .pipe(
           map(response => response.category),
-          catchError((err) => this.handlerError(err))
+          catchError((err) => this.HandlerErrorSrv.handlerError(err))
         );
     }
   
@@ -38,7 +38,7 @@ import { NotificationService } from "./notification.service";
       return this.http.post<CategoryResponseById>(`${environment.server_url}categories/create`, data)
         .pipe(
           map(response => response.category),
-          catchError((err) => this.handlerError(err))
+          catchError((err) => this.HandlerErrorSrv.handlerError(err))
         );
     }
   
@@ -46,48 +46,14 @@ import { NotificationService } from "./notification.service";
       return this.http.put<CategoryResponseAddUpdate>(`${environment.server_url}categories/update/${id}`, data)
         .pipe(
           map(response => response.category),
-          catchError((err) => this.handlerError(err))
+          catchError((err) => this.HandlerErrorSrv.handlerError(err))
         );
     }
   
     deleteCategory(id: number): Observable<{ message: string }> {
       return this.http.delete<{ message: string }>(`${environment.server_url}categories/delete/${id}`)
         .pipe(
-          catchError((err) => this.handlerError(err))
+          catchError((err) => this.HandlerErrorSrv.handlerError(err))
         );
-    }
-  
-    public handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
-      if (!err) {
-        return throwError('Error desconocido');
-      }
-    
-      switch (err.error.status) {
-        case 400:
-          this.notificationServices.showErrorCustom(err.error.message);
-          break;
-        case 401:
-          this.notificationServices.showErrorCustom(err.error.message);
-          break;
-        case 403:
-          this.notificationServices.showErrorCustom(err.error.message);
-          break;
-        case 404:
-          this.notificationServices.showErrorCustom(err.error.message);
-          break;
-        case 500:
-          this.notificationServices.showErrorCustom(err.error.message);
-          break;
-        default:
-          this.notificationServices.showErrorCustom(err.message);
-      }
-  
-      if (err.error.details && err.error.details.length > 0) {
-        for (let i = 0; i < err.error.details.length; i++) {
-          this.notificationServices.showErrorCustom(err.error.details[i]);
-        }
-      }
-    
-      return throwError(err);
     }
   }

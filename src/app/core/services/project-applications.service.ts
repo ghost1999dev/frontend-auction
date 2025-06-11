@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { NotificationService } from './notification.service';
 import { Application } from 'express';
 import { ApplicationResponse, SingleApplicationResponse, CreateApplicationRequest, UpdateApplicationRequest, ApplicationsCounterResponse } from '../models/applications_projects';
+import { HandlerErrorService } from './handler-error.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class ProjectApplicationsService {
 
   constructor(
     private http: HttpClient,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private HandlerErrorSrv: HandlerErrorService,
   ) { }
 
   // Cache management
@@ -41,7 +43,7 @@ export class ProjectApplicationsService {
       this.applicationsCache = this.http.get<ApplicationResponse>(`${environment.server_url}application-projects/show/all`).pipe(
         map(response => response.applications),
         shareReplay(1),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
     }
     return this.applicationsCache;
@@ -52,7 +54,7 @@ export class ProjectApplicationsService {
       const application$: any = this.http.get<SingleApplicationResponse>(`${environment.server_url}application-projects/${id}`).pipe(
         map(response => response.application),
         shareReplay(1),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
       this.applicationCache.set(id, application$);
     }
@@ -65,7 +67,7 @@ export class ProjectApplicationsService {
         this.clearCache();
         return response;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -75,7 +77,7 @@ export class ProjectApplicationsService {
         this.clearApplicationCache(id);
         return response;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -85,7 +87,7 @@ export class ProjectApplicationsService {
         this.clearCache();
         return response;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -95,7 +97,7 @@ export class ProjectApplicationsService {
       const applications$: any = this.http.get<ApplicationResponse>(`${environment.server_url}application-projects/my-applications/${developerId}`).pipe(
         map(response => response.applications),
         shareReplay(1),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
       this.developerApplicationsCache.set(developerId, applications$);
     }
@@ -105,47 +107,7 @@ export class ProjectApplicationsService {
   getApplicationsCounter(developerId: number): Observable<number> {
     return this.http.get<ApplicationsCounterResponse>(`${environment.server_url}application-projects/counter/${developerId}`).pipe(
       map(response => response.applications),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
-  }
-
-  private handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
-    if (!err) {
-      return throwError(() => 'Error desconocido');
-    }
-
-    switch (err.error?.status) {
-      case 400:
-        this.notificationService.showErrorCustom(err.error?.message || 'Solicitud incorrecta');
-        break;
-      case 401:
-        this.notificationService.showErrorCustom(err.error?.message || 'No autorizado');
-        break;
-      case 404:
-        this.notificationService.showErrorCustom(err.error?.message || 'Recurso no encontrado');
-        break;
-      case 409:
-        this.notificationService.showErrorCustom(err.error?.message || 'Conflicto con el estado actual');
-        break;
-      case 422:
-        this.notificationService.showErrorCustom(err.error?.message || 'Entidad no procesable');
-        break;
-      case 429:
-        this.notificationService.showErrorCustom(err.error?.message || 'Demasiadas solicitudes');
-        break;
-      case 500:
-        this.notificationService.showErrorCustom(err.error?.message || 'Error del servidor');
-        break;
-      default:
-        this.notificationService.showErrorCustom(err.message || 'Error desconocido');
-    }
-
-    if (err.error?.details?.length) {
-      for (const detail of err.error.details) {
-        this.notificationService.showErrorCustom(detail);
-      }
-    }
-
-    return throwError(() => err);
   }
 }

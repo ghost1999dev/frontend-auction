@@ -28,6 +28,7 @@ export class AuthService {
     private userService: UserService,
     private companiesService: CompaniesService,
     private developerService: DeveloperService,
+    private HandlerErrorSrv: HandlerErrorService,
     private notificationServices: NotificationService,
     ) {
     this.checkToken();
@@ -58,7 +59,7 @@ export class AuthService {
         this.loggedIn.next(true);
         return res;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 

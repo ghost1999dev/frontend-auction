@@ -13,7 +13,11 @@ export class CompaniesService {
 
   private companiesCache: Observable<companies[]> | null = null;
 
-  constructor(private http: HttpClient, private notificationServices: NotificationService) { }
+  constructor(
+    private http: HttpClient, 
+    private notificationServices: NotificationService,
+    private HandlerErrorSrv: HandlerErrorService
+  ) { }
 
   getAllCompanies(): Observable<companies[]> {
     if (!this.companiesCache) {
@@ -38,7 +42,7 @@ export class CompaniesService {
     return this.http.put<UpdateCompanyResponse>(`${environment.server_url}companies/update/${id}`, data)
       .pipe(
         map(response => response.company),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
 
@@ -59,40 +63,8 @@ export class CompaniesService {
       map((res:addCompaniesRes)=> {
         return res;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
-  }
-
-  public handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
-    if (!err) {
-      return throwError('Error desconocido');
-    }
-  
-    switch (err.error.status) {
-      case 400:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 401:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 404:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 429:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 500:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      default:
-        this.notificationServices.showErrorCustom(err.message .message);
-    }
-
-    for (let i = 0; i < err.error.details.length; i++) {
-      this.notificationServices.showErrorCustom(err.error.details[i])
-    }
-  
-    return throwError(err);
   }
 
 }

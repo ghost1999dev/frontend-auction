@@ -2,7 +2,7 @@
     <div class="flex flex-column align-items-center justify-content-center">
         <img [routerLink]="['/auth/login']" src="assets/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0">        
         <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
-            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px; height: -webkit-fit-content;max-width: 600px; min-width: 460px;">
                 <div class="text-center mb-5">
                     <div class="text-900 text-3xl font-medium mb-3">Bienvenido al Registro</div>
                     <span class="text-600 font-medium">Seleccione una de las opciones</span>
@@ -12,17 +12,21 @@
                     <!-- Card for Developer -->
                     <p-card class="cursor-pointer" 
                             (click)="selectUserType('developer')" 
-                            [ngClass]="{'selected-card': userType === 'developer'}">
+                            [ngClass]="{'selected-card': userType === 'developer', 
+                                    'light-mode': layoutService.config.colorScheme === 'light',
+                                    'dark-mode': layoutService.config.colorScheme === 'dark'}">
                         <div class="flex flex-column align-items-center">
                             <i class="pi pi-user text-6xl mb-3"></i>
                             <span class="text-900 text-xl font-medium">Desarrollador</span>
                         </div>
                     </p-card>
-                
+
                     <!-- Card for Company -->
                     <p-card class="cursor-pointer" 
                             (click)="selectUserType('company')" 
-                            [ngClass]="{'selected-card': userType === 'company'}">
+                            [ngClass]="{'selected-card': userType === 'company',
+                                    'light-mode': layoutService.config.colorScheme === 'light',
+                                    'dark-mode': layoutService.config.colorScheme === 'dark'}">
                         <div class="flex flex-column align-items-center">
                             <i class="pi pi-building text-6xl mb-3"></i>
                             <span class="text-900 text-xl font-medium">Compañía</span>
@@ -59,13 +63,13 @@
                             class="w-full mb-2"
                             [style]="{'width':'100%'}"
                             [toggleMask]="false"
-                            [feedback]="true" 
+                            [feedback]="false" 
                             (input)="updatePasswordChecksDev()"
                             placeholder="Ingrese su contraseña"
                         ></p-password>
                         
                         <!-- Checklist de requisitos -->
-                        <div class="password-checklist mt-2 text-sm">
+                        <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
                             <p class="font-medium mb-2">Requisitos:</p>
                             <ul>
                                 <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">
@@ -132,13 +136,13 @@
                             class="w-full mb-2"
                             [style]="{'width':'100%'}"
                             [toggleMask]="false"
-                            [feedback]="true" 
+                            [feedback]="false" 
                             (input)="updatePasswordChecksCompany()"
                             placeholder="Ingrese la contraseña"
                         ></p-password>
                         
                         <!-- Checklist de requisitos -->
-                        <div class="password-checklist mt-2 text-sm">
+                         <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
                             <p class="font-medium mb-2">Requisitos:</p>
                             <ul>
                                 <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">

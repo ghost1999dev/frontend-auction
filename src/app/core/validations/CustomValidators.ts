@@ -9,7 +9,7 @@ export class CustomValidators {
     const hasLowerCase = /[a-z]/.test(value);
     const hasNumber = /[0-9]/.test(value);
     const hasSpecialChar = /[!@#$%^&*]/.test(value);
-    const isLengthValid = value.length >= 8;
+    const isLengthValid = value.length >= 6;
 
     const passwordValid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && isLengthValid;
 

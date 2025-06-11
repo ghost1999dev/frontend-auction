@@ -9,6 +9,7 @@ import { updatePasswordUser, updatePasswordUserResponse, updateUser, usersWithIm
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { ImageUploadService } from 'src/app/core/services/image-upload.service';
+import { LayoutService } from 'src/app/core/services/layout.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { UserService } from 'src/app/core/services/user.service';
 
@@ -72,13 +73,21 @@ export class ProfileComponent implements OnInit {
     nit_number: ''
   };
 
+  passwordChecks = {
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false
+  };
+
   constructor(
     private notificationServices: NotificationService,
     private authService: AuthService,
     private companiesService: CompaniesService,
     private userService: UserService,
     private developerService: DeveloperService,
-    private sanitizer: DomSanitizer,
+    public layoutService: LayoutService,
     private imageUploadService: ImageUploadService,
 
   ){
@@ -89,134 +98,155 @@ export class ProfileComponent implements OnInit {
     this.getUserById(this.id)
   }
 
-    nrcValidator(control: AbstractControl): Observable<ValidationErrors | null> {
-      return of(control.value).pipe(
-        delay(500), // Simula llamada a API
-        map(value => {
-          return value && value.match(/^\d{6}-\d$/) ? null : { invalidNrc: true };
-        })
-      );
-    }
-  
-    onKeyDown(event: KeyboardEvent) {
-      // Permitir teclas de control (backspace, delete, flechas, etc.)
-      if (event.ctrlKey || event.altKey || 
-          [8, 9, 13, 16, 17, 18, 20, 27, 35, 36, 37, 38, 39, 40, 45, 46, 91, 93].includes(event.keyCode)) {
-        return;
-      }
-      
-      // Permitir solo números
-      if (event.keyCode < 48 || event.keyCode > 57) {
-        if (event.keyCode < 96 || event.keyCode > 105) {
-          event.preventDefault();
-        }
-      }
-    }
+  updatePasswordChecks() {
+    const value = this.passwordData.Newpassword || '';
     
-    formatNitNumber(event: Event) {
-      const input = event.target as HTMLInputElement;
-      let value = input.value.replace(/[^0-9]/g, '');
-    
-      // Permitir borrado completo
-      if (value.length === 0) {
-        this.companyUpdate.nit_number = '';
-        return;
-      }
-    
-      let formattedValue = '';
-    
-      if (value.length <= 9) {
-        // DUI: 00000000-0
-        formattedValue = value.substring(0, 8);
-        if (value.length > 8) {
-          formattedValue += '-' + value.substring(8, 9);
-        }
-      } else {
-        // NIT: 0000-000000-000-00
-        const a = value.substring(0, 4);   // 4 dígitos
-        const b = value.substring(4, 10);  // 6 dígitos
-        const c = value.substring(10, 13); // 3 dígitos
-        const d = value.substring(13, 15); // 2 dígitos
-    
-        formattedValue = a;
-        if (b) formattedValue += '-' + b;
-        if (c) formattedValue += '-' + c;
-        if (d) formattedValue += '-' + d;
-      }
-    
-      // Actualizar en form y DOM
-      this.companyUpdate.nit_number = formattedValue;
-      input.value = formattedValue;
-    
-      // Posicionar cursor al final
-      requestAnimationFrame(() => {
-        const len = input.value.length;
-        input.setSelectionRange(len, len);
-      });
-    }
-      
-    formatPhone(event: Event) {
-      const input = event.target as HTMLInputElement;
-      let value = input.value.replace(/\D/g, '');
-      
-      // Permitir borrado completo
-      if (value.length === 0) {
-        this.userUpdate.phone = '';
-        return;
-      }
-      
-      // Asegurar que el código de país sea 503
-      const countryCode = '503';
-      let mainNumber = value;
-      
-      // Si el valor comienza con 503, lo usamos
-      if (value.startsWith('503')) {
-        mainNumber = value.substring(3);
-      }
-      // Si no, asumimos que es parte del número principal
-      
-      let formattedValue = `+(${countryCode})`;
-      
-      if (mainNumber.length > 0) {
-        formattedValue += ` ${mainNumber.substring(0, 4)}`;
-        if (mainNumber.length > 4) {
-          formattedValue += `-${mainNumber.substring(4, 8)}`;
-        }
-      }
+    this.passwordChecks = {
+      length: value.length >= 6,
+      upper: /[A-Z]/.test(value),
+      lower: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[!@#$%^&*]/.test(value)
+    };
+  }
 
-      this.userUpdate.phone = formattedValue;
-      
-      // Manejo básico del cursor
-      setTimeout(() => {
-        const newCursorPosition = formattedValue.length;
-        input.setSelectionRange(newCursorPosition, newCursorPosition);
-      });
+  public isFormValid(): any {
+    const hasCurrentPassword = !!this.passwordData.currentPassword;
+    const hasNewPassword = !!this.passwordData.Newpassword;
+    const passwordsMatch = this.passwordData.Newpassword === this.confirmPassword;
+    const isPasswordStrong = Object.values(this.passwordChecks).every(Boolean);
+    
+    return hasCurrentPassword && hasNewPassword && passwordsMatch && isPasswordStrong;
+  }
+
+  nrcValidator(control: AbstractControl): Observable<ValidationErrors | null> {
+    return of(control.value).pipe(
+      delay(500), // Simula llamada a API
+      map(value => {
+        return value && value.match(/^\d{6}-\d$/) ? null : { invalidNrc: true };
+      })
+    );
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    // Permitir teclas de control (backspace, delete, flechas, etc.)
+    if (event.ctrlKey || event.altKey || 
+        [8, 9, 13, 16, 17, 18, 20, 27, 35, 36, 37, 38, 39, 40, 45, 46, 91, 93].includes(event.keyCode)) {
+      return;
+    }
+    
+    // Permitir solo números
+    if (event.keyCode < 48 || event.keyCode > 57) {
+      if (event.keyCode < 96 || event.keyCode > 105) {
+        event.preventDefault();
+      }
+    }
+  }
+  
+  formatNitNumber(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/[^0-9]/g, '');
+  
+    // Permitir borrado completo
+    if (value.length === 0) {
+      this.companyUpdate.nit_number = '';
+      return;
     }
   
-    formatNrcNumber(event: Event) {
-      const input = event.target as HTMLInputElement;
-      let value = input.value.replace(/\D/g, '');
-      
-      // Permitir borrado completo
-      if (value.length === 0) {
-        this.companyUpdate.nrc_number = "";
-        return;
+    let formattedValue = '';
+  
+    if (value.length <= 9) {
+      // DUI: 00000000-0
+      formattedValue = value.substring(0, 8);
+      if (value.length > 8) {
+        formattedValue += '-' + value.substring(8, 9);
       }
-      
-      // Aplicar formato
-      let formattedValue = value.substring(0, 6);
-      if (value.length > 6) {
-        formattedValue += '-' + value.substring(6, 7);
-      }
-      
-      this.companyUpdate.nrc_number = formattedValue ;
-      
-      // Manejar posición del cursor
-      setTimeout(() => {
-        const newCursorPosition = formattedValue.length;
-        input.setSelectionRange(newCursorPosition, newCursorPosition);
-      });
+    } else {
+      // NIT: 0000-000000-000-00
+      const a = value.substring(0, 4);   // 4 dígitos
+      const b = value.substring(4, 10);  // 6 dígitos
+      const c = value.substring(10, 13); // 3 dígitos
+      const d = value.substring(13, 15); // 2 dígitos
+  
+      formattedValue = a;
+      if (b) formattedValue += '-' + b;
+      if (c) formattedValue += '-' + c;
+      if (d) formattedValue += '-' + d;
     }
+  
+    // Actualizar en form y DOM
+    this.companyUpdate.nit_number = formattedValue;
+    input.value = formattedValue;
+  
+    // Posicionar cursor al final
+    requestAnimationFrame(() => {
+      const len = input.value.length;
+      input.setSelectionRange(len, len);
+    });
+  }
+    
+  formatPhone(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '');
+    
+    // Permitir borrado completo
+    if (value.length === 0) {
+      this.userUpdate.phone = '';
+      return;
+    }
+    
+    // Asegurar que el código de país sea 503
+    const countryCode = '503';
+    let mainNumber = value;
+    
+    // Si el valor comienza con 503, lo usamos
+    if (value.startsWith('503')) {
+      mainNumber = value.substring(3);
+    }
+    // Si no, asumimos que es parte del número principal
+    
+    let formattedValue = `+(${countryCode})`;
+    
+    if (mainNumber.length > 0) {
+      formattedValue += ` ${mainNumber.substring(0, 4)}`;
+      if (mainNumber.length > 4) {
+        formattedValue += `-${mainNumber.substring(4, 8)}`;
+      }
+    }
+
+    this.userUpdate.phone = formattedValue;
+    
+    // Manejo básico del cursor
+    setTimeout(() => {
+      const newCursorPosition = formattedValue.length;
+      input.setSelectionRange(newCursorPosition, newCursorPosition);
+    });
+  }
+
+  formatNrcNumber(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '');
+    
+    // Permitir borrado completo
+    if (value.length === 0) {
+      this.companyUpdate.nrc_number = "";
+      return;
+    }
+    
+    // Aplicar formato
+    let formattedValue = value.substring(0, 6);
+    if (value.length > 6) {
+      formattedValue += '-' + value.substring(6, 7);
+    }
+    
+    this.companyUpdate.nrc_number = formattedValue ;
+    
+    // Manejar posición del cursor
+    setTimeout(() => {
+      const newCursorPosition = formattedValue.length;
+      input.setSelectionRange(newCursorPosition, newCursorPosition);
+    });
+  }
 
   loadCompany(userId: number): void {
     this.loading = true;
@@ -268,8 +298,6 @@ export class ProfileComponent implements OnInit {
         };
       }
   }
-
-  
 
   hideDialog(): void {
     this.userDialog = false;
@@ -473,14 +501,6 @@ export class ProfileComponent implements OnInit {
           }
         });
     }
-  }
-
-  private isFormValid(): boolean {
-    const hasCurrentPassword = !!this.passwordData.currentPassword;
-    const hasNewPassword = !!this.passwordData.Newpassword;
-    const passwordsMatch = this.passwordData.Newpassword === this.confirmPassword;
-    
-    return hasCurrentPassword && hasNewPassword && passwordsMatch;
   }
 
   getRoleName(roleId: number): string {

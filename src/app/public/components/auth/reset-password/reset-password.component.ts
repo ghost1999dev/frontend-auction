@@ -49,7 +49,7 @@ export class ResetPasswordComponent implements OnInit {
     const value = this.resetForm.get('password')?.value || '';
     
     this.passwordChecks = {
-      length: value.length >= 8,
+      length: value.length >= 6,
       upper: /[A-Z]/.test(value),
       lower: /[a-z]/.test(value),
       number: /[0-9]/.test(value),

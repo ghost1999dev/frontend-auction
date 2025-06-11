@@ -10,6 +10,7 @@ import {
     UpdateAuction 
 } from '../models/auctions';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { HandlerErrorService } from './handler-error.service';
 
 @Injectable({
     providedIn: 'root'
@@ -20,7 +21,8 @@ export class AuctionService {
 
     constructor(
         private http: HttpClient,
-        private notificationService: NotificationService
+        private notificationService: NotificationService,
+        private HandlerErrorSrv: HandlerErrorService,
     ) { }
 
     getAuctions(): Observable<Auction[]> {
@@ -60,7 +62,7 @@ export class AuctionService {
                 this.notificationService.showSuccessCustom('Subasta creada exitosamente');
                 return response.auction;
             }),
-            catchError(err => this.handleError(err))
+            catchError(err => this.HandlerErrorSrv.handlerError(err))
         );
     }
 
@@ -72,7 +74,7 @@ export class AuctionService {
                 this.notificationService.showSuccessCustom('Subasta actualizada exitosamente');
                 return response.auction;
             }),
-            catchError(err => this.handleError(err))
+            catchError(err => this.HandlerErrorSrv.handlerError(err))
         );
     }
 
@@ -84,20 +86,7 @@ export class AuctionService {
                 this.notificationService.showSuccessCustom('Subasta eliminada exitosamente');
                 return response;
             }),
-            catchError(err => this.handleError(err))
+            catchError(err => this.HandlerErrorSrv.handlerError(err))
         );
-    }
-
-    private handleError(error: any): Observable<never> {
-        let errorMessage = 'Ocurrió un error desconocido';
-        
-        if (error.error && error.error.message) {
-            errorMessage = error.error.message;
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-
-        this.notificationService.showErrorCustom(errorMessage);
-        return throwError(() => new Error(errorMessage));
     }
 }

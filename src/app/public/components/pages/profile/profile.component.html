@@ -303,48 +303,82 @@
 </p-dialog>
 
 <p-dialog [(visible)]="passwordDialog" [style]="{width: '450px'}" header="Actualizar Contraseña" [modal]="true" class="p-fluid">
-<ng-template pTemplate="content">
+  <ng-template pTemplate="content">
     <div class="field">
-        <label for="currentPassword">Contraseña Actual</label>
-        <p-password id="currentPassword" [(ngModel)]="passwordData.currentPassword" 
-                   [feedback]="false" required [toggleMask]="true"
-                   class="eye-icons"
-                   [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.currentPassword}">
-        </p-password>
-        <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.currentPassword">
-            La contraseña actual es requerida.
-        </small>
+      <label for="currentPassword">Contraseña Actual</label>
+      <p-password id="currentPassword" [(ngModel)]="passwordData.currentPassword" 
+                 [feedback]="false" required [toggleMask]="true"
+                 [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.currentPassword}">
+      </p-password>
+      <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.currentPassword">
+        La contraseña actual es requerida.
+      </small>
     </div>
 
     <div class="field">
-        <label for="newPassword">Nueva Contraseña</label>
-        <p-password id="newPassword" [(ngModel)]="passwordData.Newpassword" 
-                   [feedback]="true" required [toggleMask]="true"
-                   [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.Newpassword}">
-        </p-password>
-        <small class="ng-dirty ng-invalid" *ngIf="submitted && !passwordData.Newpassword">
-            La nueva contraseña es requerida.
-        </small>
+      <label for="newPassword">Nueva Contraseña</label>
+      <p-password id="newPassword" [(ngModel)]="passwordData.Newpassword" 
+                 [feedback]="false" required [toggleMask]="true"
+                 (input)="updatePasswordChecks()"
+                 [ngClass]="{'ng-invalid ng-dirty': submitted && !passwordData.Newpassword}">
+      </p-password>
+      
+      <!-- Password checklist -->
+      <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
+        <p class="font-medium mb-2">Requisitos:</p>
+        <ul>
+          <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">
+            <i [class]="passwordChecks.length ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+            <span>Mínimo 8 caracteres</span>
+          </li>
+          <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.upper">
+            <i [class]="passwordChecks.upper ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+            <span>1 letra mayúscula (A-Z)</span>
+          </li>
+          <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.lower">
+            <i [class]="passwordChecks.lower ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+            <span>1 letra minúscula (a-z)</span>
+          </li>
+          <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.number">
+            <i [class]="passwordChecks.number ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+            <span>1 número (0-9)</span>
+          </li>
+          <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.special">
+            <i [class]="passwordChecks.special ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+            <span>1 carácter especial (!#$%^&*)</span>
+          </li>
+        </ul>
+      </div>
+      
+      <small class="p-error" *ngIf="submitted && !passwordData.Newpassword">
+        La nueva contraseña es requerida
+      </small>
+      <small class="p-error" *ngIf="submitted && passwordData.Newpassword && !passwordChecks.length">
+        Mínimo 8 caracteres
+      </small>
+      <small class="p-error" *ngIf="submitted && passwordData.Newpassword && (!passwordChecks.upper || !passwordChecks.lower || !passwordChecks.number || !passwordChecks.special)">
+        La contraseña no cumple con todos los requisitos
+      </small>
     </div>
 
-    <div class="field" *ngIf="passwordData.Newpassword && passwordData.currentPassword">
-        <label for="confirmPassword">Confirmar Nueva Contraseña</label>
-        <p-password id="confirmPassword" [(ngModel)]="confirmPassword" 
-                   [feedback]="false" required [toggleMask]="true"
-                   [ngClass]="{'ng-invalid ng-dirty': submitted && passwordData.Newpassword !== confirmPassword}">
-        </p-password>
-        <small class="ng-dirty ng-invalid" *ngIf="submitted && passwordData.Newpassword !== confirmPassword">
-            Las contraseñas no coinciden.
-        </small>
+    <div class="field">
+      <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+      <p-password id="confirmPassword" [(ngModel)]="confirmPassword" 
+                 [feedback]="false" required [toggleMask]="true"
+                 [ngClass]="{'ng-invalid ng-dirty': submitted && passwordData.Newpassword !== confirmPassword}">
+      </p-password>
+      <small class="ng-dirty ng-invalid" *ngIf="submitted && passwordData.Newpassword !== confirmPassword">
+        Las contraseñas no coinciden.
+      </small>
     </div>
-</ng-template>
+  </ng-template>
 
-<ng-template pTemplate="footer">
+  <ng-template pTemplate="footer">
     <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" 
             (click)="hideDialog()" [disabled]="loading"></button>
     <button pButton pRipple label="Actualizar" icon="pi pi-check" class="p-button-text" 
-            (click)="updatePassword()" [disabled]="loading"></button>
-</ng-template>
+            (click)="updatePassword()" [disabled]="loading || !isFormValid()"></button>
+  </ng-template>
 </p-dialog>
 
 <p-dialog [(visible)]="showImageUploadDialog" [style]="{width: '400px'}" header="Confirmar subida de imagen" [modal]="true">

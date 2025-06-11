@@ -20,7 +20,8 @@ export class ProjectsService {
 
   constructor(
     private http: HttpClient,  
-    private notificationServices: NotificationService
+    private notificationServices: NotificationService,
+    private HandlerErrorSrv: HandlerErrorService,
   ) { }
 
   getAllProjects(filter?: ProjectFilter): Observable<Project[]> {
@@ -41,7 +42,7 @@ export class ProjectsService {
     return this.http.post<ProjectResponseById>(`${environment.server_url}projects/create`, data)
       .pipe(
         map(response => response.project),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
 
@@ -49,21 +50,21 @@ export class ProjectsService {
     return this.http.put<ProjectResponseById>(`${environment.server_url}projects/update/${id}`, data)
       .pipe(
         map(response => response.project),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
 
   deactivateProject(id: number): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${environment.server_url}projects/desactivate/${id}`)
       .pipe(
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
 
   hardDeleteProject(id: number): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${environment.server_url}projects/delete/${id}`)
       .pipe(
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
 
@@ -79,39 +80,5 @@ export class ProjectsService {
       .pipe(
         map(response => response.projects)
       );
-  }
-
-  public handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
-    if (!err) {
-      return throwError('Error desconocido');
-    }
-  
-    switch (err.error.status) {
-      case 400:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 401:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 404:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 429:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 500:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      default:
-        this.notificationServices.showErrorCustom(err.message .message);
-    }
-  
-    console.log(err.error)
-    for (let i = 0; i < err.error.details.length; i++) {
-      console.log(err.error.details[i])
-      this.notificationServices.showErrorCustom(err.error.details[i])
-    }
-  
-    return throwError(err);
   }
 }

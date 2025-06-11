@@ -20,6 +20,7 @@ import {
     Rating
 } from '../models/ratings';
 import { environment } from 'src/environments/environment';
+import { HandlerErrorService } from './handler-error.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,8 @@ export class RatingService {
 
   constructor(
     private http: HttpClient,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private HandlerErrorSrv: HandlerErrorService,
   ) { }
 
   // Cache management
@@ -46,7 +48,7 @@ export class RatingService {
   // Rating CRUD Operations
   getAllRatings(params?: FilterRatingsParams): Observable<RatingResponse> {
     return this.http.get<RatingResponse>(`${environment.server_url}ratings/show/all`, { params: { ...params } }).pipe(
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -55,7 +57,7 @@ export class RatingService {
       const rating$ = this.http.get<RatingResponseById>(`${environment.server_url}ratings/show/${id}`).pipe(
         map(response => response.rating),
         shareReplay(1),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
       this.ratingCache.set(id, rating$);
     }
@@ -68,7 +70,7 @@ export class RatingService {
         this.clearCache();
         return response.rating;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -79,7 +81,7 @@ export class RatingService {
         this.clearCache();
         return response.rating;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -90,32 +92,32 @@ export class RatingService {
         this.clearRatingCache(id);
         return response;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
   // Rating Statistics Operations
   getAverageRatingByDeveloper(developerId: number): Observable<RatingAverageResponse> {
     return this.http.get<RatingAverageResponse>(`${environment.server_url}ratings/getPromDeveloper/${developerId}`).pipe(
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
   getAverageRatingByCompany(companyId: number): Observable<RatingAverageResponse> {
     return this.http.get<RatingAverageResponse>(`${environment.server_url}ratings/getPromCompany/${companyId}`).pipe(
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
   getGlobalAverageRatingByDeveloper(): Observable<RatingAverageResponse> {
     return this.http.get<RatingAverageResponse>(`${environment.server_url}ratings/getGlobalPromDeveloper`).pipe(
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
   getGlobalAverageRatingByCompany(): Observable<RatingAverageResponse> {
     return this.http.get<RatingAverageResponse>(`${environment.server_url}ratings/getGlobalPromCompany`).pipe(
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -124,42 +126,7 @@ export class RatingService {
     if (filterBy) params.filterBy = filterBy;
     
     return this.http.get<PublicProfileResponse>(`${environment.server_url}ratings/getPublicProfile/${userId}`, { params }).pipe(
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
-  }
-
-  // Error handling
-  private handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
-    if (!err) {
-      return throwError('Error desconocido');
-    }
-  
-    switch (err.error?.status || err.status) {
-      case 400:
-        this.notificationService.showErrorCustom(err.error?.message || 'Solicitud incorrecta');
-        break;
-      case 401:
-        this.notificationService.showErrorCustom(err.error?.message || 'No autorizado');
-        break;
-      case 403:
-        this.notificationService.showErrorCustom(err.error?.message || 'Prohibido');
-        break;
-      case 404:
-        this.notificationService.showErrorCustom(err.error?.message || 'No encontrado');
-        break;
-      case 500:
-        this.notificationService.showErrorCustom(err.error?.message || 'Error interno del servidor');
-        break;
-      default:
-        this.notificationService.showErrorCustom(err.message || 'Error desconocido');
-    }
-
-    if (err.error?.details) {
-      for (let i = 0; i < err.error.details.length; i++) {
-        this.notificationService.showErrorCustom(err.error.details[i]);
-      }
-    }
-  
-    return throwError(err);
   }
 }

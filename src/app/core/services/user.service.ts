@@ -20,7 +20,8 @@ export class UserService {
     private http: HttpClient,  
     private developerService: DeveloperService,
     private companiesService: CompaniesService,
-    private NotificationService: NotificationService
+    private NotificationService: NotificationService,
+    private HandlerErrorSrv: HandlerErrorService,
   ) { }
 
   getUsers(): Observable<usersWithImage[]> {
@@ -59,7 +60,7 @@ export class UserService {
       map((res:addUserResponse)=> {
         return res;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -69,7 +70,7 @@ export class UserService {
       map((res:updateUserResponse)=> {
         return res;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -79,7 +80,7 @@ export class UserService {
       map((res:updatePasswordUserResponse)=> {
         return res;
       }),
-      catchError((err: any) => this.handlerError(err.status))
+      catchError((err: any) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -89,7 +90,7 @@ export class UserService {
       map((res:updateFieldsGoogleRes)=> {
         return res;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -99,7 +100,7 @@ export class UserService {
       map((res:activateRes)=> {
         return res;
       }),
-      catchError((err) => this.handlerError(err))
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
   }
 
@@ -123,7 +124,7 @@ export class UserService {
           this.NotificationService.showSuccessCustom('Código de recuperación enviado a tu correo');
           return res;
         }),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
 
@@ -134,42 +135,9 @@ export class UserService {
           this.NotificationService.showSuccessCustom('Contraseña actualizada correctamente');
           return res;
         }),
-        catchError((err) => this.handlerError(err))
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
-
-  public handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
-    if (!err) {
-      return throwError('Error desconocido');
-    }
-  
-    switch (err.error.status) {
-      case 400:
-        this.NotificationService.showErrorCustom(err.error.message);
-        break;
-      case 401:
-        this.NotificationService.showErrorCustom(err.error.message);
-        break;
-      case 404:
-        this.NotificationService.showErrorCustom(err.error.message);
-        break;
-      case 429:
-        this.NotificationService.showErrorCustom(err.error.message);
-        break;
-      case 500:
-        this.NotificationService.showErrorCustom(err.error.message);
-        break;
-      default:
-        this.NotificationService.showErrorCustom(err.message .message);
-    }
-
-    for (let i = 0; i < err.error.details.length; i++) {
-      this.NotificationService.showErrorCustom(err.error.details[i])
-    }
-  
-    return throwError(err);
-  }
-
 }
 
   

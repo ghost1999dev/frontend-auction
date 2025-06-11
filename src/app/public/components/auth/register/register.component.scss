@@ -26,15 +26,17 @@
 
 .selected-card {
     transition: all 0.3s ease;
+    //padding: 12px;
     
     &.light-mode {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border: 1px solid #e0e0e0;
+      //border: 1px solid #e0e0e0;
     }
     
     &.dark-mode {
-      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-      border: 1px solid #444;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+      //border: 1px solid #444;
+      //padding: 12px;
     }
   }
   
@@ -184,6 +186,42 @@
     
     .surface-card {
       padding: 1.5rem !important;
+    }
+  }
+}
+
+:host ::ng-deep {
+  /* Estilos para las tarjetas de selección */
+  .p-card {
+    width: 200px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    
+    &.selected-card {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 1px var(--primary-color);
+      
+      &.light-mode {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--primary-color);
+      }
+      
+      &.dark-mode {
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2), 0 0 0 1px var(--primary-color);
+      }
+    }
+    
+    &:hover:not(.selected-card) {
+      transform: translateY(-5px);
+      &.light-mode {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      &.dark-mode {
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+      }
+    }
+    
+    .p-card-body {
+      padding: 1.5rem;
     }
   }
 }
