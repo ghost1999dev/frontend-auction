@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from 'src/app/core/services/layout.service';
 import { UserService } from 'src/app/core/services/user.service';
+import { CustomValidators } from 'src/app/core/validations/CustomValidators';
 
 @Component({
   selector: 'app-reset-password',
@@ -13,6 +14,15 @@ export class ResetPasswordComponent implements OnInit {
   resetForm: FormGroup;
   loading = false;
   email: string = '';
+  token: string = '';
+
+  passwordChecks = {
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -23,7 +33,7 @@ export class ResetPasswordComponent implements OnInit {
   ) {
     this.resetForm = this.fb.group({
       code: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(6), CustomValidators.passwordStrength]],
       confirmPassword: ['', [Validators.required]]
     }, { validator: this.passwordMatchValidator });
   }
@@ -31,14 +41,27 @@ export class ResetPasswordComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       this.email = params['email'];
+      this.token = params['token'];
     });
+  }
+
+  updatePasswordChecks() {
+    const value = this.resetForm.get('password')?.value || '';
+    
+    this.passwordChecks = {
+      length: value.length >= 8,
+      upper: /[A-Z]/.test(value),
+      lower: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[!@#$%^&*]/.test(value)
+    };
   }
 
   passwordMatchValidator(form: FormGroup) {
     return form.get('password')?.value === form.get('confirmPassword')?.value 
       ? null : { mismatch: true };
   }
-
+  
   onSubmit(): void {
     if (this.resetForm.invalid) {
       return;

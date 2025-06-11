@@ -5,6 +5,7 @@ import { Observable, of, delay, map } from 'rxjs';
 import { LayoutService } from 'src/app/core/services/layout.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { UserService } from 'src/app/core/services/user.service';
+import { CustomValidators } from 'src/app/core/validations/CustomValidators';
 import { passwordValidator } from 'src/app/core/validations/passwordValidator';
 
 @Component({
@@ -18,9 +19,18 @@ export class RegisterComponent {
   userType: 'developer' | 'company' | null = null; 
   developerForm!: FormGroup; 
   companyForm!: FormGroup;   
+
   submitted: boolean = false; 
   public formData: any = new FormData();
   businessTypeTags: string[] = [];
+
+  passwordChecks = {
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -37,7 +47,7 @@ export class RegisterComponent {
     this.developerForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, passwordValidator()]],
+      password: ['', [Validators.required, Validators.minLength(6), CustomValidators.passwordStrength]],
       image: [''],
       address: ['Unknow'],
       phone: ['+(000) 0000-0000'],
@@ -51,7 +61,7 @@ export class RegisterComponent {
     this.companyForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, passwordValidator()]],
+      password: ['', [Validators.required, Validators.minLength(6), CustomValidators.passwordStrength]],
       image: [''],
       address: ['Unknow'],
       phone: ['+(000) 0000-0000'],
@@ -138,6 +148,30 @@ export class RegisterComponent {
       const len = input.value.length;
       input.setSelectionRange(len, len);
     });
+  }
+
+  updatePasswordChecksDev() {
+    const value = this.developerForm.get('password')?.value || '';
+    
+    this.passwordChecks = {
+      length: value.length >= 8,
+      upper: /[A-Z]/.test(value),
+      lower: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[!@#$%^&*]/.test(value)
+    };
+  }
+
+  updatePasswordChecksCompany() {
+    const value = this.companyForm.get('password')?.value || '';
+    
+    this.passwordChecks = {
+      length: value.length >= 8,
+      upper: /[A-Z]/.test(value),
+      lower: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[!@#$%^&*]/.test(value)
+    };
   }
     
   formatPhone(event: Event) {
