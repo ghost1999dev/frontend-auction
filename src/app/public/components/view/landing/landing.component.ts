@@ -9,7 +9,6 @@ import { ProjectsService } from 'src/app/core/services/projects.service';
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent {
-
   projects: any[] = [];
 
   // Filtering and pagination

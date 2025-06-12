@@ -2,7 +2,6 @@
           [style]="{width: '85vw', maxWidth: '1200px', maxHeight: '90vh'}" [breakpoints]="{'960px': '90vw'}"
           [draggable]="true" [resizable]="true" [closable]="false"
           [contentStyle]="{'padding': '0', 'overflow': 'auto'}">
-    <!-- Contenido del diálogo -->
     
     <div class="dialog-container">
         <div class="dialog-content">
@@ -42,88 +41,128 @@
                                 <div class="form-grid">
                                     <!-- Columna 1 -->
                                     <div class="form-column">
-                                        <!-- Password -->
-                                        <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="password" class="input-label">Contraseña</label>
-                                                <input id="password" type="password" formControlName="password" 
-                                                        [toggleMask]="true" [feedback]="false"
-                                                        [ngClass]="{'p-invalid': submitted && developerForm.get('password')?.errors}"
-                                                        class="centered-input">
-                                                <small *ngIf="submitted && developerForm.get('password')?.errors" class="error-message">
-                                                    <span *ngIf="developerForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
-                                                    <span *ngIf="developerForm.get('password')?.errors?.['minlength']">Debe tener al menos 6 caracteres</span>
-                                                </small>
-                                            </div>
-                                        </div>
 
                                         <!-- Address -->
                                         <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="address" class="input-label">Dirección</label>
-                                                <input id="address" type="text" pInputText formControlName="address" 
-                                                        class="centered-input"
-                                                        [ngClass]="{'p-invalid': submitted && developerForm.get('address')?.errors}">
-                                                <small *ngIf="submitted && developerForm.get('address')?.errors" class="error-message">
-                                                    Dirección es requerida
-                                                </small>
-                                            </div>
+                                            <label for="address" class="input-label">Dirección</label>
+                                            <input id="address" type="text" pInputText formControlName="address" 
+                                                    class="centered-input"
+                                                    [ngClass]="{'p-invalid': submitted && developerForm.get('address')?.errors}">
+                                            <small *ngIf="submitted && developerForm.get('address')?.errors" class="error-message">
+                                                Dirección es requerida
+                                            </small>
                                         </div>
 
                                         <!-- Phone -->
                                         <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="phone" class="input-label">Teléfono</label>
-                                                <input id="phone" type="text" 
-                                                (input)="formatPhone($event)" 
-                                                pInputText class="centered-input"
-                                                formControlName="phone" 
-                                                [ngClass]="{ 'p-invalid': submitted && developerForm.get('phone')?.errors }">  
-                                                <small *ngIf="submitted && developerForm.get('phone')?.errors" class="error-message">
-                                                    Teléfono es requerido
-                                                </small>
-                                            </div>
+                                            <label for="phone" class="input-label">Teléfono</label>
+                                            <input id="phone" type="text" 
+                                            (input)="formatPhone($event)" 
+                                            pInputText class="centered-input"
+                                            formControlName="phone" 
+                                            [ngClass]="{ 'p-invalid': submitted && developerForm.get('phone')?.errors }">  
+                                            <small *ngIf="submitted && developerForm.get('phone')?.errors" class="error-message">
+                                                Teléfono es requerido
+                                            </small>
                                         </div>
 
-                                        <!-- Occupation -->
+                                        <!-- Password -->
                                         <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="occupation" class="input-label">Ocupación/Título</label>
-                                                <input id="occupation" type="text" pInputText formControlName="occupation" 
-                                                        class="centered-input" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)"
-                                                        placeholder="Ej: Desarrollador Frontend, Ingeniero Full Stack">
+                                            <label for="password" class="input-label">Contraseña</label>
+                                            <div class="password-input-container">
+                                                <p-password 
+                                                    id="password" 
+                                                    formControlName="password" 
+                                                    [toggleMask]="false" 
+                                                    [feedback]="false"
+                                                    (input)="updatePasswordChecks()"
+                                                    [ngClass]="{'p-invalid': submitted && developerForm.get('password')?.errors}"
+                                                    class="full-width-password">
+                                                </p-password>
                                             </div>
+                                            
+                                            <!-- Password checklist -->
+                                            <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
+                                                <p class="font-medium mb-2">Requisitos:</p>
+                                                <ul>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">
+                                                    <i [class]="passwordChecks.length ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>Mínimo 8 caracteres</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.upper">
+                                                    <i [class]="passwordChecks.upper ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 letra mayúscula (A-Z)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.lower">
+                                                    <i [class]="passwordChecks.lower ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 letra minúscula (a-z)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.number">
+                                                    <i [class]="passwordChecks.number ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 número (0-9)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.special">
+                                                    <i [class]="passwordChecks.special ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 carácter especial (!#$%^&*)</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <small *ngIf="submitted && developerForm.get('password')?.errors" class="error-message">
+                                                <span *ngIf="developerForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
+                                                <span *ngIf="developerForm.get('password')?.errors?.['minlength']">Debe tener al menos 8 caracteres</span>
+                                            </small>
+                                        </div>
+
+                                        <div class="field-container">
+                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña</label>
+                                            <div class="password-input-container">
+                                                <p-password 
+                                                    id="confirmPassword" 
+                                                    [(ngModel)]="confirmPassword" 
+                                                    [feedback]="false" 
+                                                    [toggleMask]="false"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    class="full-width-password"
+                                                    [ngClass]="{'p-invalid': submitted && !passwordMatchValidator()}">
+                                                </p-password>
+                                            </div>
+                                            <small *ngIf="submitted && !passwordMatchValidator()" class="error-message">
+                                                Las contraseñas no coinciden
+                                            </small>
                                         </div>
                                     </div>
 
                                     <!-- Columna 2 -->
                                     <div class="form-column">
+                                        <!-- Occupation -->
+                                        <div class="field-container">
+                                            <label for="occupation" class="input-label">Ocupación/Título</label>
+                                            <input id="occupation" type="text" pInputText formControlName="occupation" 
+                                                    class="centered-input" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)"
+                                                    placeholder="Ej: Desarrollador Frontend, Ingeniero Full Stack">
+                                        </div>
+
                                         <!-- LinkedIn -->
                                         <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="linkedin" class="input-label">Perfil de LinkedIn</label>
-                                                <input id="linkedin" type="url" pInputText formControlName="linkedin" 
-                                                        class="centered-input"
-                                                        placeholder="https://linkedin.com/in/tuperfil">
-                                            </div>
+                                            <label for="linkedin" class="input-label">Perfil de LinkedIn</label>
+                                            <input id="linkedin" type="url" pInputText formControlName="linkedin" 
+                                                    class="centered-input"
+                                                    placeholder="https://linkedin.com/in/tuperfil">
                                         </div>
 
                                         <!-- Portfolio -->
                                         <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="portfolio" class="input-label">Portafolio/GitHub</label>
-                                                <input id="portfolio" type="url" pInputText formControlName="portfolio" 
-                                                        class="centered-input"
-                                                        placeholder="https://github.com/tuusuario o tu sitio web">
-                                            </div>
+                                            <label for="portfolio" class="input-label">Portafolio/GitHub</label>
+                                            <input id="portfolio" type="url" pInputText formControlName="portfolio" 
+                                                    class="centered-input"
+                                                    placeholder="https://github.com/tuusuario o tu sitio web">
                                         </div>
 
                                         <!-- Bio -->
                                         <div class="field-container">
-                                            <div class="input-group">
                                             <label for="bio" class="input-label">Biografía</label>
                                             <textarea pInputText id="bio" formControlName="bio" class="centered-input" rows="3"></textarea>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -138,56 +177,101 @@
                                 <div class="form-grid">
                                     <!-- Columna 1 -->
                                     <div class="form-column">
+                                                                                <!-- Address -->
+                                        <div class="field-container">
+                                            <label for="address" class="input-label">Dirección</label>
+                                            <input id="address" type="text" pInputText formControlName="address" 
+                                                    class="centered-input"
+                                                    [ngClass]="{'p-invalid': submitted && companyForm.get('address')?.errors}">
+                                            <small *ngIf="submitted && companyForm.get('address')?.errors" class="error-message">
+                                                Dirección es requerida
+                                            </small>
+                                        </div>
+
+                                                                               <!-- NRC Number -->
+                                        <div class="field-container">
+                                            <label for="nrc_number" class="input-label">Número de NRC</label>
+                                            <input id="nrc_number" type="text" 
+                                                (input)="formatNrcNumber($event)"
+                                                pInputText 
+                                                class="centered-input"
+                                                formControlName="nrc_number" 
+                                                [ngClass]="{ 'p-invalid': submitted && companyForm.get('nrc_number')?.errors }">
+                                            <small *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="error-message">
+                                                <span *ngIf="companyForm.get('nrc_number')?.errors?.['required']">Número de NRC es requerido</span>
+                                                <span *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">Formato: 123456-7 (6 dígitos, guión, 1 dígito)</span>
+                                            </small>
+                                        </div>
+                                        
                                         <!-- Password -->
                                         <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="password" class="input-label">Contraseña</label>
-                                                <input id="password" type="password" formControlName="password" 
-                                                        [toggleMask]="true" [feedback]="false"
-                                                        [ngClass]="{'p-invalid': submitted && companyForm.get('password')?.errors}"
-                                                        class="centered-input">
-                                                <small *ngIf="submitted && companyForm.get('password')?.errors" class="error-message">
-                                                    <span *ngIf="companyForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
-                                                    <span *ngIf="companyForm.get('password')?.errors?.['minlength']">Debe tener al menos 6 caracteres</span>
-                                                </small>
+                                            <label for="password" class="input-label">Contraseña</label>
+                                            <div class="password-input-container">
+                                                <p-password 
+                                                    id="password" 
+                                                    formControlName="password" 
+                                                    [toggleMask]="false" 
+                                                    [feedback]="false"
+                                                    (input)="updatePasswordChecks()"
+                                                    [ngClass]="{'p-invalid': submitted && companyForm.get('password')?.errors}"
+                                                    class="full-width-password">
+                                                </p-password>
                                             </div>
+                                            
+                                            <!-- Password checklist -->
+                                            <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
+                                                <p class="font-medium mb-2">Requisitos:</p>
+                                                <ul>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">
+                                                    <i [class]="passwordChecks.length ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>Mínimo 8 caracteres</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.upper">
+                                                    <i [class]="passwordChecks.upper ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 letra mayúscula (A-Z)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.lower">
+                                                    <i [class]="passwordChecks.lower ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 letra minúscula (a-z)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.number">
+                                                    <i [class]="passwordChecks.number ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 número (0-9)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.special">
+                                                    <i [class]="passwordChecks.special ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 carácter especial (!#$%^&*)</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <small *ngIf="submitted && companyForm.get('password')?.errors" class="error-message">
+                                                <span *ngIf="companyForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
+                                                <span *ngIf="companyForm.get('password')?.errors?.['minlength']">Debe tener al menos 8 caracteres</span>
+                                            </small>
                                         </div>
 
-                                        <!-- Address -->
-                                        <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="address" class="input-label">Dirección</label>
-                                                <input id="address" type="text" pInputText formControlName="address" 
-                                                        class="centered-input"
-                                                        [ngClass]="{'p-invalid': submitted && companyForm.get('address')?.errors}">
-                                                <small *ngIf="submitted && companyForm.get('address')?.errors" class="error-message">
-                                                    Dirección es requerida
-                                                </small>
-                                            </div>
-                                        </div>
-
-                                        <!-- Phone -->
-                                        <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="phone" class="input-label">Teléfono</label>
-                                                <input id="phone" type="text" 
-                                                (input)="formatPhoneCompany($event)" 
-                                                pInputText class="centered-input"
-                                                formControlName="phone" 
-                                                [ngClass]="{ 'p-invalid': submitted && companyForm.get('phone')?.errors }">  
-                                                <small *ngIf="submitted && companyForm.get('phone')?.errors" class="error-message">
-                                                    Teléfono es requerido
-                                                </small>
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <!-- Columna 2 -->
                                     <div class="form-column">
-
+                                        <!-- Phone -->
                                         <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="business_type" class="block text-900 font-medium mb-2 mt-3">Tipo de Negocio</label>
+                                            <label for="phone" class="input-label">Teléfono</label>
+                                            <input id="phone" type="text" 
+                                            (input)="formatPhoneCompany($event)" 
+                                            pInputText class="centered-input"
+                                            formControlName="phone" 
+                                            [ngClass]="{ 'p-invalid': submitted && companyForm.get('phone')?.errors }">  
+                                            <small *ngIf="submitted && companyForm.get('phone')?.errors" class="error-message">
+                                                Teléfono es requerido
+                                            </small>
+                                        </div>
+
+                                        <!-- Business Type -->
+                                        <div class="field-container">
+                                            <label for="business_type" class="input-label">Tipo de Negocio</label>
+                                            <div class="chips-container">
                                                 <p-chips id="business_type" 
                                                         [(ngModel)]="businessTypeTags"
                                                         [ngModelOptions]="{standalone: true}"
@@ -197,68 +281,67 @@
                                                         [max]="1"
                                                         [allowDuplicate]="false"
                                                         [addOnBlur]="true"
-                                                        class="centered-input"
                                                         [ngClass]="{ 'p-invalid': submitted && companyForm.get('business_type')?.errors }">
                                                     <ng-template let-item pTemplate="item">
                                                         <p-tag [value]="item" [rounded]="true"></p-tag>
                                                     </ng-template>
                                                 </p-chips>
-                                                
-                                                <div *ngIf="submitted && companyForm.get('business_type')?.errors" class="invalid-feedback mt-1">
-                                                    <div *ngIf="companyForm.get('business_type')?.errors?.['required']">Al menos un tipo de negocio es requerido</div>
-                                                </div>
                                             </div>
+                                            <small *ngIf="submitted && companyForm.get('business_type')?.errors" class="error-message">
+                                                <span *ngIf="companyForm.get('business_type')?.errors?.['required']">Al menos un tipo de negocio es requerido</span>
+                                            </small>
                                         </div>
 
-                                        <!-- NRC Number -->
                                         <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="nrc_number" class="input-label">Número de NRC</label>
-                                                <input id="nrc_number" type="text" 
-                                                    (input)="formatNrcNumber($event)"
-                                                    pInputText 
+                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña</label>
+                                            <div class="password-input-container">
+                                                <p-password 
+                                                    id="confirmPassword" 
+                                                    [(ngModel)]="confirmPassword" 
+                                                    [feedback]="false" 
+                                                    [toggleMask]="false"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    class="full-width-password"
+                                                    [ngClass]="{'p-invalid': submitted && !passwordMatchValidator()}">
+                                                </p-password>
+                                            </div>
+                                            <small *ngIf="submitted && !passwordMatchValidator()" class="error-message">
+                                                Las contraseñas no coinciden
+                                            </small>
+                                        </div>
+
+                                                                                <!-- Website -->
+                                        <div class="field-container">
+                                            <label for="web_site" class="input-label">Sitio Web</label>
+                                            <input id="web_site" type="url" pInputText formControlName="web_site" 
                                                     class="centered-input"
-                                                    formControlName="nrc_number" 
-                                                    [ngClass]="{ 'p-invalid': submitted && companyForm.get('nrc_number')?.errors }">
-                                                <small *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="error-message">
-                                                    <span *ngIf="companyForm.get('nrc_number')?.errors?.['required']">Número de NRC es requerido</span>
-                                                    <span *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">Formato: 123456-7 (6 dígitos, guión, 1 dígito)</span>
-                                                </small>
-                                            </div>
+                                                    [ngClass]="{'p-invalid': submitted && companyForm.get('web_site')?.errors}">
+                                            <small *ngIf="submitted && companyForm.get('web_site')?.errors" class="error-message">
+                                                Sitio web es requerido
+                                            </small>
                                         </div>
 
-                                        <!-- Website -->
-                                        <div class="field-container">
-                                            <div class="input-group">
-                                                <label for="web_site" class="input-label">Sitio Web</label>
-                                                <input id="web_site" type="url" pInputText formControlName="web_site" 
-                                                        class="centered-input"
-                                                        [ngClass]="{'p-invalid': submitted && companyForm.get('web_site')?.errors}">
-                                                <small *ngIf="submitted && companyForm.get('web_site')?.errors" class="error-message">
-                                                    Sitio web es requerido
-                                                </small>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </form>
                     </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<ng-template pTemplate="footer">
-    <div class="footer-buttons">
-        <button pButton type="button" label="Regresar" icon="pi pi-arrow-left" 
-                (click)="goBack()" 
-                class="p-button-outlined p-button-secondary"></button>
-        <button pButton type="submit" label="Registrar" icon="pi pi-check" 
-                (click)="register()" 
-                class="p-button-success"
-                [disabled]="clicked"></button>
-    </div>
-</ng-template>
+
+    <ng-template pTemplate="footer">
+        <div class="footer-buttons">
+            <button pButton type="button" label="Regresar" icon="pi pi-arrow-left" 
+                    (click)="goBack()" 
+                    class="p-button-outlined p-button-secondary"></button>
+            <button pButton type="submit" label="Registrar" icon="pi pi-check" 
+                    (click)="register()" 
+                    class="p-button-success"
+                    [disabled]="clicked"></button>
+        </div>
+    </ng-template>
 </p-dialog>
 
 <p-toast position="top-center"></p-toast>

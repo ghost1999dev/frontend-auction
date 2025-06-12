@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Subscription, forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { ProjectApplicationsService } from 'src/app/core/services/project-applications.service';
@@ -82,6 +82,9 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   selectedProjectFilter: number | null = null;
   projectOptions: any[] = [];
 
+  colorSchemeSubscription!: Subscription;
+  currentColorScheme!: string;
+
   constructor(
     private applicationsService: ProjectApplicationsService,
     public layoutService: LayoutService,
@@ -93,16 +96,26 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     private ratingService: RatingService,
     private sanitizer: DomSanitizer,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private changeDetectorRef: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
     this.getUserById(this.id);
     this.initializeChartOptions();
+
+    this.colorSchemeSubscription = this.layoutService.configUpdate$.subscribe(config => {
+      this.currentColorScheme = config.colorScheme;
+      // Forzar detección de cambios si es necesario
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+    if (this.colorSchemeSubscription) {
+      this.colorSchemeSubscription.unsubscribe();
+    }
   }
 
   // Improved method with better typing and error handling

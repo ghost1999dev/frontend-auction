@@ -40,6 +40,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   clicked = false
   businessTypeTags: string[] = [];
 
+  passwordChecks = {
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false
+  };
+
+  confirmPassword = '';
+
   constructor(
     public layoutService: LayoutService,
     public developerService: DeveloperService,
@@ -91,6 +101,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
       { label: 'Add New', icon: 'pi pi-fw pi-plus' },
       { label: 'Remove', icon: 'pi pi-fw pi-minus' }
     ];
+  }
+
+  updatePasswordChecks() {
+    const value = this.userType === 'developer' 
+      ? this.developerForm.get('password')?.value || ''
+      : this.companyForm.get('password')?.value || '';
+    
+    this.passwordChecks = {
+      length: value.length >= 6,
+      upper: /[A-Z]/.test(value),
+      lower: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[!@#$%^&*]/.test(value)
+    };
+  }
+
+  passwordMatchValidator(): boolean {
+    const password = this.userType === 'developer' 
+      ? this.developerForm.get('password')?.value
+      : this.companyForm.get('password')?.value;
+    return password === this.confirmPassword;
   }
 
   public getUserById(id: any){
@@ -410,21 +441,35 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
     }
 
-    register() {
-        if (this.userType === 'developer') {
-          if(this.developerForm.valid){
-            this.clicked = true
-            this.onSubmitDeveloper();
-          }
-        } else if (this.userType === 'company') {
-          if(this.companyForm.valid){
-            this.clicked = true
-            this.onSubmitCompany();
-          }
-        } else {
-            this.notificationServices.showErrorCustom('Por favor seleccione un tipo de usuario');
-        }
+  register() {
+    this.submitted = true;
+    this.confirmPassword = this.confirmPassword || '';
+    
+    if (!this.passwordMatchValidator()) {
+      this.notificationServices.showErrorCustom('Las contraseñas no coinciden');
+      return;
     }
+
+    // Validate password strength
+    if (!Object.values(this.passwordChecks).every(Boolean)) {
+      this.notificationServices.showErrorCustom('La contraseña no cumple con todos los requisitos');
+      return;
+    }
+
+    if (this.userType === 'developer') {
+      if (this.developerForm.valid) {
+        this.clicked = true;
+        this.onSubmitDeveloper();
+      }
+    } else if (this.userType === 'company') {
+      if (this.companyForm.valid) {
+        this.clicked = true;
+        this.onSubmitCompany();
+      }
+    } else {
+      this.notificationServices.showErrorCustom('Por favor seleccione un tipo de usuario');
+    }
+  }
 
   initChart() {
       const documentStyle = getComputedStyle(document.documentElement);

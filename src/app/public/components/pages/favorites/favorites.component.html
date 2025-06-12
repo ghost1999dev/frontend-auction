@@ -26,7 +26,7 @@
       <div class="application-details">
         <div class="detail-item">
           <span class="detail-label">Descripción del Proyecto:</span>
-          <p class="project-description">{{ app.project?.description }}</p>
+          <p class="project-description">{{ (app.project.description || 'No se proporciona descripción').slice(0, 100) }}{{ (app.project.description || '').length > 100 ? '...' : '' }}</p>
         </div>
         
         <div class="detail-row">

@@ -252,3 +252,130 @@ $dark-colors: (
     flex-direction: column;
   }
 }
+
+
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+
+  .application-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    .application-details {
+      padding: 1.25rem;
+      flex: 1;
+
+      .detail-item {
+        margin-bottom: 0.75rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .detail-label {
+          display: block;
+          font-size: 0.8rem;
+          font-weight: 500;
+          margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+          font-size: 0.9rem;
+        }
+
+        .project-description {
+          margin: 0;
+          font-size: 0.9rem;
+          line-height: 1.5;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .detail-row {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 0.75rem;
+
+        .detail-item {
+          flex: 1;
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .application-actions {
+      padding: 0.75rem 1.25rem;
+      border-top: 1px solid #f0f0f0;
+      background-color: #f9f9f9;
+    }
+  }
+
+  // Dark theme styles
+    .application-card {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+      .application-header {
+        border-bottom-color: #4a5568;
+
+        .project-info {
+          .project-name {
+            color: #e2e8f0;
+          }
+
+          .company-name {
+            color: #a0aec0;
+          }
+        }
+
+        .status-badge {
+          &.pending {
+            background-color: #453411;
+            color: #f6e05e;
+          }
+
+          &.accepted {
+            background-color: #1a4531;
+            color: #68d391;
+          }
+
+          &.rejected {
+            background-color: #3c1a1a;
+            color: #fc8181;
+          }
+
+          &.withdrawn {
+            background-color: #2d3748;
+            color: #a0aec0;
+            border: 1px solid #4a5568;
+          }
+        }
+      }
+
+      .application-details {
+        .detail-label {
+          color: #a0aec0 !important;
+        }
+
+        .detail-value, .project-description {
+          color: #cbd5e0;
+        }
+      }
+
+      .application-actions {
+        background-color: #1a202c;
+        border-top-color: #4a5568;
+      }
+    }
+}
