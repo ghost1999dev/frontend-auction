@@ -1,0 +1,30 @@
+<!-- Footer -->
+<div class="py-4 px-4 mx-0 mt-8 lg:mx-8">
+    <div class="grid justify-content-between">
+        <div class="col-12 md:col-2" style="margin-top:-1.5rem;">
+            <a (click)="router.navigate(['/pages/landing'], {fragment: 'home'})" class="flex flex-wrap align-items-center justify-content-center md:justify-content-start md:mb-0 mb-3 cursor-pointer">
+                <img src="assets/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="footer sections" width="50" height="50" class="mr-2">
+                <h4 class="font-medium text-3xl text-900">CodeBid</h4>
+            </a>
+        </div>
+        <div class="col-12 md:col-10 lg:col-7">
+            <div class="grid text-center md:text-left">
+                <div class="col-12 md:col-3">
+                    <h4 class="font-medium text-2xl line-height-3 mb-3 text-900">Compañía</h4>
+                    <a class="line-height-3 text-xl block cursor-pointer mb-2 text-700" [routerLink]="['/company/about-us']">Sobre nosotros</a>
+                    <a class="line-height-3 text-xl block cursor-pointer text-700" [routerLink]="['/company/contact']">Contacto</a>
+                </div>
+                <div class="col-12 md:col-3 mt-4 md:mt-0">
+                    <h4 class="font-medium text-2xl line-height-3 mb-3 text-900">Recursos</h4>
+                    <a class="line-height-3 text-xl block cursor-pointer mb-2 text-700" [routerLink]="['/company/user-guide']">Guía del usuario</a>
+                    <a class="line-height-3 text-xl block cursor-pointer text-700" [routerLink]="['/company/documentation']">Documentación</a>
+                </div>
+                <div class="col-12 md:col-3 mt-4 md:mt-0">
+                    <h4 class="font-medium text-2xl line-height-3 mb-3 text-900">Legal</h4>
+                    <a class="line-height-3 text-xl block cursor-pointer mb-2 text-700">Política de privacidad</a>
+                    <a class="line-height-3 text-xl block cursor-pointer text-700">Términos de servicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

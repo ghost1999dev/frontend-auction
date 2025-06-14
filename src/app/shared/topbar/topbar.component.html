@@ -1,7 +1,7 @@
 <div class="layout-topbar">
     <a class="layout-topbar-logo" routerLink="">
-        <img src="assets/layout/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="logo">
-        <span>SAKAI</span>
+        <img src="assets/images/logo-white.svg" alt="logo">
+        <span>CodeBid</span>
     </a>
 
     <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
@@ -13,17 +13,22 @@
     </button>
 
     <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
-        <button class="p-link layout-topbar-button">
-            <i class="pi pi-calendar"></i>
-            <span>Calendar</span>
-        </button>
-        <button class="p-link layout-topbar-button">
+        <button [routerLink]="['/main/profile']" class="p-link layout-topbar-button">
             <i class="pi pi-user"></i>
-            <span>Profile</span>
+            <span>Perfil</span>
         </button>
-        <button class="p-link layout-topbar-button" [routerLink]="'/documentation'">
-            <i class="pi pi-cog"></i>
-            <span>Settings</span>
+        <button (click)="onLogout()" class="p-link layout-topbar-button">
+            <i class="pi pi-power-off"></i>
+            <span>Cerrar sesión</span>
         </button>
+
+        <!-- Toggle Switch -->
+        <label class="toggle-switch flex mt-2 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
+            <input type="checkbox" [checked]="isDarkMode" (change)="toggleTheme()">
+            <span class="slider round">
+              <span class="icon sun">☀️</span>
+              <span class="icon moon">🌙</span>
+            </span>
+        </label>
     </div>
 </div>

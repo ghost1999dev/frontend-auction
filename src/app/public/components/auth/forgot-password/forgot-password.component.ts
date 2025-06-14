@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { LayoutService } from 'src/app/core/services/layout.service';
+import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -7,10 +10,40 @@ import { LayoutService } from 'src/app/core/services/layout.service';
   styleUrls: ['./forgot-password.component.scss']
 })
 export class ForgotPasswordComponent {
-  
-  valCheck: string[] = ['remember'];
+  forgotForm: FormGroup;
+  loading = false;
 
-  password!: string;
+  constructor(
+    private fb: FormBuilder,
+    private userService: UserService,
+    public layoutService: LayoutService,
+    private router: Router
+  ) {
+    this.forgotForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+  }
 
-  constructor(public layoutService: LayoutService) { }
+  onSubmit(): void {
+    if (this.forgotForm.invalid) {
+      return;
+    }
+
+    this.loading = true;
+    const email = this.forgotForm.get('email')?.value;
+
+    this.userService.forgotPassword({ email })
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+          // Navigate to reset password with email as query param
+          this.router.navigate(['/auth/reset-password'], { 
+            queryParams: { email } 
+          });
+        },
+        error: (error) => {
+          this.loading = false;
+        }
+      });
+  }
 }

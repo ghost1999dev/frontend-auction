@@ -55,6 +55,16 @@ export class ConfigComponent {
       this.layoutService.config.ripple = _val;
   }
 
+  toggleTheme(theme: string) {
+    if(theme === 'light'){
+        localStorage.setItem('themePreference', 'light');
+        this.changeTheme('lara-light-indigo', 'light')
+    }else if(theme === 'dark'){
+        localStorage.setItem('themePreference', 'dark');
+        this.changeTheme('bootstrap4-dark-blue', 'dark')
+    }
+  }
+
   onConfigButtonClick() {
       this.layoutService.showConfigSidebar();
   }

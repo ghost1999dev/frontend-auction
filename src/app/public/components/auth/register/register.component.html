@@ -1,82 +1,182 @@
 <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
     <div class="flex flex-column align-items-center justify-content-center">
-        <img [routerLink]="['/auth/login']" src="assets/layout/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0">        
+        <img [routerLink]="['/auth/login']" src="assets/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0">        
         <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%);">
-            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px; height: -webkit-fit-content;max-width: 600px; min-width: 460px;">
                 <div class="text-center mb-5">
-                    <div class="text-900 text-3xl font-medium mb-3">Welcome to Register User</div>
-                    <span class="text-600 font-medium">Select one of the Options</span>
+                    <div class="text-900 text-3xl font-medium mb-3">Bienvenido al Registro</div>
+                    <span class="text-600 font-medium">Seleccione una de las opciones</span>
                 </div>
 
                 <div class="flex justify-content-center gap-5 mb-5">
                     <!-- Card for Developer -->
-                    <p-card class="cursor-pointer" (click)="selectUserType('developer')" [ngClass]="{'selected-card': userType === 'developer'}">
-                        <div class="flex flex-column align-items-center pd-all">
+                    <p-card class="cursor-pointer" 
+                            (click)="selectUserType('developer')" 
+                            [ngClass]="{'selected-card': userType === 'developer', 
+                                    'light-mode': layoutService.config.colorScheme === 'light',
+                                    'dark-mode': layoutService.config.colorScheme === 'dark'}">
+                        <div class="flex flex-column align-items-center">
                             <i class="pi pi-user text-6xl mb-3"></i>
-                            <span class="text-900 text-xl font-medium">Developer</span>
+                            <span class="text-900 text-xl font-medium">Desarrollador</span>
                         </div>
                     </p-card>
 
                     <!-- Card for Company -->
-                    <p-card class="cursor-pointer" (click)="selectUserType('company')" [ngClass]="{'selected-card': userType === 'company'}">
-                        <div class="flex flex-column align-items-center pd-all">
+                    <p-card class="cursor-pointer" 
+                            (click)="selectUserType('company')" 
+                            [ngClass]="{'selected-card': userType === 'company',
+                                    'light-mode': layoutService.config.colorScheme === 'light',
+                                    'dark-mode': layoutService.config.colorScheme === 'dark'}">
+                        <div class="flex flex-column align-items-center">
                             <i class="pi pi-building text-6xl mb-3"></i>
-                            <span class="text-900 text-xl font-medium">Company</span>
+                            <span class="text-900 text-xl font-medium">Compañía</span>
                         </div>
                     </p-card>
                 </div>
 
                 <!-- Developer Form -->
-                <div *ngIf="userType === 'developer'">
-                    <form>
-                        <div class="field">
-                            <label for="devName" class="block text-900 font-medium mb-2">Developer Name</label>
-                            <input id="devName" type="text" pInputText class="w-full mb-3">
+                <div *ngIf="userType === 'developer'" class="form-container">
+                    <form [formGroup]="developerForm" (ngSubmit)="onSubmitDeveloper()">
+                        <label for="name" class="block text-900 text-xl font-medium mb-2">Nombre del desarrollador</label>
+                        <input id="name" type="text" pInputText class="w-full mb-2" 
+                               style="padding:1rem" formControlName="name"
+                               placeholder="Ingrese su nombre completo">
+                        <small class="p-error" *ngIf="developerForm.get('name')?.hasError('required') && (developerForm.get('name')?.touched || submitted)">
+                            Nombre es requerido
+                        </small>
+
+                        <label for="email" class="block text-900 text-xl font-medium mb-2 mt-3">Correo electrónico</label>
+                        <input id="email" type="email" pInputText class="w-full mb-2" 
+                               style="padding:1rem" formControlName="email"
+                               placeholder="ejemplo@correo.com">
+                        <small class="p-error" *ngIf="developerForm.get('email')?.hasError('required') && (developerForm.get('email')?.touched || submitted)">
+                            Email es requerido
+                        </small>
+                        <small class="p-error" *ngIf="developerForm.get('email')?.hasError('email') && (developerForm.get('email')?.touched || submitted)">
+                            Formato de email inválido
+                        </small>
+
+                        <label for="password" class="block text-900 text-xl font-medium mb-2 mt-3">Contraseña</label>
+                        <p-password 
+                            id="password"
+                            formControlName="password"
+                            class="w-full mb-2"
+                            [style]="{'width':'100%'}"
+                            [toggleMask]="false"
+                            [feedback]="false" 
+                            (input)="updatePasswordChecksDev()"
+                            placeholder="Ingrese su contraseña"
+                        ></p-password>
+                        
+                        <!-- Checklist de requisitos -->
+                        <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
+                            <p class="font-medium mb-2">Requisitos:</p>
+                            <ul>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">
+                                    <i [class]="passwordChecks.length ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>Mínimo 6 caracteres</span>
+                                </li>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.upper">
+                                    <i [class]="passwordChecks.upper ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>1 letra mayúscula (A-Z)</span>
+                                </li>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.lower">
+                                    <i [class]="passwordChecks.lower ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>1 letra minúscula (a-z)</span>
+                                </li>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.number">
+                                    <i [class]="passwordChecks.number ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>1 número (0-9)</span>
+                                </li>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.special">
+                                    <i [class]="passwordChecks.special ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>1 carácter especial (!#$%^&*)</span>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="field">
-                            <label for="devEmail" class="block text-900 font-medium mb-2">Email</label>
-                            <input id="devEmail" type="email" pInputText class="w-full mb-3">
-                        </div>
-                        <div class="field">
-                            <label for="devPassword" class="block text-900 font-medium mb-2">Password</label>
-                            <input id="devPassword" type="password" pInputText class="w-full mb-3">
-                        </div>
-                        <div class="field">
-                            <label for="devImage" class="block text-900 font-medium mb-2">Image of Profile</label>
-                            <input id="devImage" type="file" accept="image/*" (change)="onFileSelectProfilePhoto($event)" class="w-full mb-3">
-                        </div>
-                        <button pButton type="submit" label="Register as Developer" class="w-full"></button>
+                        
+                        <small class="p-error" *ngIf="developerForm.get('password')?.hasError('required') && (developerForm.get('password')?.touched || submitted)">
+                            Contraseña es requerida
+                        </small>
+                        <small class="p-error" *ngIf="developerForm.get('password')?.hasError('passwordStrength') && (developerForm.get('password')?.touched || submitted)">
+                            La contraseña no cumple con todos los requisitos
+                        </small>
+
+                        <button pButton pRipple label="Registrarse como desarrollador" class="w-full p-3 text-xl mt-3" 
+                                [disabled]="developerForm.invalid"></button>
                     </form>
                 </div>
-
+                
                 <!-- Company Form -->
-                <div *ngIf="userType === 'company'">
-                    <form>
-                        <div class="field">
-                            <label for="companyUserName" class="block text-900 font-medium mb-2">User Name</label>
-                            <input id="companyUserName" type="text" pInputText class="w-full mb-3">
+                <div *ngIf="userType === 'company'" class="form-container">
+                    <form [formGroup]="companyForm" (ngSubmit)="onSubmitCompany()">
+                        <label for="companyName" class="block text-900 text-xl font-medium mb-2">Nombre de la empresa</label>
+                        <input id="companyName" type="text" pInputText class="w-full mb-2" 
+                               style="padding:1rem" formControlName="name"
+                               placeholder="Ingrese el nombre de la empresa">
+                        <small class="p-error" *ngIf="companyForm.get('name')?.hasError('required') && (companyForm.get('name')?.touched || submitted)">
+                            Nombre de empresa es requerido
+                        </small>
+
+                        <label for="companyEmail" class="block text-900 text-xl font-medium mb-2 mt-3">Correo electrónico</label>
+                        <input id="companyEmail" type="email" pInputText class="w-full mb-2" 
+                               style="padding:1rem" formControlName="email"
+                               placeholder="empresa@correo.com">
+                        <small class="p-error" *ngIf="companyForm.get('email')?.hasError('required') && (companyForm.get('email')?.touched || submitted)">
+                            Email es requerido
+                        </small>
+                        <small class="p-error" *ngIf="companyForm.get('email')?.hasError('email') && (companyForm.get('email')?.touched || submitted)">
+                            Formato de email inválido
+                        </small>
+
+                        <label for="companyPassword" class="block text-900 text-xl font-medium mb-2 mt-3">Contraseña</label>
+                        <p-password 
+                            id="companyPassword"
+                            formControlName="password"
+                            class="w-full mb-2"
+                            [style]="{'width':'100%'}"
+                            [toggleMask]="false"
+                            [feedback]="false" 
+                            (input)="updatePasswordChecksCompany()"
+                            placeholder="Ingrese la contraseña"
+                        ></p-password>
+                        
+                        <!-- Checklist de requisitos -->
+                         <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
+                            <p class="font-medium mb-2">Requisitos:</p>
+                            <ul>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">
+                                    <i [class]="passwordChecks.length ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>Mínimo 6 caracteres</span>
+                                </li>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.upper">
+                                    <i [class]="passwordChecks.upper ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>1 letra mayúscula (A-Z)</span>
+                                </li>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.lower">
+                                    <i [class]="passwordChecks.lower ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>1 letra minúscula (a-z)</span>
+                                </li>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.number">
+                                    <i [class]="passwordChecks.number ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>1 número (0-9)</span>
+                                </li>
+                                <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.special">
+                                    <i [class]="passwordChecks.special ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                    <span>1 carácter especial (!#$%^&*)</span>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="field">
-                            <label for="companyName" class="block text-900 font-medium mb-2">Company Name</label>
-                            <input id="companyName" type="text" pInputText class="w-full mb-3">
-                        </div>
-                        <div class="field">
-                            <label for="companyEmail" class="block text-900 font-medium mb-2">Email</label>
-                            <input id="companyEmail" type="email" pInputText class="w-full mb-3">
-                        </div>
-                        <div class="field">
-                            <label for="companyPassword" class="block text-900 font-medium mb-2">Password</label>
-                            <input id="companyPassword" type="password" pInputText class="w-full mb-3">
-                        </div>
-                        <div class="field">
-                            <label for="companyImage" class="block text-900 font-medium mb-2">Image of profile User</label>
-                            <input id="companyImage" type="file" accept="image/*" (change)="onFileSelectProfilePhotoCompany($event)" class="w-full mb-3">
-                        </div>
-                        <div class="field">
-                            <label for="companyLogo" class="block text-900 font-medium mb-2">Logo of Company</label>
-                            <input id="companyLogo" type="file" accept="image/*" (change)="onFileSelectProfilePhotoLogo($event)" class="w-full mb-3">
-                        </div>
-                        <button pButton type="submit" label="Register as Company" class="w-full"></button>
+                        
+                        <small class="p-error" *ngIf="companyForm.get('password')?.hasError('required') && (companyForm.get('password')?.touched || submitted)">
+                            Contraseña es requerida
+                        </small>
+                        <small class="p-error" *ngIf="companyForm.get('password')?.hasError('passwordStrength') && (companyForm.get('password')?.touched || submitted)">
+                            La contraseña no cumple con todos los requisitos
+                        </small>
+
+                        <button pButton pRipple label="Registrarse como empresa" class="w-full p-3 text-xl mt-3" 
+                                [disabled]="companyForm.invalid"></button>
                     </form>
                 </div>
             </div>

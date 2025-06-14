@@ -1,0 +1,514 @@
+:host {
+    display: block;
+    background-color: var(--surface-card);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+  }
+  
+  h2 {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+  }
+  
+  .field {
+    margin-bottom: 1.5rem;
+  
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-color-secondary);
+    }
+  }
+
+
+.form-group {
+  margin-bottom: 1rem; 
+}
+
+.form-inline {
+display: -webkit-box;
+display: -ms-flexbox;
+display: flex;
+-webkit-box-orient: horizontal;
+-webkit-box-direction: normal;
+-ms-flex-flow: row wrap;
+flex-flow: row wrap;
+-webkit-box-align: center;
+-ms-flex-align: center;
+align-items: center;
+.form-check {
+  width: 100%;
+}
+}
+
+ngx-dropzone, 
+.custom-dropzone {
+margin: 20px;
+}
+
+.custom-dropzone {
+height: 250px;
+background: #eff0f7;
+color: #136;
+border: 2px dashed #1363b3;
+border-radius: 5px;
+font-size: 20px;
+}
+
+#_font-family{
+font-family: 'Public Sans';
+}
+
+.custom-dropzone.ngx-dz-hovered {
+border: 3px solid #1363b3;
+}
+
+._angular-editor ::ng-deep .angular-editor .angular-editor-wrapper .angular-editor-textarea{
+min-height: 5rem !important;
+padding: 0.5rem 0.8rem 1rem;
+background-color: transparent;
+overflow-x: hidden;
+overflow-y: auto;
+position: relative;
+height: 9rem !important;
+}
+
+
+
+#_lottie-player{
+margin-top:-30px;
+width: 250px; 
+height: 250px;
+}
+
+#_position-span{
+color:#fff;
+}
+
+#_title-header{
+color:#334D6E;
+}
+
+#_btn-back{
+margin-left: 20px; 
+background-color: #fff;
+border: solid 1px #1263b3;
+}
+
+
+.invalid-feedback {
+display: none;
+width: 100%;
+margin-top: 0.25rem;
+font-size: 80%;
+color: #dc3545; 
+}
+
+
+.was-validated {
+.form-control {
+  &:invalid {
+    ~ {
+      .invalid-feedback {
+        display: block;
+      }
+      .invalid-tooltip {
+        display: block;
+      }
+    }
+  }
+}
+}
+.form-control.is-invalid {
+~ {
+  .invalid-feedback {
+    display: block;
+  }
+  .invalid-tooltip {
+    display: block;
+  }
+}
+}
+
+.was-validated {
+.custom-select {
+  &:invalid {
+    ~ {
+      .invalid-feedback {
+        display: block;
+      }
+      .invalid-tooltip {
+        display: block;
+      }
+    }
+  }
+}
+.form-control-file {
+  &:invalid {
+    ~ {
+      .invalid-feedback {
+        display: block;
+      }
+      .invalid-tooltip {
+        display: block;
+      }
+    }
+  }
+}
+}
+.custom-select.is-invalid {
+~ {
+  .invalid-feedback {
+    display: block;
+  }
+  .invalid-tooltip {
+    display: block;
+  }
+}
+}
+.form-control-file.is-invalid {
+~ {
+  .invalid-feedback {
+    display: block;
+  }
+  .invalid-tooltip {
+    display: block;
+  }
+}
+}
+
+
+.was-validated {
+.form-check-input {
+  &:invalid {
+    ~ {
+      .invalid-feedback {
+        display: block;
+      }
+      .invalid-tooltip {
+        display: block;
+      }
+    }
+  }
+}
+}
+.form-check-input.is-invalid {
+~ {
+  .invalid-feedback {
+    display: block;
+  }
+  .invalid-tooltip {
+    display: block;
+  }
+}
+}
+
+.was-validated {
+.custom-control-input {
+  &:invalid {
+    ~ {
+      .invalid-feedback {
+        display: block;
+      }
+      .invalid-tooltip {
+        display: block;
+      }
+    }
+  }
+}
+}
+.custom-control-input.is-invalid {
+~ {
+  .invalid-feedback {
+    display: block;
+  }
+  .invalid-tooltip {
+    display: block;
+  }
+}
+}
+
+
+.was-validated {
+.custom-file-input {
+  &:invalid {
+    ~ {
+      .invalid-feedback {
+        display: block;
+      }
+      .invalid-tooltip {
+        display: block;
+      }
+    }
+  }
+}
+}
+.custom-file-input.is-invalid {
+~ {
+  .invalid-feedback {
+    display: block;
+  }
+  .invalid-tooltip {
+    display: block;
+  }
+}
+}
+
+
+
+
+
+@media (min-width: 576px) {
+.form-inline {
+  label {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+  .form-group {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: row wrap;
+    flex-flow: row wrap;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin-bottom: 0;
+  }
+  .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+  }
+  .form-control-plaintext {
+    display: inline-block;
+  }
+  .input-group {
+    width: auto;
+  }
+  .custom-select {
+    width: auto;
+  }
+  .form-check {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: auto;
+    padding-left: 0;
+  }
+  .form-check-input {
+    position: relative;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    margin-top: 0;
+    margin-right: 0.25rem;
+    margin-left: 0;
+  }
+  .custom-control {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+  .custom-control-label {
+    margin-bottom: 0;
+  }
+}
+}
+
+
+
+@media (max-width: 991.98px) {
+.img {
+  width: 100%;
+}
+.login-wrap {
+  width: 100%;
+}
+}
+@media (max-width: 767.98px) {
+.wrap {
+  .img {
+    height: 160px;
+  }
+}
+}
+
+@media (min-width: 768px) {
+.d-md-none {
+  display: none !important;
+}
+.d-md-inline {
+  display: inline !important;
+}
+.d-md-inline-block {
+  display: inline-block !important;
+}
+.d-md-block {
+  display: block !important;
+}
+.d-md-table {
+  display: table !important;
+}
+.d-md-table-row {
+  display: table-row !important;
+}
+.d-md-table-cell {
+  display: table-cell !important;
+}
+.d-md-flex {
+  display: -webkit-box !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
+}
+.d-md-inline-flex {
+  display: -webkit-inline-box !important;
+  display: -ms-inline-flexbox !important;
+  display: inline-flex !important;
+}
+}
+
+
+/* Tema claro */
+.editor-light-theme {
+  .angular-editor {
+    background-color: #ffffff;
+    color: #212529;
+    
+    .angular-editor-toolbar {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      
+      .angular-editor-toolbar-set {
+        button {
+          color: #495057;
+          
+          &:hover {
+            background: #e9ecef;
+          }
+        }
+      }
+    }
+    
+    .angular-editor-textarea {
+      background: #fff;
+      border: 1px solid #ced4da;
+      color: #212529;
+    }
+  }
+}
+
+/* Tema oscuro */
+.editor-dark-theme {
+  .angular-editor {
+    background-color: #2d3035;
+    color: #e9ecef;
+    
+    .angular-editor-toolbar {
+      background: #343a40;
+      border: 1px solid #495057;
+      
+      .angular-editor-toolbar-set {
+        button {
+          color: #f8f9fa;
+          
+          &:hover {
+            background: #495057;
+          }
+        }
+      }
+    }
+    
+    .angular-editor-textarea {
+      background: #2d3035;
+      border: 1px solid #495057;
+      color: #e9ecef;
+    }
+  }
+}
+
+/* Estilos para los iconos SVG */
+.ql-toolbar {
+  .ql-stroke {
+    stroke: currentColor !important;
+  }
+  
+  .ql-fill {
+    fill: currentColor !important;
+  }
+  
+  .ql-picker-label {
+    color: currentColor;
+  }
+}
+
+::ng-deep angular-editor .angular-editor-toolbar {
+  button {
+    color: #000 !important;
+  }
+  border-radius: 5px !important;
+}
+
+::ng-deep .p-inputtext{
+  width: -webkit-fill-available !important;
+}
+
+/* PDF Viewer styling */
+pdf-viewer {
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Estilos para el dropdown de categoría */
+.category-dropdown {
+  width: -webkit-fill-available !important;
+  width: -moz-available !important;
+  width: stretch !important;
+  
+  ::ng-deep .p-dropdown {
+      width: 100% !important;
+  }
+}
+
+/* Para mantener consistencia con otros inputs */
+::ng-deep .p-inputtext {
+  width: -webkit-fill-available !important;
+  width: -moz-available !important;
+  width: stretch !important;
+}
+
+/* Terms checkbox styling */
+.terms-checkbox {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.angular-editor .fa {
+  font-family: 'Font Awesome 6 Free' !important;
+}

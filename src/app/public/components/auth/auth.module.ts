@@ -7,14 +7,20 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PasswordModule } from 'primeng/password';
 import { InputTextModule } from 'primeng/inputtext';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FileUploadModule } from 'primeng/fileupload';
-
+import { ActivateAccountComponent } from './activate-account/activate-account.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { PassportComponent } from './passport/passport.component';
+import { InputMaskModule } from 'primeng/inputmask';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { ChipsModule } from 'primeng/chips';
+import { TagModule } from 'primeng/tag';
 const routes: Routes = [
   {
     path: '',
@@ -34,8 +40,20 @@ const routes: Routes = [
         component: RegisterComponent
       },
       {
+        path: 'passport',
+        component: PassportComponent
+      },
+      {
         path: 'forgot-password',
         component: ForgotPasswordComponent
+      },
+      {
+        path: 'activate-account',
+        component: ActivateAccountComponent
+      },
+      {
+        path: 'reset-password',
+        component: ResetPasswordComponent
       }
     ]
   },
@@ -46,7 +64,10 @@ const routes: Routes = [
     AuthComponent,
     LoginComponent,
     RegisterComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    ActivateAccountComponent,
+    ResetPasswordComponent,
+    PassportComponent,
   ],
   imports: [
     CommonModule,
@@ -55,16 +76,23 @@ const routes: Routes = [
     ButtonModule,
     CheckboxModule,
     InputTextModule,
-    FormsModule,
     PasswordModule,
 
     RadioButtonModule,
     FileUploadModule,
     
+    ReactiveFormsModule,
+    FormsModule,
+    InputMaskModule,
+    InputTextareaModule,
+
+    ChipsModule,
+    TagModule,
+
     RouterModule.forChild(routes)
   ],
   providers: [
-    OutletContext
+  
   ],
 })
 export class AuthModule { }

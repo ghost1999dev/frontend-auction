@@ -11,7 +11,6 @@ import { TopbarComponent } from 'src/app/shared/topbar/topbar.component';
 })
 export class PagesComponent implements OnDestroy {
 
-
     overlayMenuOpenSubscription: Subscription;
 
     menuOutsideClickListener: any;

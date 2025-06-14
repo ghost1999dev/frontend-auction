@@ -1,1 +1,37 @@
-<p>users works!</p>
+<!-- user-list.component.html -->
+<div class="user-list-container">
+  <h2 class="title">Welcome to Users of API REST </h2>
+  
+  <div class="user-grid">
+    <div *ngFor="let user of users" class="user-card">
+      <div class="user-header">
+        <img alt="User image" class="user-image">
+        <div class="user-info">
+          <h3 class="user-name">{{ user.name }}</h3>
+          <span class="user-email">{{ user.email }}</span>
+        </div>
+      </div>
+      
+      <div class="user-details">
+        <div class="detail-item">
+          <span class="detail-label">Role:</span>
+          <span>{{ user.role_id }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status:</span>
+          <span>
+            {{ user.status }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Created:</span>
+          <span>{{user.last_login}}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Updated:</span>
+          <span>{{ user.updatedAt }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

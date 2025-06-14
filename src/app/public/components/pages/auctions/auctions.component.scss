@@ -1,0 +1,270 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+/* Estilos generales para ambas vistas (empresa y desarrollador) */
+.card {
+  background-color: var(--surface-card);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+
+  h1, h2 {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Estilos específicos para la vista de empresa */
+.flex.justify-content-between {
+  margin-bottom: 1.5rem;
+
+  .warning-text {
+    color: var(--red-500);
+    font-size: 0.875rem;
+    align-self: center;
+  }
+
+  .p-button-success {
+    background-color: var(--green-500);
+    border-color: var(--green-500);
+
+    &:hover {
+      background-color: var(--green-600);
+      border-color: var(--green-600);
+    }
+  }
+}
+
+/* Estilos para la tabla de proyectos */
+::ng-deep .p-table {
+  .p-datatable {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .p-datatable-thead > tr > th {
+      background-color: var(--surface-100);
+      color: var(--text-color);
+      font-weight: 600;
+      border: none;
+    }
+
+    .p-datatable-tbody > tr {
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: var(--surface-50);
+      }
+
+      td {
+        border: none;
+        border-bottom: 1px solid var(--surface-200);
+      }
+    }
+  }
+
+  .project-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    &.status-active {
+      background-color: var(--green-100);
+      color: var(--green-800);
+    }
+
+    &.status-inactive {
+      background-color: var(--red-100);
+      color: var(--red-800);
+    }
+  }
+
+  .p-button {
+    &.p-button-success {
+      background-color: var(--green-500);
+      border-color: var(--green-500);
+    }
+
+    &.p-button-warning {
+      background-color: var(--orange-500);
+      border-color: var(--orange-500);
+    }
+
+    &.p-button-info {
+      background-color: var(--blue-500);
+      border-color: var(--blue-500);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+}
+
+/* Estilos específicos para la vista de desarrollador */
+#projects {
+  .p-inputgroup {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+
+    .p-inputgroup-addon {
+      background-color: var(--surface-100);
+      border: none;
+    }
+
+    input {
+      border: none;
+      background-color: var(--surface-card);
+    }
+
+    .p-button {
+      border-left: 1px solid var(--surface-200);
+    }
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .project-card {
+    background-color: var(--surface-card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid var(--surface-border);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary-color);
+    }
+
+    .category-badge {
+      font-size: 0.75rem;
+      color: var(--text-color-secondary);
+    }
+
+    .budget-badge {
+      background-color: var(--blue-100);
+      color: var(--blue-800);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    h3 {
+      color: var(--text-color);
+      margin: 1rem 0;
+      flex-grow: 1;
+    }
+
+    .project-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+
+      .company {
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .project-footer {
+      border-top: 1px solid var(--surface-border);
+      padding-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .days-remaining {
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+      }
+
+      .p-button-text {
+        color: var(--primary-color);
+
+        &:hover {
+          background-color: var(--primary-color);
+          color: white;
+        }
+      }
+
+      .max-projects-warning {
+        color: var(--red-500);
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-color-secondary);
+  }
+}
+
+/* Estilos para los diálogos */
+::ng-deep .p-dialog {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+  .p-dialog-header {
+    background-color: var(--surface-card);
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .p-dialog-content {
+    background-color: var(--surface-card);
+    padding: 1.5rem;
+  }
+
+  .p-dialog-footer {
+    background-color: var(--surface-card);
+    border-top: 1px solid var(--surface-border);
+    padding: 1rem 1.5rem;
+  }
+
+  .p-button-text {
+    &:hover {
+      background-color: var(--surface-hover);
+    }
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.project-card {
+  animation: fadeIn 0.5s ease forwards;
+  opacity: 0;
+
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) {
+      animation-delay: $i * 0.1s;
+    }
+  }
+}
