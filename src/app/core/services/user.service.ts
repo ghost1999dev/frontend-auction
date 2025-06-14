@@ -13,9 +13,6 @@ import { CompaniesService } from './companies.service';
 })
 export class UserService {
 
-  private usersCache: Observable<usersWithImage[]> | null = null;
-  private userCache = new Map<any, Observable<usersWithImage[]>>();
-
   constructor(
     private http: HttpClient,  
     private developerService: DeveloperService,
@@ -25,35 +22,19 @@ export class UserService {
   ) { }
 
   getUsers(): Observable<usersWithImage[]> {
-    if (!this.usersCache) {
-      this.usersCache = this.http.get<userResponse>(`${environment.server_url}users/show/all`).pipe(
+    return this.http.get<userResponse>(`${environment.server_url}users/show/all`).pipe(
         map(response => response.usersWithImage),
         shareReplay(1)
       );
-    }
-    return this.usersCache;
   }
 
   getUsersById(id: any): Observable<usersWithImage[]> {
-    if (!this.userCache.has(id)) {
-      const user$: any = this.http.get<userResponseById>(`${environment.server_url}users/show/${id}`).pipe(
+    return this.http.get<userResponseById>(`${environment.server_url}users/show/${id}`).pipe(
         map(response => response.user),
         shareReplay(1)
       );
-      this.userCache.set(id, user$);
-    }
-    return this.userCache.get(id)!;
   }
-
-  clearCache(): void {
-    this.usersCache = null;
-    this.userCache.clear();
-  }
-
-  clearUserCache(id: any): void {
-    this.userCache.delete(id);
-  }
-
+  
   createUsers(data: addUser) : Observable<addUserResponse | void>{
     return this.http.post<addUserResponse>(`${environment.server_url}users/create`, data)
     .pipe(

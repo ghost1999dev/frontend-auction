@@ -65,10 +65,6 @@ export class AddEditProjectComponent implements OnInit {
     this.categoryService.getAllCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
-      },
-      error: (error) => {
-        this.notificationServices.showErrorCustom('No se pudo cargar categorías');
-        console.error('No se pudo cargar categorías:', error);
       }
     });
   }
@@ -152,7 +148,6 @@ export class AddEditProjectComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.notificationServices.showErrorCustom('No se pudo cargar proyectos')
         this.loading = false;
       }
     });
@@ -191,7 +186,6 @@ export class AddEditProjectComponent implements OnInit {
             this.loading = false;
           },
           error: () => {
-            this.notificationServices.showErrorCustom('No se pudo actualizar el proyecto')
             this.loading = false;
           }
         });
@@ -217,7 +211,6 @@ export class AddEditProjectComponent implements OnInit {
                 this.loading = false;
             },
             error: () => {
-                this.notificationServices.showErrorCustom('No se pudo volver a publicar el proyecto');
                 this.loading = false;
             }
         });
@@ -230,7 +223,6 @@ export class AddEditProjectComponent implements OnInit {
               this.loading = false;
             },
             error: () => {
-              this.notificationServices.showErrorCustom('No se pudo crear el proyecto')
               this.loading = false;
             }
           });      

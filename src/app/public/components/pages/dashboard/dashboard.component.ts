@@ -372,13 +372,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           if(next){
             this.displayAlert = false;
             this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.")
-          }else{
-            this.notificationServices.showErrorCustom("Error a crear desarrollador.")
           }
         })
-      },
-      error: (err: any) => {
-        //this.notificationServices.showErrorCustom("Error verifying your account")
       }
     });
   
@@ -418,13 +413,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           if(next){
             this.displayAlert = false;
             this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.")
-          }else{
-            //this.notificationServices.showErrorCustom("Error Creating Developer.")
           }
         })
-      },
-      error: (err: any) => {
-        //this.notificationServices.showErrorCustom("Error verifying your account")
       }
     });
 

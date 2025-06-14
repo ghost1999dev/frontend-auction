@@ -80,8 +80,7 @@ export class AuctionsComponent implements OnInit, OnDestroy {
           this.loadDeveloperData(user.id);
         }
       },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar datos del usuario');
+      error: () => {
         this.loading = false;
       }
     });
@@ -95,8 +94,7 @@ export class AuctionsComponent implements OnInit, OnDestroy {
         this.company = company;
         this.loadCompanyProjectsAndAuctions(company.id);
       },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar datos de la empresa');
+      error: () => {
         this.loading = false;
       }
     });
@@ -116,8 +114,7 @@ export class AuctionsComponent implements OnInit, OnDestroy {
         );
         this.loading = false;
       },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar proyectos y subastas');
+      error: () => {
         this.loading = false;
       }
     });
@@ -129,8 +126,7 @@ export class AuctionsComponent implements OnInit, OnDestroy {
         this.developer = developer;
         this.loadActiveAuctions();
       },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar datos del desarrollador');
+      error: () => {
         this.loading = false;
       }
     });
@@ -146,8 +142,7 @@ export class AuctionsComponent implements OnInit, OnDestroy {
         this.filteredActiveAuctions = [...this.auctions];
         this.loading = false;
       },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar subastas activas');
+      error: () => {
         this.loading = false;
       }
     });
@@ -213,9 +208,6 @@ export class AuctionsComponent implements OnInit, OnDestroy {
         this.notificationService.showSuccessCustom('Subasta eliminada exitosamente');
         this.loadInitialData();
         this.auction = {} as Auction;
-      },
-      error: (err) => {
-        this.notificationService.showErrorCustom(err.error?.message || 'Error al eliminar la subasta');
       }
     });
     
@@ -239,9 +231,6 @@ export class AuctionsComponent implements OnInit, OnDestroy {
         this.notificationService.showSuccessCustom(`${this.selectedAuctions.length} subastas eliminadas`);
         this.loadInitialData();
         this.selectedAuctions = [];
-      },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al eliminar algunas subastas');
       }
     });
   }

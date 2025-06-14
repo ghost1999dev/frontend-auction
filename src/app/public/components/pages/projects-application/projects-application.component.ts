@@ -141,9 +141,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
           } else if (user.role_id === 2) { // Developer
             this.loadDeveloperData(user.id);
           }
-        },
-        error: (err: any) => {
-          this.notificationService.showErrorCustom('Error al cargar datos del usuario'+err.message);
         }
       })
     );
@@ -158,9 +155,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
         next: (company) => {
           this.company = company;
           this.loadProjectsAndApplications(company.id);
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar datos de la empresa'+err.message);
         }
       })
     );
@@ -177,9 +171,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
           if (developer) {
             this.loadApplications(Number(developer.id));
           }
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar datos del desarrollador'+err.message);
         }
       })
     );
@@ -208,9 +199,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
             this.projects.some(project => project.id === app.project_id)
           );
           this.filteredApplications = [...this.applications];
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar proyectos y aplicaciones'+ err.message);
         }
       })
     );
@@ -225,9 +213,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
         next: (apps) => {
           this.applications = apps;
           this.filteredApplications = [...this.applications];
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar aplicaciones'+ err.message);
         }
       })
     );
@@ -259,9 +244,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
           console.log(this.developerRatings)
 
           this.updateChartData();
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar los ratings del desarrollador'+err.message);
         }
       })
     );
@@ -386,8 +368,7 @@ private updateChartData(): void {
             project.long_description || project.full_description || 'No hay descripción disponible'
           );
         },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar los detalles del proyecto'+err.message);
+        error: () => {
           this.displayProjectDialog = false;
         }
       })
@@ -411,9 +392,6 @@ private updateChartData(): void {
           this.notificationService.showSuccessCustom('Aplicación retirada correctamente');
           this.loadApplications(Number(this.developer.id));
           this.displayWithdrawDialog = false;
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al retirar la aplicación'+err.message);
         }
       })
     );

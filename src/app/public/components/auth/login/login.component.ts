@@ -42,9 +42,6 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/main/dashboard']);
         this.notificationServices.showSuccessCustom('Bienvenido a CodeBid');
       }
-    },
-    (err: any) => {
-      this.notificationServices.showErrorCustom('Nombre de usuario o contraseña incorrectos');
     })
 
   }

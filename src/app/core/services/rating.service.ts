@@ -26,8 +26,6 @@ import { HandlerErrorService } from './handler-error.service';
   providedIn: 'root'
 })
 export class RatingService {
-  private ratingsCache: Observable<Rating[]> | null = null;
-  private ratingCache = new Map<number, Observable<Rating>>();
 
   constructor(
     private http: HttpClient,
@@ -35,17 +33,6 @@ export class RatingService {
     private HandlerErrorSrv: HandlerErrorService,
   ) { }
 
-  // Cache management
-  clearCache(): void {
-    this.ratingsCache = null;
-    this.ratingCache.clear();
-  }
-
-  clearRatingCache(id: number): void {
-    this.ratingCache.delete(id);
-  }
-
-  // Rating CRUD Operations
   getAllRatings(params?: FilterRatingsParams): Observable<RatingResponse> {
     return this.http.get<RatingResponse>(`${environment.server_url}ratings/show/all`, { params: { ...params } }).pipe(
       catchError((err) => this.HandlerErrorSrv.handlerError(err))
@@ -53,21 +40,16 @@ export class RatingService {
   }
 
   getRatingById(id: number): Observable<Rating> {
-    if (!this.ratingCache.has(id)) {
-      const rating$ = this.http.get<RatingResponseById>(`${environment.server_url}ratings/show/${id}`).pipe(
+    return this.http.get<RatingResponseById>(`${environment.server_url}ratings/show/${id}`).pipe(
         map(response => response.rating),
         shareReplay(1),
         catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
-      this.ratingCache.set(id, rating$);
-    }
-    return this.ratingCache.get(id)!;
   }
 
   createRating(ratingData: CreateRatingRequest): Observable<Rating> {
     return this.http.post<RatingResponseById>(`${environment.server_url}ratings/create`, ratingData).pipe(
       map(response => {
-        this.clearCache();
         return response.rating;
       }),
       catchError((err) => this.HandlerErrorSrv.handlerError(err))
@@ -77,8 +59,6 @@ export class RatingService {
   updateRating(id: number, ratingData: UpdateRatingRequest): Observable<Rating> {
     return this.http.put<RatingResponseById>(`${environment.server_url}ratings/update/${id}`, ratingData).pipe(
       map(response => {
-        this.clearRatingCache(id);
-        this.clearCache();
         return response.rating;
       }),
       catchError((err) => this.HandlerErrorSrv.handlerError(err))
@@ -88,8 +68,6 @@ export class RatingService {
   deleteRating(id: number): Observable<any> {
     return this.http.delete(`${environment.server_url}ratings/delete/${id}`).pipe(
       map(response => {
-        this.clearCache();
-        this.clearRatingCache(id);
         return response;
       }),
       catchError((err) => this.HandlerErrorSrv.handlerError(err))

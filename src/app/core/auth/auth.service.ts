@@ -67,9 +67,6 @@ export class AuthService {
     localStorage.removeItem('login-token');
     localStorage.removeItem('isLoggedin');
     localStorage.removeItem('lenght_projects');
-    this.userService.clearCache()
-    this.developerService.clearDevelopersCache()
-    this.companiesService.clearCompaniesCache()
 
     this.loggedIn.next(false);
     this.router.navigate(['auth/login']);
@@ -92,37 +89,4 @@ export class AuthService {
   IsLoggedIn() {
     return !!localStorage.getItem('login-token');
   }
-
-  public handlerError(err: { error?: any, message?: any, status?: number }): Observable<never> {
-    if (!err) {
-      return throwError('Error desconocido');
-    }
-  
-    switch (err.error.status) {
-      case 400:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 401:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 404:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 429:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      case 500:
-        this.notificationServices.showErrorCustom(err.error.message);
-        break;
-      default:
-        this.notificationServices.showErrorCustom(err.message .message);
-    }
-
-    for (let i = 0; i < err.error.details.length; i++) {
-      this.notificationServices.showErrorCustom(err.error.details[i])
-    }
-  
-    return throwError(err);
-  }
-
 }

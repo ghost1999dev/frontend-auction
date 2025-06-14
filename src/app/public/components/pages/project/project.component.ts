@@ -8,6 +8,7 @@ import { NotificationService } from 'src/app/core/services/notification.service'
 import { ProjectApplicationsService } from 'src/app/core/services/project-applications.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { UserService } from 'src/app/core/services/user.service';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-project',
@@ -100,7 +101,6 @@ showApplyDialog(project: any): void {
     this.applyDialogVisible = true;
 }
 
-// Añade este método para confirmar la aplicación
 confirmApply(): void {
     if (!this.selectedProject || !this.developer) return;
 
@@ -115,7 +115,32 @@ confirmApply(): void {
         next: () => {
             this.notificationServices.showSuccessCustom('Has aplicado al proyecto correctamente');
             this.applyDialogVisible = false;
-            this.selectedProject = null;
+            
+            // 1. Actualizar las aplicaciones primero
+            this.projectApplicationsService.getApplicationsByDeveloper(this.developer.id)
+                .subscribe({
+                    next: (apps) => {
+                        this.applications = apps;
+                        
+                        // 2. Volver a cargar todos los proyectos
+                        this.projectsService.getAllProjects()
+                            .subscribe({
+                                next: (projects) => {
+                                    this.projects = projects.filter(p => p.status === 1);
+                                    
+                                    // 3. Aplicar filtros nuevamente
+                                    this.filterProjects();
+                                    this.selectedProject = null;
+                                },
+                                error: (err) => {
+                                    console.error('Error loading projects:', err);
+                                }
+                            });
+                    },
+                    error: (err) => {
+                        console.error('Error loading applications:', err);
+                    }
+                });
         },
         error: (err) => {
             this.notificationServices.showErrorCustom('Error al aplicar al proyecto');
@@ -136,40 +161,34 @@ loadApplications(id: number): void {
   });
 }
 
-  // project.component.ts
-// project.component.ts
 filterProjects() {
-  if (!this.projects || !this.applications) return;
+    if (!this.projects || !this.applications) return;
 
-  this.filteredProjects = this.projects.filter(project => {
-    // Verificar si el desarrollador ya aplicó a este proyecto
-    const alreadyApplied = this.applications.some(app => 
-      app.project_id === project.id
-    );
+    console.log('Filtering projects...'); // Debug
+    console.log('Current applications:', this.applications); // Debug
 
-    // Search term filter
-    const matchesSearch = !this.searchTerm || 
-      project.project_name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      project.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      (project.company?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-      (project.category?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()));
-    
-    // Status filter (mostrar solo activos para desarrolladores)
-    const matchesStatus = this.developer ? project.status === 1 : 
-                         (this.selectedStatus === null || project.status === this.selectedStatus);
-    
-    // Para desarrolladores: no mostrar proyectos ya aplicados
-    const shouldShow = this.developer ? !alreadyApplied : true;
-    
-    return matchesSearch && matchesStatus && shouldShow;
-  });
+    this.filteredProjects = this.projects.filter(project => {
+        const alreadyApplied = this.applications.some(app => app.project_id === project.id);
+        
+        const matchesSearch = !this.searchTerm || 
+            project.project_name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+            project.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+            (project.company?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+            (project.category?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()));
+        
+        const matchesStatus = this.developer ? project.status === 1 : 
+                            (this.selectedStatus === null || project.status === this.selectedStatus);
+        
+        const shouldShow = this.developer ? !alreadyApplied : true;
+        
+        return matchesSearch && matchesStatus && shouldShow;
+    });
 
-  // Sorting
-  this.sortProjects();
-  
-  // Reset pagination
-  this.page = 1;
-  this.first = 0;
+    console.log('Filtered projects:', this.filteredProjects); // Debug
+    
+    this.sortProjects();
+    this.page = 1;
+    this.first = 0;
 }
 
 loadDeveloper(id: number): void {
@@ -216,9 +235,6 @@ loadDeveloper(id: number): void {
     .subscribe({
       next: (data: any) => {
         this.projects = data;
-      },
-      error: (error) => {
-        this.notificationServices.showErrorCustom('No se pudo cargar proyectos')
       }
     });
   }
@@ -230,21 +246,21 @@ loadDeveloper(id: number): void {
   }
 
 loadAllProjects(): void {
-  this.projectsService.getAllProjects()
-  .subscribe({
-    next: (data) => {
-      // Solo mantener proyectos activos para desarrolladores
-      this.projects = this.developer 
-        ? data.filter(project => project.status === 1)
-        : data;
-      
-      // Aplicar filtros después de cargar
-      this.filterProjects();
-    },
-    error: (error) => {
-      this.notificationServices.showErrorCustom('No se pudo cargar proyectos');
-    }
-  });
+    this.projectsService.getAllProjects()
+    .subscribe({
+        next: (data) => {
+            // Solo mantener proyectos activos para desarrolladores
+            this.projects = this.developer 
+                ? data.filter(project => project.status === 1)
+                : data;
+            
+            // Aplicar filtros después de cargar
+            this.filterProjects();
+        },
+        error: (error) => {
+            this.notificationServices.showErrorCustom('No se pudo cargar proyectos');
+        }
+    });
 }
 
 // project.component.ts
@@ -294,9 +310,6 @@ hasApplied(projectId: number): boolean {
         this.loadProjects(this.company.id);
         this.deleteProjectDialog = false;
         this.project = {} as Project;
-      },
-      error: (error) => {
-        this.notificationServices.showErrorCustom('No se pudo desactivar el proyecto')
       }
     });
   }
@@ -328,9 +341,6 @@ hasApplied(projectId: number): boolean {
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
-          },
-          error: (error) => {
-            this.notificationServices.showErrorCustom('No se pudo actualizar el proyecto')
           }
         });
       } else {
@@ -380,9 +390,6 @@ hasApplied(projectId: number): boolean {
         this.notificationServices.showSuccessCustom(`${this.selectedProjects.length} proyectos desactivados`)
         this.loadProjects(this.company.id);
         this.selectedProjects = [];
-      },
-      error: (error: any) => {
-        this.notificationServices.showErrorCustom('No se pudo desactivar algunos proyectos')
       }
     });
   }

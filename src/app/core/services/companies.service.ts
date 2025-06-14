@@ -11,24 +11,18 @@ import { NotificationService } from './notification.service';
 })
 export class CompaniesService {
 
-  private companiesCache: Observable<companies[]> | null = null;
-
   constructor(
     private http: HttpClient, 
-    private notificationServices: NotificationService,
     private HandlerErrorSrv: HandlerErrorService
   ) { }
 
   getAllCompanies(): Observable<companies[]> {
-    if (!this.companiesCache) {
-      this.companiesCache = this.http.get<getCompaniesResponse>(
+    return this.http.get<getCompaniesResponse>(
         `${environment.server_url}companies/show/all`
       ).pipe(
         map(response => response.companies),
-        shareReplay(1) // Cache the response and replay to future subscribers
+        shareReplay(1) 
       );
-    }
-    return this.companiesCache;
   }
 
   getCompanyByUserId(userId: number): Observable<CompanyWithRelations> {
@@ -44,17 +38,6 @@ export class CompaniesService {
         map(response => response.company),
         catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
-  }
-
-  // Optional: Method to clear cache when needed
-  clearCompaniesCache(): void {
-    this.companiesCache = null;
-  }
-
-  // Optional: Method to force refresh (clear cache and fetch new data)
-  refreshCompanies(): Observable<companies[]> {
-    this.clearCompaniesCache();
-    return this.getAllCompanies();
   }
 
   createCompanies(data: addCompanies) : Observable<addCompaniesRes | void>{

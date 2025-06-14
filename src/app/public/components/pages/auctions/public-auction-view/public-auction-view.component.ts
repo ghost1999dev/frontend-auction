@@ -49,8 +49,7 @@ export class PublicAuctionViewComponent implements OnInit, OnDestroy {
         this.startTimer();
         this.loading = false;
       },
-      error: (error) => {
-        this.notificationService.showErrorCustom('Error al cargar la subasta');
+      error: () => {
         this.loading = false;
         this.router.navigate(['/auctions']);
       }

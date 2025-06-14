@@ -36,7 +36,6 @@ export class FavoritesComponent implements OnInit {
       const savedApps = JSON.parse(localStorage.getItem('savedApplications') || '[]');
       this.savedApplications = savedApps;
     } catch (error) {
-      this.notificationService.showErrorCustom('Error al cargar aplicaciones guardadas');
       console.error('Error loading saved applications:', error);
     } finally {
       this.loading = false;
@@ -51,7 +50,6 @@ export class FavoritesComponent implements OnInit {
       this.savedApplications = updatedApps;
       this.notificationService.showSuccessCustom('Aplicación eliminada de favoritos');
     } catch (error) {
-      this.notificationService.showErrorCustom('Error al eliminar de favoritos');
       console.error('Error removing from favorites:', error);
     }
   }
@@ -70,8 +68,7 @@ export class FavoritesComponent implements OnInit {
         );
         this.loadingProject = false;
       },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar los detalles del proyecto');
+      error: () => {
         this.displayProjectDialog = false;
         this.loadingProject = false;
       }

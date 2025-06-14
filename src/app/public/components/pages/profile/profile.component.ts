@@ -362,7 +362,6 @@ export class ProfileComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error uploading image:', error);
-        this.notificationServices.showErrorCustom('La imagen no se pudo cargar. Por favor intente de nuevo.');
       },
       complete: () => {
         this.uploadingImage = false;
@@ -452,9 +451,8 @@ export class ProfileComponent implements OnInit {
                   this.userDialog = false;
                   this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.");
                 },
-                error: (err) => {
+                error: () => {
                   this.loading = false;
-                  this.notificationServices.showErrorCustom("");
                 }
               });
             }
@@ -467,9 +465,8 @@ export class ProfileComponent implements OnInit {
                   this.userDialog = false;
                   this.notificationServices.showSuccessCustom("Congratulations! Your account has been successfully updated.");              
                 },
-                error: (err) => {
+                error: () => {
                   this.loading = false;
-                  this.notificationServices.showErrorCustom("¡Error! Su cuenta no ha sido actualizada.");
                 }
               });
             }
@@ -497,7 +494,6 @@ export class ProfileComponent implements OnInit {
           error: (err) => {
             console.error('Error updating password:', err);
             this.loading = false;
-            this.notificationServices.showErrorCustom("La contraseña actual es incorrecta")
           }
         });
     }

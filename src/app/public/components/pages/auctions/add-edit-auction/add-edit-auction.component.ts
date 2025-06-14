@@ -76,8 +76,7 @@ export class AddEditAuctionComponent implements OnInit {
             this.loadCompanyData(user.id);
           }
         },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al cargar datos del usuario');
+        error: () => {
           this.loading = false;
         }
       });
@@ -88,8 +87,7 @@ export class AddEditAuctionComponent implements OnInit {
       next: (company) => {
         this.loadProjects(company.id);
       },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar datos de la empresa');
+      error: () => {
         this.loading = false;
       }
     });
@@ -99,9 +97,6 @@ export class AddEditAuctionComponent implements OnInit {
     this.projectService.getProjectsByCompany(id).subscribe({
       next: (projects) => {
         this.projects = projects;
-      },
-      error: (error) => {
-        this.notificationService.showErrorCustom('Error al cargar los proyectos');
       }
     });
   }
@@ -133,8 +128,7 @@ export class AddEditAuctionComponent implements OnInit {
         this.minDeadlineDate = startDate;
         this.loading = false;
       },
-      error: (error) => {
-        this.notificationService.showErrorCustom('Error al cargar la subasta');
+      error: () => {
         this.loading = false;
       }
     });
@@ -193,8 +187,7 @@ export class AddEditAuctionComponent implements OnInit {
           this.notificationService.showSuccessCustom('Subasta actualizada exitosamente');
           this.saved.emit();
         },
-        error: (error) => {
-          this.notificationService.showErrorCustom(error.error?.message || 'Error al actualizar la subasta');
+        error: () => {
           this.loading = false;
         }
       });
@@ -205,8 +198,7 @@ export class AddEditAuctionComponent implements OnInit {
           this.notificationService.showSuccessCustom('Subasta creada exitosamente');
           this.saved.emit();
         },
-        error: (error) => {
-          this.notificationService.showErrorCustom(error.error?.message || 'Error al crear la subasta');
+        error: () => {
           this.loading = false;
         }
       });

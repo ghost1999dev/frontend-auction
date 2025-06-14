@@ -314,8 +314,6 @@ export class RegisterComponent {
           this.saveData(formValue);
           this.router.navigate(['/auth/activate-account']); 
           this.notificationServices.showSuccessCustom("Felicitaciones, cuenta creada exitosamente")
-        }else{
-          this.notificationServices.showErrorCustom("Error al crear usuario");
         }
       })
 
@@ -342,8 +340,6 @@ export class RegisterComponent {
           this.saveDataCompanies(formValue);
           this.router.navigate(['/auth/activate-account']); 
           this.notificationServices.showSuccessCustom("Felicitaciones, cuenta creada exitosamente")
-        }else{
-          this.notificationServices.showErrorCustom("Error al crear la empresa");
         }
       })
   }

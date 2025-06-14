@@ -11,8 +11,6 @@ import { NotificationService } from './notification.service';
 })
 export class DeveloperService {
 
-  private developersCache: Observable<getDeveloper[]> | null = null;
-
   constructor(
     private http: HttpClient, 
     private notificationServices: NotificationService,
@@ -37,15 +35,12 @@ export class DeveloperService {
   }
 
   getAllDevelopers(): Observable<getDeveloper[]> {  
-    if (!this.developersCache) {
-      this.developersCache = this.http.get<getDeveloperResponse>(
+    return this.http.get<getDeveloperResponse>(
         `${environment.server_url}developers/show/all`
       ).pipe(
         map(response => response.developers),
-        shareReplay(1) // Cache the response and replay to future subscribers
+        shareReplay(1) 
       );
-    }
-    return this.developersCache;
   }
 
   updateDeveloper(id: number, data: UpdateDeveloper): Observable<DeveloperWithRelations> {
@@ -54,10 +49,5 @@ export class DeveloperService {
         map(response => response.developer),
         catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
-  }
-
-  // Optional: Method to clear cache when needed
-  clearDevelopersCache(): void {
-    this.developersCache = null;
   }
 }
