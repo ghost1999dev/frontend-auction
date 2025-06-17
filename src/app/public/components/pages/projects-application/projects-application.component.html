@@ -47,10 +47,10 @@
             <div class="flex gap-2">
               <button pButton pRipple icon="pi pi-star" class="p-button-rounded p-button-help" 
                       tooltip="Ver ratings" tooltipPosition="top" (click)="showDeveloperRatings(app.developer)"></button>
-              <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success" 
+              <!-- <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success" 
                       *ngIf="app.status === 0" tooltip="Aceptar" tooltipPosition="top"></button>
               <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger" 
-                      *ngIf="app.status === 0" tooltip="Rechazar" tooltipPosition="top"></button>
+                      *ngIf="app.status === 0" tooltip="Rechazar" tooltipPosition="top"></button> -->
             </div>
           </td>
         </tr>
@@ -62,99 +62,98 @@
           [draggable]="false" [resizable]="false" header="Ratings del Desarrollador"
           [styleClass]="'ratings-dialog'" [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
           [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
-  <div class="ratings-container">
-    @if (loadingRatings) {
-      <div class="text-center">
+    <div *ngIf="loadingRatings; else ratingContent">
         <p-progressSpinner></p-progressSpinner>
-      </div>
-    } @else {
-      <!-- Sección de resumen -->
-      <div class="summary-section">
-        <div class="average-rating-card">
-          <div class="average-content">
-            <div class="average-score">
-              {{averageRating.toFixed(1)}}
-              <span class="max-rating">/5</span>
-            </div>
-            <div class="stars">
-              <span *ngFor="let star of [1,2,3,4,5]" 
-                    [class.filled]="star <= averageRating">
-                ★
-              </span>
-            </div>
-            <div class="total-ratings">
-              Basado en {{totalRatings}} 
-              {{totalRatings === 1 ? 'evaluación' : 'evaluaciones'}}
-            </div>
-          </div>
-          <div class="rating-badge">
-            <i class="pi pi-star-fill"></i>
-            <span>Rating Promedio</span>
-          </div>
-        </div>
-        
-        <div class="chart-container">
-          <h4>Distribución de Ratings</h4>
-          <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions" 
-                  width="100%" height="300px"></p-chart>
-        </div>
-      </div>
-
-      <div class="divider">
-        <span>Comentarios</span>
-      </div>
-
-      <!-- Sección de comentarios -->
-      <h3 class="section-title">Evaluaciones Recientes</h3>
-      @if (developerRatings.length > 0) {
-        <div class="comments-section">
-          @for (rating of developerRatings; track rating.id) {
-            <div class="comment-card">
-              <div class="comment-header">
-                <div class="user-info">
-                  <div class="avatar" [style.background]="getRandomColor()">
-                    {{rating.company_name?.charAt(0)?.toUpperCase() || 'E'}}
-                  </div>
-                  <div class="user-details">
-                    <div class="user-name">{{rating.company_name || 'Empresa'}}</div>
-                    <div class="rating-info">
-                      <div class="rating-stars">
-                        <span *ngFor="let star of [1,2,3,4,5]" 
-                              [class.filled]="star <= rating.score">
-                          ★
-                        </span>
-                      </div>
-                      <div class="rating-date">
-                        {{rating.createdAt | date:'mediumDate'}}
-                      </div>
+    </div>
+    
+    <ng-template #ratingContent>
+        <div *ngIf="developerRatingData" class="ratings-container">
+            <!-- Sección de resumen mejorada -->
+            <div class="summary-section">
+                <div class="average-rating-card">
+                    <div class="average-content">
+                        <div class="average-score">
+                            {{developerRatingData.ratingSummary.averageScore | number:'1.1-1'}}
+                            <span class="max-rating">/5</span>
+                        </div>
+                        <div class="stars">
+                            <span *ngFor="let star of [1,2,3,4,5]" 
+                                  [class.filled]="star <= developerRatingData.ratingSummary.averageScore">
+                                ★
+                            </span>
+                        </div>
+                        <div class="total-ratings">
+                            Basado en {{developerRatingData.ratingSummary.totalRatings}} 
+                            {{developerRatingData.ratingSummary.totalRatings === 1 ? 'evaluación' : 'evaluaciones'}}
+                        </div>
                     </div>
-                  </div>
+                    <div class="rating-badge">
+                        <i class="pi pi-star-fill"></i>
+                        <span>Rating Promedio</span>
+                    </div>
                 </div>
-              </div>
-              <div class="comment-content">
-                <p>{{rating.comment || 'La empresa no dejó un comentario adicional'}}</p>
-              </div>
-              <div class="comment-footer">
-                <i class="pi pi-quote-left"></i>
-              </div>
+                
+                <div class="chart-container">
+                    <h4>Distribución de Ratings</h4>
+                    <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions" 
+                            width="100%" height="300px"></p-chart>
+                </div>
             </div>
-          }
+
+            <div class="divider">
+                <span>Comentarios</span>
+            </div>
+
+            <!-- Sección de comentarios mejorada -->
+            <h3 class="section-title">Evaluaciones Recientes</h3>
+            <div *ngIf="developerRatingData.recentRatings.length > 0; else noRatings" class="comments-section">
+                <div *ngFor="let rating of developerRatingData.recentRatings" class="comment-card">
+                    <div class="comment-header">
+                        <div class="user-info">
+                            <div class="avatar" [style.background]="getRandomColor()">
+                                {{rating.company_name?.charAt(0)?.toUpperCase() || 'E'}}
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">{{rating.company_name || 'Empresa'}}</div>
+                                <div class="rating-info">
+                                    <div class="rating-stars">
+                                        <span *ngFor="let star of [1,2,3,4,5]" 
+                                              [class.filled]="star <= rating.score">
+                                            ★
+                                        </span>
+                                    </div>
+                                    <div class="rating-date">
+                                        {{rating.createdAt | date:'mediumDate'}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comment-content">
+                        <p>{{rating.comment || 'La empresa no dejó un comentario adicional'}}</p>
+                    </div>
+                    <div class="comment-footer">
+                        <i class="pi pi-quote-left"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <ng-template #noRatings>
+                <div class="no-ratings">
+                    <div class="no-ratings-icon">
+                        <i class="pi pi-star"></i>
+                    </div>
+                    <h4>No hay evaluaciones aún</h4>
+                    <p>Este desarrollador no ha recibido ratings todavía.</p>
+                </div>
+            </ng-template>
         </div>
-      } @else {
-        <div class="no-ratings">
-          <div class="no-ratings-icon">
-            <i class="pi pi-star"></i>
-          </div>
-          <h4>No hay evaluaciones aún</h4>
-          <p>Este desarrollador no ha recibido ratings todavía.</p>
-        </div>
-      }
-    }
-  </div>
-  <ng-template pTemplate="footer">
-    <button pButton pRipple label="Cerrar" icon="pi pi-times" 
-            class="p-button-rounded p-button-text" (click)="displayRatingsDialog=false"></button>
-  </ng-template>
+    </ng-template>
+    
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cerrar" icon="pi pi-times" 
+                class="p-button-rounded p-button-text" (click)="displayRatingsDialog=false"></button>
+    </ng-template>
 </p-dialog>
 
 }@else if (this.developer){ 

@@ -7,12 +7,27 @@ import { LayoutService } from 'src/app/core/services/layout.service';
   templateUrl: './view-header.component.html',
   styleUrls: ['./view-header.component.scss']
 })
-export class ViewHeaderComponent {
+export class ViewHeaderComponent implements OnInit {
 
   constructor(public layoutService: LayoutService, public router: Router) {}
 
-  get isDarkMode(): boolean {
-    return this.layoutService.config.colorScheme === 'dark';
+  isDarkMode = false; // Valor por defecto, será sobrescrito en ngOnInit
+
+  ngOnInit() {
+    // Al iniciar el componente, leemos el tema guardado en localStorage
+    const savedTheme = localStorage.getItem('themePreference');
+    if (savedTheme) {
+      this.isDarkMode = savedTheme === 'dark';
+      this.applyTheme(); // Aplicamos el tema guardado
+    }
+  }
+
+  applyTheme() {
+    if (this.isDarkMode) {
+      this.changeTheme('bootstrap4-dark-blue', 'dark');
+    } else {
+      this.changeTheme('lara-light-indigo', 'light')
+    }
   }
 
   toggleTheme() {
@@ -22,6 +37,7 @@ export class ViewHeaderComponent {
       newScheme === 'dark' ? 'bootstrap4-dark-blue' : 'lara-light-indigo',
       newScheme
     );
+    window.location.reload()
   }
 
   changeTheme(theme: string, colorScheme: string) {
