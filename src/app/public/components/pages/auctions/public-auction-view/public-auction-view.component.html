@@ -1,0 +1,48 @@
+<div class="card" *ngIf="!loading">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1>Informacion de la subasta</h1>
+    <button pButton pRipple label="Volver" icon="pi pi-arrow-left" class="p-button-secondary" (click)="goBack()"></button>
+  </div>
+
+  <div class="grid">
+    <div class="col-12 md:col-6">
+      <div class="p-4">
+        <h2>{{ auction.project?.project_name || 'N/A' }}</h2>
+        <p>{{ auction.project?.description || 'Sin descripción' }}</p>
+        
+        <div class="grid mt-4">
+          <div class="col-6">
+            <h4>Presupuesto</h4>
+            <p>{{ auction.project?.budget | currency:'USD':'symbol':'1.2-2'}}</p>
+          </div>
+          <div class="col-6">
+            <h4>Estado</h4>
+            <p-tag [severity]="getStatusSeverity(auction.status)" [value]="getStatusLabel(auction.status)"></p-tag>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-6">
+      <div class="p-4">
+        <h3>Tiempo restante</h3>
+        <h2 class="font-bold" style="font-size: 2.25rem !important;">{{ timeRemaining }}</h2>
+
+        <div class="grid mt-4">
+          <div class="col-6">
+            <h4>Fecha de inicio</h4>
+            <p>{{ auction.bidding_started_at | date:'medium' }}</p>
+          </div>
+          <div class="col-6">
+            <h4>Fecha límite</h4>
+            <p>{{ auction.bidding_deadline | date:'medium' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="flex justify-content-center align-items-center" style="height: 300px;">
+  <p-progressSpinner></p-progressSpinner>
+</div>

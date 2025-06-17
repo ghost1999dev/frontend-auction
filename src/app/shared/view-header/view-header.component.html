@@ -1,0 +1,54 @@
+<!-- Header -->
+ <div class="py-4 px-4 mx-0 md:mx-6 lg:mx-8 lg:px-8 flex align-items-center justify-content-between relative lg:static mb-3">
+    <a class="flex align-items-center" href="#">
+        <img src="assets/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="CodeBid Logo" height="50" class="mr-0 lg:mr-2">
+        <span class="text-900 font-medium text-2xl line-height-3 mr-8">CodeBid</span>
+    </a>
+    <a pRipple class="cursor-pointer block lg:hidden text-700" pStyleClass="@next" enterFromClass="hidden" leaveToClass="hidden" [hideOnOutsideClick]="true">
+        <i class="pi pi-bars text-4xl"></i>
+    </a>
+    <div class="align-items-center surface-0 flex-grow-1 justify-content-between hidden lg:flex absolute lg:static w-full left-0 px-6 lg:px-0 z-2" style="top:120px">
+        <ul class="list-none p-0 m-0 flex lg:align-items-center select-none flex-column lg:flex-row cursor-pointer">
+            <li>
+                <a (click)="router.navigate(['/view/landing'], {fragment: 'home'})" pRipple class="flex m-0 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
+                    <span>Inicio</span>
+                </a>
+            </li>
+            <li>
+                <a (click)="router.navigate(['/view/landing'], {fragment: 'features'})" pRipple class="flex m-0 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
+                    <span>Características</span>
+                </a>
+            </li>
+            <li>
+                <a (click)="router.navigate(['/view/landing'], {fragment: 'highlights'})" pRipple class="flex m-0 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
+                    <span>Beneficios</span>
+                </a>
+            </li>
+            <li *ngIf="getTokens()">
+                <a (click)="router.navigate(['/main/dashboard'], {fragment: 'highlights'})" pRipple class="flex m-0 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
+                    <span>Panel</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="flex align-items-center justify-content-between">
+            <!-- Botones de Login y Sign Up -->
+            <div class="flex align-items-center" *ngIf="!getTokens()">
+                <button pButton (click)="navigateTo('/auth/login')" label="Iniciar Sesión"
+                class="p-button-text p-button-rounded border-none text-blue-500"></button>
+                
+                <button pButton (click)="navigateTo('/auth/register')" label="Registrarse"
+                class="p-button-rounded border-none ml-5 bg-blue-500 text-white"></button>
+            </div>
+          
+            <!-- Toggle Switch -->
+            <label class="toggle-switch flex m-0 md:ml-5 px-0 py-3 text-900 font-medium line-height-3">
+                <input type="checkbox" [checked]="isDarkMode" (change)="toggleTheme()">
+                <span class="slider round">
+                  <span class="icon sun">☀️</span>
+                  <span class="icon moon">🌙</span>
+                </span>
+              </label>
+          </div>
+    </div>
+</div>

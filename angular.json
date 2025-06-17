@@ -17,6 +17,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "noty"
+            ],
             "outputPath": "dist/online-auctions-admin",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -25,25 +28,35 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets"  ,
+              {
+                "glob": "**/*.svg",
+                "input": "node_modules/quill/assets/icons/",
+                "output": "/assets/quill/icons/"
+              }          
             ],
             "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": []
+              "src/styles.scss",             
+              "src/assets/js/noty/noty.css",
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css"            ],
+            "scripts": [
+              "src/assets/js/noty/noty.js",
+              "src/assets/js/noty/noty.min.js",
+              "node_modules/@lottiefiles/lottie-player/dist/lottie-player.js"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "10mb",
+                  "maximumError": "10mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "10mb",
+                  "maximumError": "10mb"
                 }
               ],
               "fileReplacements": [
@@ -69,10 +82,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "online-auctions-admin:build:production"
+              "buildTarget": "online-auctions-admin:build:production"
             },
             "development": {
-              "browserTarget": "online-auctions-admin:build:development"
+              "buildTarget": "online-auctions-admin:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -80,7 +93,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "online-auctions-admin:build"
+            "buildTarget": "online-auctions-admin:build"
           }
         },
         "test": {
@@ -103,5 +116,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "d5d8734f-6933-442c-a364-cb096128d737"
   }
 }

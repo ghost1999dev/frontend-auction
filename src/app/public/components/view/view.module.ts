@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ViewComponent } from './view.component';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -10,11 +10,16 @@ import { PanelModule } from 'primeng/panel';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { LandingComponent } from './landing/landing.component';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { DropdownModule } from 'primeng/dropdown';
+import { PaginatorModule } from 'primeng/paginator';
+import { RippleModule } from 'primeng/ripple';
 
 const routes: Routes = [
   {
     path: '',
-    component: LandingComponent,
+    component: ViewComponent,
     children: [
       {
         path: '',
@@ -32,7 +37,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     ViewComponent,
-    LandingComponent
+    LandingComponent,
   ],
   imports: [
     CommonModule,
@@ -44,7 +49,13 @@ const routes: Routes = [
     PanelModule,
     ButtonModule,
     FormsModule,
+    InputTextModule,
+    InputTextareaModule,
+    DropdownModule,
+    PaginatorModule,
+    RippleModule,
     RouterModule.forChild(routes)
-  ]
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA] // Add this line
 })
 export class ViewModule { }

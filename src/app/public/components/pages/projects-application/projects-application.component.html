@@ -1,0 +1,339 @@
+@if (this.company) {
+  <div class="card">
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h1>Aplicaciones recibidas</h1>
+        <!--<button pButton pRipple label="Nueva subasta" icon="pi pi-plus" class="p-button-success"></button>-->
+    </div>
+
+    <p-table #dt [value]="filteredApplications" [loading]="loading" responsiveLayout="scroll" [rows]="10" 
+            [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
+            [globalFilterFields]="['project.project_name','status']"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas">
+      <ng-template pTemplate="caption">
+        <div class="flex justify-content-between align-items-center">
+          <p-dropdown [options]="projectOptions" [(ngModel)]="selectedProjectFilter" 
+                      (onChange)="onProjectFilterChange()" placeholder="Filtrar por proyecto"
+                      filter="true"
+                      appendTo="body" [showClear]="true">
+          </p-dropdown>          
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar aplicaciones..." style="width: 100%"/>
+          </span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="project.project_name">Proyecto <p-sortIcon field="project.project_name"></p-sortIcon></th>
+          <th pSortableColumn="developer.name">Desarrollador <p-sortIcon field="developer.name"></p-sortIcon></th>
+          <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
+          <th pSortableColumn="createdAt">Fecha <p-sortIcon field="createdAt"></p-sortIcon></th>
+          <th style="width: 150px">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-app>
+        <tr>
+          <td>{{app.project?.project_name || 'N/A'}}</td>
+          <td>
+            <div class="developer-info">
+              <span class="developer-name">{{app.developer?.name || 'N/A'}}</span>
+            </div>
+          </td>
+          <td>
+            <p-tag [severity]="getStatusSeverity(app.status)" [value]="getStatusText(app.status)"></p-tag>
+          </td>
+          <td>{{app.createdAt | date:'mediumDate'}}</td>
+          <td>
+            <div class="flex gap-2">
+              <button pButton pRipple icon="pi pi-star" class="p-button-rounded p-button-help" 
+                      tooltip="Ver ratings" tooltipPosition="top" (click)="showDeveloperRatings(app.developer)"></button>
+              <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success" 
+                      *ngIf="app.status === 0" tooltip="Aceptar" tooltipPosition="top"></button>
+              <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger" 
+                      *ngIf="app.status === 0" tooltip="Rechazar" tooltipPosition="top"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+<p-dialog [(visible)]="displayRatingsDialog" [modal]="true" [style]="{width: '1200px'}" 
+          [draggable]="false" [resizable]="false" header="Ratings del Desarrollador"
+          [styleClass]="'ratings-dialog'" [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
+          [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
+  <div class="ratings-container">
+    @if (loadingRatings) {
+      <div class="text-center">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+    } @else {
+      <!-- Sección de resumen -->
+      <div class="summary-section">
+        <div class="average-rating-card">
+          <div class="average-content">
+            <div class="average-score">
+              {{averageRating.toFixed(1)}}
+              <span class="max-rating">/5</span>
+            </div>
+            <div class="stars">
+              <span *ngFor="let star of [1,2,3,4,5]" 
+                    [class.filled]="star <= averageRating">
+                ★
+              </span>
+            </div>
+            <div class="total-ratings">
+              Basado en {{totalRatings}} 
+              {{totalRatings === 1 ? 'evaluación' : 'evaluaciones'}}
+            </div>
+          </div>
+          <div class="rating-badge">
+            <i class="pi pi-star-fill"></i>
+            <span>Rating Promedio</span>
+          </div>
+        </div>
+        
+        <div class="chart-container">
+          <h4>Distribución de Ratings</h4>
+          <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions" 
+                  width="100%" height="300px"></p-chart>
+        </div>
+      </div>
+
+      <div class="divider">
+        <span>Comentarios</span>
+      </div>
+
+      <!-- Sección de comentarios -->
+      <h3 class="section-title">Evaluaciones Recientes</h3>
+      @if (developerRatings.length > 0) {
+        <div class="comments-section">
+          @for (rating of developerRatings; track rating.id) {
+            <div class="comment-card">
+              <div class="comment-header">
+                <div class="user-info">
+                  <div class="avatar" [style.background]="getRandomColor()">
+                    {{rating.company_name?.charAt(0)?.toUpperCase() || 'E'}}
+                  </div>
+                  <div class="user-details">
+                    <div class="user-name">{{rating.company_name || 'Empresa'}}</div>
+                    <div class="rating-info">
+                      <div class="rating-stars">
+                        <span *ngFor="let star of [1,2,3,4,5]" 
+                              [class.filled]="star <= rating.score">
+                          ★
+                        </span>
+                      </div>
+                      <div class="rating-date">
+                        {{rating.createdAt | date:'mediumDate'}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="comment-content">
+                <p>{{rating.comment || 'La empresa no dejó un comentario adicional'}}</p>
+              </div>
+              <div class="comment-footer">
+                <i class="pi pi-quote-left"></i>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="no-ratings">
+          <div class="no-ratings-icon">
+            <i class="pi pi-star"></i>
+          </div>
+          <h4>No hay evaluaciones aún</h4>
+          <p>Este desarrollador no ha recibido ratings todavía.</p>
+        </div>
+      }
+    }
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cerrar" icon="pi pi-times" 
+            class="p-button-rounded p-button-text" (click)="displayRatingsDialog=false"></button>
+  </ng-template>
+</p-dialog>
+
+}@else if (this.developer){ 
+<div class="applications-container" [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
+  <h2 class="title">Mis Aplicaciónes a Proyectos</h2>
+  
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading && applications.length === 0" class="no-applications">
+    <p>No has aplicado a ningún proyecto aún.</p>
+  </div>
+  
+<div class="applications-grid" >
+    <div *ngFor="let app of applications" class="application-card">
+      <div class="application-header">
+        <div class="project-info">
+          <h3 class="project-name">{{ app.project?.project_name }}</h3>
+          <span class="company-name" *ngIf="app.project?.company_profile?.user">
+            {{ app.project.company_profile.user.name }}
+          </span>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(app.status)">
+          {{ getStatusText(app.status) }}
+        </span>
+      </div>
+      
+      <div class="application-details">
+        <div class="detail-item">
+          <span class="detail-label">Descripción del Proyecto:</span>
+          <p class="project-description">{{ (app.project.description || 'No se proporciona descripción').slice(0, 100) }}{{ (app.project.description || '').length > 100 ? '...' : '' }}</p>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-item">
+            <span class="detail-label">Categoría:</span>
+            <span class="detail-value">{{ app.project?.category?.name || 'No especificada' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Fecha de Postulación:</span>
+            <span class="detail-value">{{ app.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-item">
+            <span class="detail-label">Última Actualización:</span>
+            <span class="detail-value">{{ app.updatedAt | date:'mediumDate' }}</span>
+          </div>
+          <!-- <div class="detail-item">
+            <span class="detail-label">Email de Contacto:</span>
+            <span class="detail-value">{{ app.project?.company_profile?.user?.email || 'No disponible' }}</span>
+          </div> -->
+        </div>
+      </div>
+      
+      <div class="application-actions p-card-footer">
+        <div class="flex justify-content-end gap-2">
+          <button pButton pRipple icon="pi pi-bookmark" class="p-button-rounded p-button-primary p-button-sm" 
+                  (click)="saveApplicationToLocalStorage(app)" pTooltip="Guardar aplicación" tooltipPosition="top"></button>
+          <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" 
+                  (click)="showProjectDetails(app.project_id)" pTooltip="Ver proyecto" tooltipPosition="top"></button>
+          <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" 
+                  (click)="openWithdrawDialog(app.id)" pTooltip="Retirar aplicación" tooltipPosition="top"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [(visible)]="displayProjectDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '1200px'}" 
+          [draggable]="false" [resizable]="false" [breakpoints]="{'960px': '75vw', '640px': '90vw'}" header="Detalles del Proyecto"
+          styleClass="project-dialog">
+  <div class="project-dialog-content">
+    @if (loadingProject) {
+      <div class="text-center p-5 flex flex-column align-items-center gap-3">
+        <p-progressSpinner strokeWidth="4" animationDuration=".5s"></p-progressSpinner>
+        <p class="text-600">Cargando detalles del proyecto...</p>
+      </div>
+    } @else if (selectedProject) {
+      <div class="project-details">
+        <div class="project-header mb-5">
+          <div class="flex align-items-center gap-3 mb-2">
+            <i class="pi pi-folder-open text-primary" style="font-size: 1.5rem"></i>
+            <h3 class="text-3xl font-semibold m-0 text-900">{{selectedProject.project_name}}</h3>
+          </div>
+          <p-tag [severity]="selectedProject.status === 1 ? 'success' : 'danger'" 
+                 [value]="selectedProject.status === 1 ? 'Activo' : 'Inactivo'"
+                 icon="pi pi-circle-fill" iconPos="left" styleClass="mr-2"></p-tag>
+          <p-tag value="{{selectedProject.category.name || 'Sin categoría'}}" 
+                 icon="pi pi-tag" iconPos="left" severity="info"></p-tag>
+        </div>
+        
+        <div class="grid">
+          <!-- Columna izquierda -->
+          <div class="col-12 md:col-6">
+            <div class="detail-card mb-4">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-building text-primary"></i>
+                <span class="detail-label font-medium text-600">Empresa</span>
+              </div>
+              <p class="text-900 m-0">{{selectedProject.company.name || 'No especificada'}}</p>
+            </div>
+            
+            <div class="detail-card mb-4">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-wallet text-primary"></i>
+                <span class="detail-label font-medium text-600">Presupuesto</span>
+              </div>
+              <p class="text-900 m-0">{{selectedProject.budget ? (selectedProject.budget | currency) : 'No especificado'}}</p>
+            </div>
+          </div>
+          
+          <!-- Columna derecha -->
+          <div class="col-12 md:col-6">
+            <div class="detail-card mb-4">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-calendar text-primary"></i>
+                <span class="detail-label font-medium text-600">Días disponibles</span>
+              </div>
+              <p class="text-900 m-0">{{selectedProject.days_available || 'No especificados'}}</p>
+            </div>
+            
+            <div class="detail-card mb-4">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-clock text-primary"></i>
+                <span class="detail-label font-medium text-600">Última actualización</span>
+              </div>
+              <p class="text-900 m-0">{{selectedProject.updated_at || 'No disponible'}}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Descripción corta -->
+        <div class="detail-card mb-4">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-comment text-primary"></i>
+            <span class="detail-label font-medium text-600">Descripción corta</span>
+          </div>
+          <p class="text-900 m-0">{{selectedProject.description || 'No disponible'}}</p>
+        </div>
+        
+        <!-- Descripción completa -->
+        <div class="detail-card">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-file text-primary"></i>
+            <span class="detail-label font-medium text-600">Descripción completa</span>
+          </div>
+          <div class="prose border-round p-3" [innerHTML]="sanitizedLongDescription"></div>
+        </div>
+        
+        <!-- Sección de acciones (opcional) -->
+       <!--  <div class="flex justify-content-end gap-2 mt-5 pt-3 border-top-1 surface-border">
+          <button pButton pRipple icon="pi pi-download" label="Exportar PDF" class="p-button-outlined p-button-secondary"></button>
+          <button pButton pRipple icon="pi pi-share-alt" label="Compartir" class="p-button-outlined"></button>
+        </div> -->
+      </div>
+    }
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayProjectDialog = false" 
+            class="p-button-outlined p-button-secondary"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog [(visible)]="displayWithdrawDialog" [modal]="true" [style]="{width: '450px'}" 
+          [draggable]="false" [resizable]="false" header="Confirmar">
+  <div class="confirmation-content">
+    <div class="flex align-items-center gap-3 mb-3">
+      <i class="pi pi-exclamation-triangle text-2xl text-yellow-500"></i>
+      <span>¿Estás seguro de que quieres retirar tu aplicación?</span>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" 
+            (click)="displayWithdrawDialog = false" class="p-button-text"></button>
+    <button pButton pRipple label="Sí, retirar" icon="pi pi-check" 
+            (click)="confirmWithdraw()" class="p-button-danger" [loading]="withdrawLoading"></button>
+  </ng-template>
+</p-dialog>
+}

@@ -1,0 +1,103 @@
+/* user-list.component.css */
+.user-list-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .user-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+  
+  .user-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .user-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .user-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid #ddd;
+  }
+  
+  .user-info {
+    flex: 1;
+  }
+  
+  .user-name {
+    margin: 0;
+    color: #333;
+    font-size: 1.1rem;
+  }
+  
+  .user-email {
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  .user-details {
+    padding: 15px;
+  }
+  
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .detail-label {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .badge-admin, .badge-user {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  
+  .badge-admin {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .badge-user {
+    background-color: #e2e3e5;
+    color: #383d41;
+  }
+  
+  .status-active {
+    color: #28a745;
+  }
+  
+  .status-inactive {
+    color: #dc3545;
+  }

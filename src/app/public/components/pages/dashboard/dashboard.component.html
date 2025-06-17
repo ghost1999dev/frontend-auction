@@ -1,239 +1,590 @@
-<div class="grid">
-    <div class="col-12 lg:col-6 xl:col-3">
-        <div class="card mb-0">
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Orders</span>
-                    <div class="text-900 font-medium text-xl">152</div>
-                </div>
-                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+<p-dialog header="Completa tu registro" [(visible)]="displayAlert" [modal]="true" 
+          [style]="{width: '85vw', maxWidth: '1200px', maxHeight: '90vh'}" [breakpoints]="{'960px': '90vw'}"
+          [draggable]="true" [resizable]="true" [closable]="false"
+          [contentStyle]="{'padding': '0', 'overflow': 'auto'}">
+    
+    <div class="dialog-container">
+        <div class="dialog-content">
+            <img src="assets/images/{{layoutService.config.colorScheme === 'light' ? 'logo-dark' : 'logo-white'}}.svg" alt="Logo" class="logo">        
+            <div class="gradient-container">
+                <div class="form-container">
+                    <div class="header-text">
+                        <div class="title">Bienvenido a CodeBid</div>
+                        <span class="subtitle">Selecciona tu tipo de registro</span>
+                    </div>
+
+                    <!-- Selección de tipo de usuario -->
+                    <div *ngIf="!userType" class="card-selection">
+                        <!-- Developer Card -->
+                        <p-card class="role-card" (click)="selectUserType('developer')">
+                            <div class="card-content">
+                                <i class="pi pi-code card-icon"></i>
+                                <span class="card-title">Desarrollador</span>
+                                <span class="card-description">Regístrate como desarrollador freelance</span>
+                            </div>
+                        </p-card>
+
+                        <!-- Company Card -->
+                        <p-card class="role-card" (click)="selectUserType('company')">
+                            <div class="card-content">
+                                <i class="pi pi-building card-icon"></i>
+                                <span class="card-title">Empresa</span>
+                                <span class="card-description">Registra tu negocio</span>
+                            </div>
+                        </p-card>
+                    </div>
+
+                    <!-- Formulario de Developer -->
+                    <div *ngIf="userType === 'developer'" class="scrollable-content">
+                        <form [formGroup]="developerForm">
+                            <div class="form-scrollable">
+                                <div class="form-grid">
+                                    <!-- Columna 1 -->
+                                    <div class="form-column">
+
+                                        <!-- Address -->
+                                        <div class="field-container">
+                                            <label for="address" class="input-label">Dirección</label>
+                                            <input id="address" type="text" pInputText formControlName="address" 
+                                                    class="centered-input"
+                                                    [ngClass]="{'p-invalid': submitted && developerForm.get('address')?.errors}">
+                                            <small *ngIf="submitted && developerForm.get('address')?.errors" class="error-message">
+                                                Dirección es requerida
+                                            </small>
+                                        </div>
+
+                                        <!-- Phone -->
+                                        <div class="field-container">
+                                            <label for="phone" class="input-label">Teléfono</label>
+                                            <input id="phone" type="text" 
+                                            (input)="formatPhone($event)" 
+                                            pInputText class="centered-input"
+                                            formControlName="phone" 
+                                            [ngClass]="{ 'p-invalid': submitted && developerForm.get('phone')?.errors }">  
+                                            <small *ngIf="submitted && developerForm.get('phone')?.errors" class="error-message">
+                                                Teléfono es requerido
+                                            </small>
+                                        </div>
+
+                                        <!-- Password -->
+                                        <div class="field-container">
+                                            <label for="password" class="input-label">Contraseña</label>
+                                            <div class="password-input-container">
+                                                <p-password 
+                                                    id="password" 
+                                                    formControlName="password" 
+                                                    [toggleMask]="false" 
+                                                    [feedback]="false"
+                                                    (input)="updatePasswordChecks()"
+                                                    [ngClass]="{'p-invalid': submitted && developerForm.get('password')?.errors}"
+                                                    class="full-width-password">
+                                                </p-password>
+                                            </div>
+                                            
+                                            <!-- Password checklist -->
+                                            <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
+                                                <p class="font-medium mb-2">Requisitos:</p>
+                                                <ul>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">
+                                                    <i [class]="passwordChecks.length ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>Mínimo 8 caracteres</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.upper">
+                                                    <i [class]="passwordChecks.upper ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 letra mayúscula (A-Z)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.lower">
+                                                    <i [class]="passwordChecks.lower ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 letra minúscula (a-z)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.number">
+                                                    <i [class]="passwordChecks.number ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 número (0-9)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.special">
+                                                    <i [class]="passwordChecks.special ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 carácter especial (!#$%^&*)</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <small *ngIf="submitted && developerForm.get('password')?.errors" class="error-message">
+                                                <span *ngIf="developerForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
+                                                <span *ngIf="developerForm.get('password')?.errors?.['minlength']">Debe tener al menos 8 caracteres</span>
+                                            </small>
+                                        </div>
+
+                                        <div class="field-container">
+                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña</label>
+                                            <div class="password-input-container">
+                                                <p-password 
+                                                    id="confirmPassword" 
+                                                    [(ngModel)]="confirmPassword" 
+                                                    [feedback]="false" 
+                                                    [toggleMask]="false"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    class="full-width-password"
+                                                    [ngClass]="{'p-invalid': submitted && !passwordMatchValidator()}">
+                                                </p-password>
+                                            </div>
+                                            <small *ngIf="submitted && !passwordMatchValidator()" class="error-message">
+                                                Las contraseñas no coinciden
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Columna 2 -->
+                                    <div class="form-column">
+                                        <!-- Occupation -->
+                                        <div class="field-container">
+                                            <label for="occupation" class="input-label">Ocupación/Título</label>
+                                            <input id="occupation" type="text" pInputText formControlName="occupation" 
+                                                    class="centered-input" onkeydown="return /[a-ñA-ZÑ, ]/i.test(event.key)"
+                                                    placeholder="Ej: Desarrollador Frontend, Ingeniero Full Stack">
+                                        </div>
+
+                                        <!-- LinkedIn -->
+                                        <div class="field-container">
+                                            <label for="linkedin" class="input-label">Perfil de LinkedIn</label>
+                                            <input id="linkedin" type="url" pInputText formControlName="linkedin" 
+                                                    class="centered-input"
+                                                    placeholder="https://linkedin.com/in/tuperfil">
+                                        </div>
+
+                                        <!-- Portfolio -->
+                                        <div class="field-container">
+                                            <label for="portfolio" class="input-label">Portafolio/GitHub</label>
+                                            <input id="portfolio" type="url" pInputText formControlName="portfolio" 
+                                                    class="centered-input"
+                                                    placeholder="https://github.com/tuusuario o tu sitio web">
+                                        </div>
+
+                                        <!-- Bio -->
+                                        <div class="field-container">
+                                            <label for="bio" class="input-label">Biografía</label>
+                                            <textarea pInputText id="bio" formControlName="bio" class="centered-input" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Formulario de Company -->
+                    <div *ngIf="userType === 'company'" class="scrollable-content">
+                        <form [formGroup]="companyForm">
+                            <div class="form-scrollable">
+                                <div class="form-grid">
+                                    <!-- Columna 1 -->
+                                    <div class="form-column">
+                                                                                <!-- Address -->
+                                        <div class="field-container">
+                                            <label for="address" class="input-label">Dirección</label>
+                                            <input id="address" type="text" pInputText formControlName="address" 
+                                                    class="centered-input"
+                                                    [ngClass]="{'p-invalid': submitted && companyForm.get('address')?.errors}">
+                                            <small *ngIf="submitted && companyForm.get('address')?.errors" class="error-message">
+                                                Dirección es requerida
+                                            </small>
+                                        </div>
+
+                                                                               <!-- NRC Number -->
+                                        <div class="field-container">
+                                            <label for="nrc_number" class="input-label">Número de NRC</label>
+                                            <input id="nrc_number" type="text" 
+                                                (input)="formatNrcNumber($event)"
+                                                pInputText 
+                                                class="centered-input"
+                                                formControlName="nrc_number" 
+                                                [ngClass]="{ 'p-invalid': submitted && companyForm.get('nrc_number')?.errors }">
+                                            <small *ngIf="submitted && companyForm.get('nrc_number')?.errors" class="error-message">
+                                                <span *ngIf="companyForm.get('nrc_number')?.errors?.['required']">Número de NRC es requerido</span>
+                                                <span *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">Formato: 123456-7 (6 dígitos, guión, 1 dígito)</span>
+                                            </small>
+                                        </div>
+                                        
+                                        <!-- Password -->
+                                        <div class="field-container">
+                                            <label for="password" class="input-label">Contraseña</label>
+                                            <div class="password-input-container">
+                                                <p-password 
+                                                    id="password" 
+                                                    formControlName="password" 
+                                                    [toggleMask]="false" 
+                                                    [feedback]="false"
+                                                    (input)="updatePasswordChecks()"
+                                                    [ngClass]="{'p-invalid': submitted && companyForm.get('password')?.errors}"
+                                                    class="full-width-password">
+                                                </p-password>
+                                            </div>
+                                            
+                                            <!-- Password checklist -->
+                                            <div class="password-checklist mt-2 text-sm" [ngClass]="{'surface-ground': layoutService.config.colorScheme === 'dark'}">                            
+                                                <p class="font-medium mb-2">Requisitos:</p>
+                                                <ul>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.length">
+                                                    <i [class]="passwordChecks.length ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>Mínimo 8 caracteres</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.upper">
+                                                    <i [class]="passwordChecks.upper ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 letra mayúscula (A-Z)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.lower">
+                                                    <i [class]="passwordChecks.lower ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 letra minúscula (a-z)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.number">
+                                                    <i [class]="passwordChecks.number ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 número (0-9)</span>
+                                                    </li>
+                                                    <li class="flex items-center gap-2" [class.text-green-500]="passwordChecks.special">
+                                                    <i [class]="passwordChecks.special ? 'pi pi-check-circle' : 'pi pi-circle-off'"></i>
+                                                    <span>1 carácter especial (!#$%^&*)</span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <small *ngIf="submitted && companyForm.get('password')?.errors" class="error-message">
+                                                <span *ngIf="companyForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
+                                                <span *ngIf="companyForm.get('password')?.errors?.['minlength']">Debe tener al menos 8 caracteres</span>
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Columna 2 -->
+                                    <div class="form-column">
+                                        <!-- Phone -->
+                                        <div class="field-container">
+                                            <label for="phone" class="input-label">Teléfono</label>
+                                            <input id="phone" type="text" 
+                                            (input)="formatPhoneCompany($event)" 
+                                            pInputText class="centered-input"
+                                            formControlName="phone" 
+                                            [ngClass]="{ 'p-invalid': submitted && companyForm.get('phone')?.errors }">  
+                                            <small *ngIf="submitted && companyForm.get('phone')?.errors" class="error-message">
+                                                Teléfono es requerido
+                                            </small>
+                                        </div>
+
+                                        <!-- Business Type -->
+                                        <div class="field-container">
+                                            <label for="business_type" class="input-label">Tipo de Negocio</label>
+                                            <div class="chips-container">
+                                                <p-chips id="business_type" 
+                                                        [(ngModel)]="businessTypeTags"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        placeholder="Agrega tipos de negocio"
+                                                        (onAdd)="onBusinessTypeAdd($event)"
+                                                        (onRemove)="onBusinessTypeRemove($event)"
+                                                        [max]="1"
+                                                        [allowDuplicate]="false"
+                                                        [addOnBlur]="true"
+                                                        [ngClass]="{ 'p-invalid': submitted && companyForm.get('business_type')?.errors }">
+                                                    <ng-template let-item pTemplate="item">
+                                                        <p-tag [value]="item" [rounded]="true"></p-tag>
+                                                    </ng-template>
+                                                </p-chips>
+                                            </div>
+                                            <small *ngIf="submitted && companyForm.get('business_type')?.errors" class="error-message">
+                                                <span *ngIf="companyForm.get('business_type')?.errors?.['required']">Al menos un tipo de negocio es requerido</span>
+                                            </small>
+                                        </div>
+
+                                        <div class="field-container">
+                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña</label>
+                                            <div class="password-input-container">
+                                                <p-password 
+                                                    id="confirmPassword" 
+                                                    [(ngModel)]="confirmPassword" 
+                                                    [feedback]="false" 
+                                                    [toggleMask]="false"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    class="full-width-password"
+                                                    [ngClass]="{'p-invalid': submitted && !passwordMatchValidator()}">
+                                                </p-password>
+                                            </div>
+                                            <small *ngIf="submitted && !passwordMatchValidator()" class="error-message">
+                                                Las contraseñas no coinciden
+                                            </small>
+                                        </div>
+
+                                                                                <!-- Website -->
+                                        <div class="field-container">
+                                            <label for="web_site" class="input-label">Sitio Web</label>
+                                            <input id="web_site" type="url" pInputText formControlName="web_site" 
+                                                    class="centered-input"
+                                                    [ngClass]="{'p-invalid': submitted && companyForm.get('web_site')?.errors}">
+                                            <small *ngIf="submitted && companyForm.get('web_site')?.errors" class="error-message">
+                                                Sitio web es requerido
+                                            </small>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <span class="text-green-500 font-medium">24 new </span>
-            <span class="text-500">since last visit</span>
         </div>
     </div>
-    <div class="col-12 lg:col-6 xl:col-3">
-        <div class="card mb-0">
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Revenue</span>
-                    <div class="text-900 font-medium text-xl">$2.100</div>
+
+    <ng-template pTemplate="footer">
+        <div class="footer-buttons">
+            <button pButton type="button" label="Regresar" icon="pi pi-arrow-left" 
+                    (click)="goBack()" 
+                    class="p-button-outlined p-button-secondary"></button>
+            <button pButton type="submit" label="Registrar" icon="pi pi-check" 
+                    (click)="register()" 
+                    class="p-button-success"
+                    [disabled]="clicked"></button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-toast position="top-center"></p-toast>
+
+@if(this.user?.role_id === 1){
+    <div class="grid">
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Pedidos</span>
+                        <div class="text-900 font-medium text-xl">152</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                        <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+                    </div>
                 </div>
-                <div class="flex align-items-center justify-content-center bg-orange-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-map-marker text-orange-500 text-xl"></i>
-                </div>
+                <span class="text-green-500 font-medium">24 nuevos </span>
+                <span class="text-500">desde la última visita</span>
             </div>
-            <span class="text-green-500 font-medium">%52+ </span>
-            <span class="text-500">since last week</span>
         </div>
-    </div>
-    <div class="col-12 lg:col-6 xl:col-3">
-        <div class="card mb-0">
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Customers</span>
-                    <div class="text-900 font-medium text-xl">28441</div>
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Ingresos</span>
+                        <div class="text-900 font-medium text-xl">$2.100</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-orange-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                        <i class="pi pi-map-marker text-orange-500 text-xl"></i>
+                    </div>
                 </div>
-                <div class="flex align-items-center justify-content-center bg-cyan-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-inbox text-cyan-500 text-xl"></i>
-                </div>
+                <span class="text-green-500 font-medium">%52+ </span>
+                <span class="text-500">desde la semana pasada</span>
             </div>
-            <span class="text-green-500 font-medium">520  </span>
-            <span class="text-500">newly registered</span>
         </div>
-    </div>
-    <div class="col-12 lg:col-6 xl:col-3">
-        <div class="card mb-0">
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Comments</span>
-                    <div class="text-900 font-medium text-xl">152 Unread</div>
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Clientes</span>
+                        <div class="text-900 font-medium text-xl">28441</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-cyan-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                        <i class="pi pi-inbox text-cyan-500 text-xl"></i>
+                    </div>
                 </div>
-                <div class="flex align-items-center justify-content-center bg-purple-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-comment text-purple-500 text-xl"></i>
-                </div>
-            </div>
-            <span class="text-green-500 font-medium">85 </span>
-            <span class="text-500">responded</span>
-        </div>
-    </div>
-
-    <div class="col-12 xl:col-6">
-        <div class="card">
-            <h5>Recent Sales</h5>
-            <p-table [value]="products" [paginator]="true" [rows]="5" responsiveLayout="scroll">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>Image</th>
-                        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
-                        <th pSortableColumn="price">Price <p-sortIcon field="price"></p-sortIcon></th>
-                        <th>View</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-product>
-                    <tr>
-                        <td style="width: 15%; min-width: 5rem;">
-                            <img src="assets/demo/images/product/{{product.image}}" class="shadow-4" alt="{{product.name}}" width="50">
-                        </td>
-                        <td style="width: 35%; min-width: 7rem;">{{product.name}}</td>
-                        <td style="width: 35%; min-width: 8rem;">{{product.price | currency:'USD'}}</td>
-                        <td style="width: 15%;">
-                            <button pButton pRipple type="button" icon="pi pi-search" class="p-button p-component p-button-text p-button-icon-only"></button>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
-        <div class="card">
-            <div class="flex justify-content-between align-items-center mb-5">
-                <h5>Best Selling Products</h5>
-                <div>
-                    <button pButton type="button" icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-plain" (click)="menu.toggle($event)"></button>
-                    <p-menu #menu [popup]="true" [model]="items"></p-menu>
-                </div>
-            </div>
-            <ul class="list-none p-0 m-0">
-                <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                    <div>
-                        <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Space T-Shirt</span>
-                        <div class="mt-1 text-600">Clothing</div>
-                    </div>
-                    <div class="mt-2 md:mt-0 flex align-items-center">
-                        <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
-                            <div class="bg-orange-500 h-full" [ngStyle]="{width: '50%'}"></div>
+                <span class="text-green-500 font-medium">520  </span>
+                                <span class="text-500">nuevos registros</span>
+                            </div>
                         </div>
-                        <span class="text-orange-500 ml-3 font-medium">%50</span>
-                    </div>
-                </li>
-                <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                    <div>
-                        <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Portal Sticker</span>
-                        <div class="mt-1 text-600">Accessories</div>
-                    </div>
-                    <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                        <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
-                            <div class="bg-cyan-500 h-full" [ngStyle]="{width: '16%'}"></div>
+                        <div class="col-12 lg:col-6 xl:col-3">
+                            <div class="card mb-0">
+                                <div class="flex justify-content-between mb-3">
+                                    <div>
+                                        <span class="block text-500 font-medium mb-3">Comentarios</span>
+                                        <div class="text-900 font-medium text-xl">152 No leídos</div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                                        <i class="pi pi-comment text-purple-500 text-xl"></i>
+                                    </div>
+                                </div>
+                                <span class="text-green-500 font-medium">85 </span>
+                                <span class="text-500">respondidos</span>
+                            </div>
                         </div>
-                        <span class="text-cyan-500 ml-3 font-medium">%16</span>
-                    </div>
-                </li>
-                <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                    <div>
-                        <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Supernova Sticker</span>
-                        <div class="mt-1 text-600">Accessories</div>
-                    </div>
-                    <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                        <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
-                            <div class="bg-pink-500 h-full" [ngStyle]="{width: '67%'}"></div>
+                    
+                        <div class="col-12 xl:col-6">
+                            <div class="card">
+                                <h5>Ventas Recientes</h5>
+                                <p-table [value]="products" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th>Imagen</th>
+                                            <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+                                            <th pSortableColumn="price">Precio <p-sortIcon field="price"></p-sortIcon></th>
+                                            <th>Ver</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-product>
+                                        <tr>
+                                            <td style="width: 15%; min-width: 5rem;">
+                                                <img src="assets/demo/images/product/{{product.image}}" class="shadow-4" alt="{{product.name}}" width="50">
+                                            </td>
+                                            <td style="width: 35%; min-width: 7rem;">{{product.name}}</td>
+                                            <td style="width: 35%; min-width: 8rem;">{{product.price | currency:'USD'}}</td>
+                                            <td style="width: 15%;">
+                                                <button pButton pRipple type="button" icon="pi pi-search" class="p-button p-component p-button-text p-button-icon-only"></button>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                            <div class="card">
+                                <div class="flex justify-content-between align-items-center mb-5">
+                                    <h5>Productos Más Vendidos</h5>
+                                    <div>
+                                        <button pButton type="button" icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-plain" (click)="menu.toggle($event)"></button>
+                                        <p-menu #menu [popup]="true" [model]="items"></p-menu>
+                                    </div>
+                                </div>
+                                <ul class="list-none p-0 m-0">
+                                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                                        <div>
+                                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Camiseta Espacial</span>
+                                            <div class="mt-1 text-600">Ropa</div>
+                                        </div>
+                                        <div class="mt-2 md:mt-0 flex align-items-center">
+                                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
+                                                <div class="bg-orange-500 h-full" [ngStyle]="{width: '50%'}"></div>
+                                            </div>
+                                            <span class="text-orange-500 ml-3 font-medium">%50</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                                        <div>
+                                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Pegatina Portal</span>
+                                            <div class="mt-1 text-600">Accesorios</div>
+                                        </div>
+                                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
+                                                <div class="bg-cyan-500 h-full" [ngStyle]="{width: '16%'}"></div>
+                                            </div>
+                                            <span class="text-cyan-500 ml-3 font-medium">%16</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                                        <div>
+                                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Pegatina Supernova</span>
+                                            <div class="mt-1 text-600">Accesorios</div>
+                                        </div>
+                                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
+                                                <div class="bg-pink-500 h-full" [ngStyle]="{width: '67%'}"></div>
+                                            </div>
+                                            <span class="text-pink-500 ml-3 font-medium">%67</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                                        <div>
+                                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Cuaderno Wonders</span>
+                                            <div class="mt-1 text-600">Oficina</div>
+                                        </div>
+                                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
+                                                <div class="bg-green-500 h-full" [ngStyle]="{width: '35%'}"></div>
+                                            </div>
+                                            <span class="text-green-500 ml-3 font-medium">%35</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                                        <div>
+                                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Funda Mate Negra</span>
+                                            <div class="mt-1 text-600">Accesorios</div>
+                                        </div>
+                                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
+                                                <div class="bg-purple-500 h-full" [ngStyle]="{width: '75%'}"></div>
+                                            </div>
+                                            <span class="text-purple-500 ml-3 font-medium">%75</span>
+                                        </div>
+                                    </li>
+                                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+                                        <div>
+                                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Camiseta de Robots</span>
+                                            <div class="mt-1 text-600">Ropa</div>
+                                        </div>
+                                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
+                                                <div class="bg-teal-500 h-full" [ngStyle]="{width: '40%'}"></div>
+                                            </div>
+                                            <span class="text-teal-500 ml-3 font-medium">%40</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <span class="text-pink-500 ml-3 font-medium">%67</span>
-                    </div>
-                </li>
-                <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                    <div>
-                        <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Wonders Notebook</span>
-                        <div class="mt-1 text-600">Office</div>
-                    </div>
-                    <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                        <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
-                            <div class="bg-green-500 h-full" [ngStyle]="{width: '35%'}"></div>
+                    
+                        <div class="col-12 xl:col-6">
+                            <div class="card">
+                                <h5>Resumen de Ventas</h5>
+                                <p-chart type="line" [data]="chartData" [options]="chartOptions"></p-chart>
+                            </div>
+                    
+                            <div class="card">
+                                <div class="flex align-items-center justify-content-between mb-4">
+                                    <h5>Notificaciones</h5>
+                                    <div>
+                                        <button pButton type="button" icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-plain" (click)="menu.toggle($event)"></button>
+                                        <p-menu #menu [popup]="true" [model]="items"></p-menu>
+                                    </div>
+                                </div>
+                    
+                                <span class="block text-600 font-medium mb-3">HOY</span>
+                                <ul class="p-0 mx-0 mt-0 mb-4 list-none">
+                                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
+                                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
+                                            <i class="pi pi-dollar text-xl text-blue-500"></i>
+                                        </div>
+                                        <span class="text-900 line-height-3">Richard Jones
+                                    <span class="text-700"> ha comprado una camiseta azul por <span class="text-blue-500">79$</span></span>
+                                </span>
+                                    </li>
+                                    <li class="flex align-items-center py-2">
+                                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-orange-100 border-circle mr-3 flex-shrink-0">
+                                            <i class="pi pi-download text-xl text-orange-500"></i>
+                                        </div>
+                                        <span class="text-700 line-height-3">Tu solicitud de retiro de <span class="text-blue-500 font-medium">2500$</span> ha sido iniciada.</span>
+                                    </li>
+                                </ul>
+                    
+                                <span class="block text-600 font-medium mb-3">AYER</span>
+                                <ul class="p-0 m-0 list-none">
+                                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
+                                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
+                                            <i class="pi pi-dollar text-xl text-blue-500"></i>
+                                        </div>
+                                        <span class="text-900 line-height-3">Keyser Wick
+                                    <span class="text-700"> ha comprado una chaqueta negra por <span class="text-blue-500">59$</span></span>
+                                </span>
+                                    </li>
+                                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
+                                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-pink-100 border-circle mr-3 flex-shrink-0">
+                                            <i class="pi pi-question text-xl text-pink-500"></i>
+                                        </div>
+                                        <span class="text-900 line-height-3">Jane Davis<span class="text-700"> ha publicado nuevas preguntas sobre tu producto.</span></span>
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                            <div class="px-4 py-5 shadow-2 flex flex-column md:flex-row md:align-items-center justify-content-between mb-3" [ngStyle]="{borderRadius: '1rem', background: 'linear-gradient(0deg, rgba(0, 123, 255, 0.5), rgba(0, 123, 255, 0.5)), linear-gradient(92.54deg, #1C80CF 47.88%, #FFFFFF 100.01%)'}">
+                           <div>
+                               <div class="text-blue-100 font-medium text-xl mt-2 mb-3">DA EL SIGUIENTE PASO</div>
+                               <div class="text-white font-medium text-5xl">Prueba PrimeBlocks</div>
+                           </div>
+                           <div class="mt-4 mr-auto md:mt-0 md:mr-0">
+                               <a target="_blank" href="https://www.primefaces.org/primeblocks-ng" class="p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised">
+                                   Comenzar
+                               </a>
+                           </div>
                         </div>
-                        <span class="text-green-500 ml-3 font-medium">%35</span>
                     </div>
-                </li>
-                <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                    <div>
-                        <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Mat Black Case</span>
-                        <div class="mt-1 text-600">Accessories</div>
                     </div>
-                    <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                        <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
-                            <div class="bg-purple-500 h-full" [ngStyle]="{width: '75%'}"></div>
-                        </div>
-                        <span class="text-purple-500 ml-3 font-medium">%75</span>
-                    </div>
-                </li>
-                <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                    <div>
-                        <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Robots T-Shirt</span>
-                        <div class="mt-1 text-600">Clothing</div>
-                    </div>
-                    <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                        <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" [ngStyle]="{height: '8px'}">
-                            <div class="bg-teal-500 h-full" [ngStyle]="{width: '40%'}"></div>
-                        </div>
-                        <span class="text-teal-500 ml-3 font-medium">%40</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="col-12 xl:col-6">
-        <div class="card">
-            <h5>Sales Overview</h5>
-            <p-chart type="line" [data]="chartData" [options]="chartOptions"></p-chart>
-        </div>
-
-        <div class="card">
-            <div class="flex align-items-center justify-content-between mb-4">
-                <h5>Notifications</h5>
-                <div>
-                    <button pButton type="button" icon="pi pi-ellipsis-v" class="p-button-rounded p-button-text p-button-plain" (click)="menu.toggle($event)"></button>
-                    <p-menu #menu [popup]="true" [model]="items"></p-menu>
-                </div>
-            </div>
-
-            <span class="block text-600 font-medium mb-3">TODAY</span>
-            <ul class="p-0 mx-0 mt-0 mb-4 list-none">
-                <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                    <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                        <i class="pi pi-dollar text-xl text-blue-500"></i>
-                    </div>
-                    <span class="text-900 line-height-3">Richard Jones
-                <span class="text-700"> has purchased a blue t-shirt for <span class="text-blue-500">79$</span></span>
-            </span>
-                </li>
-                <li class="flex align-items-center py-2">
-                    <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-orange-100 border-circle mr-3 flex-shrink-0">
-                        <i class="pi pi-download text-xl text-orange-500"></i>
-                    </div>
-                    <span class="text-700 line-height-3">Your request for withdrawal of <span class="text-blue-500 font-medium">2500$</span> has been initiated.</span>
-                </li>
-            </ul>
-
-            <span class="block text-600 font-medium mb-3">YESTERDAY</span>
-            <ul class="p-0 m-0 list-none">
-                <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                    <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                        <i class="pi pi-dollar text-xl text-blue-500"></i>
-                    </div>
-                    <span class="text-900 line-height-3">Keyser Wick
-                <span class="text-700"> has purchased a black jacket for <span class="text-blue-500">59$</span></span>
-            </span>
-                </li>
-                <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                    <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-pink-100 border-circle mr-3 flex-shrink-0">
-                        <i class="pi pi-question text-xl text-pink-500"></i>
-                    </div>
-                    <span class="text-900 line-height-3">Jane Davis<span class="text-700"> has posted a new questions about your product.</span></span>
-                </li>
-            </ul>
-        </div>
-
-        <div class="px-4 py-5 shadow-2 flex flex-column md:flex-row md:align-items-center justify-content-between mb-3" [ngStyle]="{borderRadius: '1rem', background: 'linear-gradient(0deg, rgba(0, 123, 255, 0.5), rgba(0, 123, 255, 0.5)), linear-gradient(92.54deg, #1C80CF 47.88%, #FFFFFF 100.01%)'}">
-       <div>
-           <div class="text-blue-100 font-medium text-xl mt-2 mb-3">TAKE THE NEXT STEP</div>
-           <div class="text-white font-medium text-5xl">Try PrimeBlocks</div>
-       </div>
-       <div class="mt-4 mr-auto md:mt-0 md:mr-0">
-           <a target="_blank" href="https://www.primefaces.org/primeblocks-ng" class="p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised">
-               Get Started
-           </a>
-       </div>
-    </div>
-</div>
-</div>
-
+}@if(this.user?.role_id === 2){
+    <h1>Bienvenido al Panel de Desarrollador</h1>
+}
