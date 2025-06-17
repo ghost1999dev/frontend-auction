@@ -51,7 +51,8 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   filteredApplications: Application[] = [];
   loading = false;
   subscriptions: Subscription = new Subscription();
-  
+  developerRatingData: any | null = null;
+
   company: any;
   developer: any;
   projects: Project[] = [];
@@ -110,6 +111,65 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
       this.changeDetectorRef.detectChanges();
     });
   }
+
+  showDeveloperRatings(developer: any): void {
+    if (!developer || !developer.id) {
+        this.notificationService.showErrorCustom('Desarrollador no válido');
+        return;
+    }
+
+    this.selectedDeveloper = developer;
+    this.loadingRatings = true;
+    this.displayRatingsDialog = true;
+
+    this.subscriptions.add(
+        this.ratingService.getAverageRatingByDeveloper(developer.id).subscribe({
+            next: (response: any) => {
+                this.developerRatingData = {
+                    ratingSummary: {
+                        averageScore: response?.averageScore || 0,
+                        totalRatings: response?.totalRatings || 0,
+                        scoreDistribution: this.calculateScoreDistribution(response.ratings || [])
+                    },
+                    recentRatings: (response.ratings || []).map((rating: any) => ({
+                        score: rating.score,
+                        comment: rating.comment,
+                        createdAt: rating.createdAt,
+                        company_name: rating.company_name || 'Empresa'
+                    }))
+                };
+                
+                this.updateChartData();
+                this.loadingRatings = false;
+            },
+            error: () => {
+                this.loadingRatings = false;
+                this.developerRatingData = this.getDefaultRatings();
+                this.updateChartData();
+            }
+        })
+    );
+}
+
+private calculateScoreDistribution(ratings: any[]): any {
+    const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+    ratings.forEach(rating => {
+        const score = Math.round(rating.score);
+        distribution[score.toString() as keyof typeof distribution]++;
+    });
+    return distribution;
+}
+
+private getDefaultRatings(): any {
+    return {
+        ratingSummary: {
+            averageScore: 0,
+            totalRatings: 0,
+            scoreDistribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }
+        },
+        recentRatings: []
+    };
+}
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
@@ -218,36 +278,57 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     );
   }
 
-  showDeveloperRatings(developer: any): void {
-    if (!developer || !developer.id) {
-      this.notificationService.showErrorCustom('Desarrollador no válido');
-      return;
+  private updateChartData(): void {
+    if (!this.developerRatingData) {
+        this.developerRatingData = this.getDefaultRatings();
     }
 
-    this.selectedDeveloper = developer;
-    this.loadingRatings = true;
-    this.displayRatingsDialog = true;
+    const distribution = this.developerRatingData.ratingSummary.scoreDistribution;
+    const isDark = this.layoutService.config.colorScheme === 'dark';
 
-    this.subscriptions.add(
-      forkJoin([
-        this.ratingService.getAverageRatingByDeveloper(developer.id),
-        this.ratingService.getAllRatings({ developer_id: developer.id })
-      ]).pipe(
-        finalize(() => this.loadingRatings = false)
-      ).subscribe({
-        next: ([averageResponse, ratingsResponse]: any) => {
-          this.averageRating = averageResponse.averageScore;
-          this.totalRatings = averageResponse.totalRatings || 0;
-          this.developerRatings = ratingsResponse.data || [];
-          console.log(this.averageRating)
-          console.log(this.totalRatings)
-          console.log(this.developerRatings)
-
-          this.updateChartData();
-        }
-      })
-    );
-  }
+    this.chartData = {
+        labels: ['1 estrella', '2 estrellas', '3 estrellas', '4 estrellas', '5 estrellas'],
+        datasets: [{
+            label: 'Distribución de Ratings',
+            backgroundColor: isDark ? [
+                'rgba(110, 142, 251, 0.7)',
+                'rgba(110, 142, 251, 0.8)',
+                'rgba(110, 142, 251, 0.9)',
+                'rgba(110, 142, 251, 1.0)',
+                'rgba(167, 119, 227, 1.0)'
+            ] : [
+                'rgba(66, 165, 245, 0.7)',
+                'rgba(66, 165, 245, 0.8)',
+                'rgba(66, 165, 245, 0.9)',
+                'rgba(66, 165, 245, 1.0)',
+                'rgba(126, 87, 194, 1.0)'
+            ],
+            borderColor: isDark ? '#4a4a4a' : '#dfe7ef',
+            borderWidth: 1,
+            borderRadius: 6,
+            hoverBackgroundColor: isDark ? [
+                'rgba(110, 142, 251, 0.9)',
+                'rgba(110, 142, 251, 1.0)',
+                'rgba(110, 142, 251, 1.1)',
+                'rgba(110, 142, 251, 1.2)',
+                'rgba(167, 119, 227, 1.2)'
+            ] : [
+                'rgba(66, 165, 245, 0.9)',
+                'rgba(66, 165, 245, 1.0)',
+                'rgba(66, 165, 245, 1.1)',
+                'rgba(66, 165, 245, 1.2)',
+                'rgba(126, 87, 194, 1.2)'
+            ],
+            data: [
+                distribution['1'] || 0,
+                distribution['2'] || 0,
+                distribution['3'] || 0,
+                distribution['4'] || 0,
+                distribution['5'] || 0
+            ]
+        }]
+    };
+}
 
   private initializeChartOptions(): void {
     const isDark = this.layoutService.config.colorScheme === 'dark';
@@ -292,65 +373,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
       }
     };
   }
-
-private updateChartData(): void {
-    const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
-    this.developerRatings.forEach((rating: any) => {
-      const score = Math.round(rating.score);
-      distribution[score.toString() as keyof typeof distribution]++;
-    });
-
-    const isDark = this.layoutService.config.colorScheme === 'dark';
-
-    // Definimos los colores base para cada nivel de rating
-    const colorPalette = {
-      1: isDark ? 'rgba(220, 53, 69, 0.8)' : 'rgba(220, 53, 69, 0.8)',    // Rojo
-      2: isDark ? 'rgba(255, 152, 0, 0.8)' : 'rgba(255, 152, 0, 0.8)',    // Naranja
-      3: isDark ? 'rgba(255, 193, 7, 0.8)' : 'rgba(255, 193, 7, 0.8)',    // Amarillo
-      4: isDark ? 'rgba(40, 167, 69, 0.8)' : 'rgba(40, 167, 69, 0.8)',    // Verde claro
-      5: isDark ? 'rgba(25, 135, 84, 0.8)' : 'rgba(25, 135, 84, 0.8)'     // Verde oscuro
-    };
-
-    // Colores para hover (más intensos)
-    const hoverColorPalette = {
-      1: isDark ? 'rgba(220, 53, 69, 1)' : 'rgba(220, 53, 69, 1)',
-      2: isDark ? 'rgba(255, 152, 0, 1)' : 'rgba(255, 152, 0, 1)',
-      3: isDark ? 'rgba(255, 193, 7, 1)' : 'rgba(255, 193, 7, 1)',
-      4: isDark ? 'rgba(40, 167, 69, 1)' : 'rgba(40, 167, 69, 1)',
-      5: isDark ? 'rgba(25, 135, 84, 1)' : 'rgba(25, 135, 84, 1)'
-    };
-
-    this.chartData = {
-      labels: ['1 estrella', '2 estrellas', '3 estrellas', '4 estrellas', '5 estrellas'],
-      datasets: [{
-        label: 'Distribución de Ratings',
-        backgroundColor: [
-          colorPalette[1],
-          colorPalette[2],
-          colorPalette[3],
-          colorPalette[4],
-          colorPalette[5]
-        ],
-        borderColor: isDark ? '#4a4a4a' : '#dfe7ef',
-        borderWidth: 1,
-        borderRadius: 6,
-        hoverBackgroundColor: [
-          hoverColorPalette[1],
-          hoverColorPalette[2],
-          hoverColorPalette[3],
-          hoverColorPalette[4],
-          hoverColorPalette[5]
-        ],
-        data: [
-          distribution['1'] || 0,
-          distribution['2'] || 0,
-          distribution['3'] || 0,
-          distribution['4'] || 0,
-          distribution['5'] || 0
-        ]
-      }]
-    };
-}
 
   showProjectDetails(projectId: number): void {
     if (!projectId) return;

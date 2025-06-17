@@ -25,18 +25,34 @@ export class TopbarComponent {
     this.authSvc.logout();
   }
   
-    get isDarkMode(): boolean {
-      return this.layoutService.config.colorScheme === 'dark';
+  isDarkMode = false; // Valor por defecto, será sobrescrito en ngOnInit
+
+  ngOnInit() {
+    // Al iniciar el componente, leemos el tema guardado en localStorage
+    const savedTheme = localStorage.getItem('themePreference');
+    if (savedTheme) {
+      this.isDarkMode = savedTheme === 'dark';
+      this.applyTheme(); // Aplicamos el tema guardado
     }
-  
+  }
+
+  applyTheme() {
+    if (this.isDarkMode) {
+      this.changeTheme('bootstrap4-dark-blue', 'dark');
+    } else {
+      this.changeTheme('lara-light-indigo', 'light')
+    }
+  }
+
     toggleTheme() {
-      const newScheme = this.isDarkMode ? 'light' : 'dark';
-      localStorage.setItem('themePreference', newScheme);
-      this.changeTheme(
-        newScheme === 'dark' ? 'bootstrap4-dark-blue' : 'lara-light-indigo',
-        newScheme
-      );
-    }
+    const newScheme = this.isDarkMode ? 'light' : 'dark';
+    localStorage.setItem('themePreference', newScheme);
+    this.changeTheme(
+      newScheme === 'dark' ? 'bootstrap4-dark-blue' : 'lara-light-indigo',
+      newScheme
+    );
+    window.location.reload()
+  }
   
     changeTheme(theme: string, colorScheme: string) {
       const themeLink = <HTMLLinkElement>document.getElementById('theme-css');
