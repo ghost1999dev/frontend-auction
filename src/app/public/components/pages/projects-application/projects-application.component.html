@@ -14,6 +14,7 @@
           <p-dropdown [options]="projectOptions" [(ngModel)]="selectedProjectFilter" 
                       (onChange)="onProjectFilterChange()" placeholder="Filtrar por proyecto"
                       filter="true"
+                      [style]="{'width':'300px'}"
                       appendTo="body" [showClear]="true">
           </p-dropdown>          
           <span class="p-input-icon-left">
@@ -36,7 +37,7 @@
           <td>{{app.project?.project_name || 'N/A'}}</td>
           <td>
             <div class="developer-info">
-              <span class="developer-name">{{app.developer?.name || 'N/A'}}</span>
+              <span class="developer-name">{{app.developer?.user.name || 'N/A'}}</span>
             </div>
           </td>
           <td>
