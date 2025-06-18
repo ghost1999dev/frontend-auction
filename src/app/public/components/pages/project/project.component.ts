@@ -107,7 +107,6 @@ confirmApply(): void {
     const applicationData = {
         project_id: this.selectedProject.id,
         developer_id: this.developer.id,
-        status: 1
     };
 
     this.projectApplicationsService.createApplication(applicationData)

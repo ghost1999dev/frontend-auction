@@ -135,9 +135,11 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
                         score: rating.score,
                         comment: rating.comment,
                         createdAt: rating.createdAt,
-                        company_name: rating.company_name || 'Empresa'
+                        company_name: rating.author_name
                     }))
                 };
+
+                console.log(this.developerRatingData)
                 
                 this.updateChartData();
                 this.loadingRatings = false;
@@ -440,17 +442,17 @@ private getDefaultRatings(): any {
 
   getStatusText(status: number): string {
     const statusTexts: Record<number, string> = {
-      0: 'Inactivo',
-      1: 'Activa',
-      2: 'Rechazada'
+      0: 'Activo',
+      1: 'Ganado',
+      2: 'Rechazado'
     };
     return statusTexts[status] || 'Desconocido';
   }
 
   getStatusSeverity(status: any): any {
     const severityMap: Record<number, string> = {
-      0: 'warning',
-      1: 'success',
+      0: 'success',
+      1: 'warning',
       2: 'danger'
     };
     return severityMap[status] || 'info';
