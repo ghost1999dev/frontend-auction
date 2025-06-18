@@ -107,7 +107,7 @@ confirmApply(): void {
     const applicationData = {
         project_id: this.selectedProject.id,
         developer_id: this.developer.id,
-        status: 0
+        status: 1
     };
 
     this.projectApplicationsService.createApplication(applicationData)
@@ -300,6 +300,7 @@ hasApplied(projectId: number): boolean {
 
   deleteProject(project: Project): void {
     this.project = { ...project };
+    this.deleteProjectDialog = true; // Abre el diálogo
   }
 
   confirmDelete(): void {

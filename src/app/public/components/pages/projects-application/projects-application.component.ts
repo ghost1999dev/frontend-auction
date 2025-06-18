@@ -440,7 +440,7 @@ private getDefaultRatings(): any {
 
   getStatusText(status: number): string {
     const statusTexts: Record<number, string> = {
-      0: 'Pendiente',
+      0: 'Inactivo',
       1: 'Activa',
       2: 'Rechazada'
     };
