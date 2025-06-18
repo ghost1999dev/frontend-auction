@@ -86,9 +86,9 @@ export class FavoritesComponent implements OnInit {
 
   getStatusText(status: number): string {
     const statusTexts: Record<number, string> = {
-      0: 'Pendiente',
-      1: 'Activa',
-      2: 'Rechazada'
+      0: 'Activo',
+      1: 'Ganado',
+      2: 'Rechazado'
     };
     return statusTexts[status] || 'Desconocido';
   }
