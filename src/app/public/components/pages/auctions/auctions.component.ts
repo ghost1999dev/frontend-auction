@@ -72,8 +72,7 @@ export class AuctionsComponent implements OnInit, OnDestroy {
     this.loading = true;
     const userSub = this.userService.getUsersById(this.id).subscribe({
       next: (user: any) => {
-        if (!user) return;
-        
+        if (!user) return;        
         if (user.role_id === 1) {
           this.loadCompanyData(user.id);
         } else if (user.role_id === 2) {
@@ -89,7 +88,9 @@ export class AuctionsComponent implements OnInit, OnDestroy {
   }
 
   private loadCompanyData(userId: number): void {
-    const companySub = this.companiesService.getCompanyByUserId(userId).subscribe({
+    console.log(userId)
+    const companySub = this.companiesService.getCompanyByUserId(userId)
+    .subscribe({
       next: (company) => {
         this.company = company;
         this.loadCompanyProjectsAndAuctions(company.id);
