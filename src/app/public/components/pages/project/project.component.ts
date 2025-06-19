@@ -392,13 +392,17 @@ filterProjects() {
             project.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
             (project.company?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
             (project.category?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()));
+
+        const hasRemainingDays = project.days_remaining >= 1; // Nueva validación    
+
+        const hasAvailableDays = project.days_available >= 1; // Nueva validación
         
         const matchesStatus = this.developer ? project.status === 1 : 
                             (this.selectedStatus === null || project.status === this.selectedStatus);
         
         const shouldShow = this.developer ? !alreadyApplied : true;
         
-        return matchesSearch && matchesStatus && shouldShow;
+        return matchesSearch && matchesStatus && shouldShow && hasAvailableDays && hasRemainingDays;
     });
 
     console.log('Filtered projects:', this.filteredProjects); // Debug
