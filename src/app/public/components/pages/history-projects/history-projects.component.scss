@@ -1,0 +1,75 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+.card {
+  background-color: var(--surface-card);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+
+  h1 {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+  }
+}
+
+::ng-deep .p-table {
+  .p-datatable {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .p-datatable-thead > tr > th {
+      background-color: var(--surface-100);
+      color: var(--text-color);
+      font-weight: 600;
+      border: none;
+    }
+
+    .p-datatable-tbody > tr {
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: var(--surface-50);
+      }
+
+      td {
+        border: none;
+        border-bottom: 1px solid var(--surface-200);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+  
+  ::ng-deep .p-datatable {
+    .p-datatable-thead {
+      display: none;
+    }
+
+    .p-datatable-tbody {
+      tr {
+        td {
+          text-align: left;
+          display: block;
+          border-bottom: 1px solid var(--surface-200);
+          width: 100%;
+          
+          &:before {
+            content: attr(data-label);
+            font-weight: bold;
+            display: inline-block;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

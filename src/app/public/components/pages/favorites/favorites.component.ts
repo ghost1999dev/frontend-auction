@@ -1,8 +1,13 @@
+// src/app/views/favorites/favorites.component.ts
 import { Component, OnInit } from '@angular/core';
 import { LayoutService } from 'src/app/core/services/layout.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { FavoritesService } from 'src/app/core/services/favorites.service';
+import { FavoriteProject } from 'src/app/core/models/favorites';
+import { AuthService } from 'src/app/core/auth/auth.service';
+import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
   selector: 'app-favorites',
@@ -10,7 +15,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   styleUrls: ['./favorites.component.scss']
 })
 export class FavoritesComponent implements OnInit {
-  savedApplications: any[] = [];
+  favoriteProjects: any[] = [];
   loading = false;
   
   // Project dialog properties
@@ -23,35 +28,38 @@ export class FavoritesComponent implements OnInit {
     public layoutService: LayoutService,
     private notificationService: NotificationService,
     private projectsService: ProjectsService,
+    private favoritesService: FavoritesService,
+    private authService: AuthService,
+    private userService: UserService,
     private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
-    this.loadSavedApplications();
+    this.loadFavoriteProjects(this.id);
   }
 
-  loadSavedApplications(): void {
+  loadFavoriteProjects(id: number): void {
     this.loading = true;
-    try {
-      const savedApps = JSON.parse(localStorage.getItem('savedApplications') || '[]');
-      this.savedApplications = savedApps;
-    } catch (error) {
-      console.error('Error loading saved applications:', error);
-    } finally {
-      this.loading = false;
-    }
+  
+
+    this.favoritesService.getAllFavorites(id).subscribe({
+      next: (response) => {
+        this.favoriteProjects = response.favoriteProjects || [];
+        this.loading = false;
+      },
+      error: (error) => {
+        this.loading = false;
+      }
+    });
   }
 
-  removeFromFavorites(applicationId: number): void {
-    try {
-      const savedApps = JSON.parse(localStorage.getItem('savedApplications') || '[]');
-      const updatedApps = savedApps.filter((app: any) => app.id !== applicationId);
-      localStorage.setItem('savedApplications', JSON.stringify(updatedApps));
-      this.savedApplications = updatedApps;
-      this.notificationService.showSuccessCustom('Aplicación eliminada de favoritos');
-    } catch (error) {
-      console.error('Error removing from favorites:', error);
-    }
+  removeFromFavorites(favoriteId: number): void {
+    this.favoritesService.removeFromFavorites(favoriteId).subscribe({
+      next: () => {
+        this.favoriteProjects = this.favoriteProjects.filter(project => project.id !== favoriteId);
+        this.notificationService.showSuccessCustom('Proyecto eliminado de favoritos');
+      }
+    });
   }
 
   showProjectDetails(projectId: number): void {
@@ -86,10 +94,42 @@ export class FavoritesComponent implements OnInit {
 
   getStatusText(status: number): string {
     const statusTexts: Record<number, string> = {
-      0: 'Activo',
-      1: 'Ganado',
-      2: 'Rechazado'
+      0: 'Pendiente',
+      1: 'Activo',
+      2: 'Inactivo',
+      3: 'Rechazado',
+      4: 'Completado',
+
     };
     return statusTexts[status] || 'Desconocido';
   }
+
+  public getUserById(id: any){
+    this.userService.getUsersById(id)
+    .subscribe((next: any) => {
+      if(next){
+        if(next.role_id === 2){
+          this.loadFavoriteProjects(next.id)
+        }
+      }
+    })
+  }
+
+   getUserInfo() {
+    const token = this.getTokens();
+    let payload;
+    if (token) {
+      payload = token.split(".")[1];
+      payload = window.atob(payload);
+      return JSON.parse(payload)['id'];
+    } else {
+      return null;
+    }
+  }
+  
+  getTokens() {
+    return localStorage.getItem("login-token");
+  }
+
+  id: any = this.getUserInfo();
 }

@@ -1,0 +1,59 @@
+<div class="card">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1>Historial de Aplicaciones a Proyectos</h1>
+  </div>
+
+  <p-table #dt [value]="projects" [loading]="loading" responsiveLayout="scroll" [rows]="10" 
+          [globalFilterFields]="['project_name','status']" [paginator]="true" 
+          [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas" 
+          [rowHover]="true" dataKey="id">
+    <ng-template pTemplate="caption">
+      <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+        <h5 class="m-0"></h5>
+        <span class="block mt-2 md:mt-0 p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..." class="w-full sm:w-auto"/>
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="project_name">Proyecto <p-sortIcon field="project_name"></p-sortIcon></th>
+        <th>Empresa</th>
+        <th>Categoría</th>
+        <th pSortableColumn="budget">Presupuesto <p-sortIcon field="budget"></p-sortIcon></th>
+        <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-project>
+      <tr>
+        <td>
+          <span class="p-column-title">Proyecto</span>
+          {{project.project.project_name || 'N/A'}}
+        </td>
+        <td>
+          <span class="p-column-title">Empresa</span>
+          {{project.project.company_profile?.user?.name || 'N/A'}}
+        </td>
+        <td>
+          <span class="p-column-title">Categoría</span>
+          {{project.project.category?.name || 'N/A'}}
+        </td>
+        <td>
+          <span class="p-column-title">Presupuesto</span>
+          {{project.project.budget | currency}}
+        </td>
+        <td>
+          <span class="p-column-title">Estado</span>
+          <p-tag [severity]="getStatusSeverity(project.project.status)" [value]="getStatusLabel(project.project.status)"></p-tag>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">No se encontraron proyectos en tu historial</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -185,7 +185,7 @@
       <div class="application-details">
         <div class="detail-item">
           <span class="detail-label">Descripción del Proyecto:</span>
-          <p class="project-description">{{ (app.project.description || 'No se proporciona descripción').slice(0, 100) }}{{ (app.project.description || '').length > 100 ? '...' : '' }}</p>
+          <p class="project-description">{{ app.project.description || 'No se proporciona descripción' }}</p>
         </div>
         
         <div class="detail-row">
@@ -214,7 +214,7 @@
       <div class="application-actions p-card-footer">
         <div class="flex justify-content-end gap-2">
           <button pButton pRipple icon="pi pi-bookmark" class="p-button-rounded p-button-primary p-button-sm" 
-                  (click)="saveApplicationToLocalStorage(app)" pTooltip="Guardar aplicación" tooltipPosition="top"></button>
+                  (click)="saveToFavorites(app.project_id)" pTooltip="Guardar en favoritos" tooltipPosition="top"></button>
           <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" 
                   (click)="showProjectDetails(app.project_id)" pTooltip="Ver proyecto" tooltipPosition="top"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" 

@@ -57,6 +57,7 @@ import { AddEditAuctionComponent } from './auctions/add-edit-auction/add-edit-au
 import { PublicAuctionViewComponent } from './auctions/public-auction-view/public-auction-view.component';
 import { BidsComponent } from './bids/bids.component';
 import { AddEditBidComponent } from './bids/add-edit-bid/add-edit-bid.component';
+import { HistoryProjectsComponent } from './history-projects/history-projects.component';
 
 const routes: Routes = [
   {
@@ -121,6 +122,12 @@ const routes: Routes = [
         component: BidsComponent,
         canActivate: [RoleGuard],
         data: { allowedRoles: [1, 2] } 
+      },
+      {
+        path: 'history-application', 
+        component: HistoryProjectsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [2] } 
       }
     ]
   },
@@ -143,7 +150,8 @@ const routes: Routes = [
     AddEditAuctionComponent,
     PublicAuctionViewComponent,
     BidsComponent,
-    AddEditBidComponent
+    AddEditBidComponent,
+    HistoryProjectsComponent
   ],
   imports: [
     CommonModule,

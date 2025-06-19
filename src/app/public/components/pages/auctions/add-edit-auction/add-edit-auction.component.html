@@ -90,14 +90,17 @@
             <label for="bidding_deadline_date" class="block mb-2 font-medium">Fecha y Hora límite*</label>
             <div class="flex gap-2">
               <input type="date" id="bidding_deadline_date" formControlName="bidding_deadline_date" 
-                    [min]="minDeadlineDate | date:'yyyy-MM-dd'" class="w-full" readonly
-                    [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline_date'].errors}"/>
+                     [min]="minDeadlineDate | date:'yyyy-MM-dd'" class="w-full"
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline_date'].errors}"/>
               <input type="time" id="bidding_deadline_time" formControlName="bidding_deadline_time" 
-                    class="w-full" readonly
-                    [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline_time'].errors}"/>
+                     class="w-full"
+                     [ngClass]="{'ng-invalid ng-dirty': submitted && f['bidding_deadline_time'].errors}"/>
             </div>
             <small class="p-error block mt-1" *ngIf="submitted && f['bidding_deadline_date'].errors?.['required']">
               Se requiere fecha límite
+            </small>
+            <small class="p-error block mt-1" *ngIf="auctionForm.errors?.['deadlineBeforeStart']">
+              La fecha límite debe ser posterior a la fecha de inicio
             </small>
           </div>
 

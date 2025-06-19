@@ -8,7 +8,9 @@ import {
   Project, 
   CreateProject, 
   UpdateProject,
-  ProjectFilter
+  ProjectFilter,
+  ProjectHistoryResponse,
+  ProjectHistory
 } from '../models/projects';
 import { environment } from 'src/environments/environment';
 import { NotificationService } from './notification.service';
@@ -79,6 +81,14 @@ export class ProjectsService {
     return this.http.get<ProjectResponse>(`${environment.server_url}projects/show/categoryProject/${categoryId}`, { params: filter as any })
       .pipe(
         map(response => response.projects)
+      );
+  }
+
+  getProjectsHistoryByDeveloper(developerId: number): Observable<ProjectHistory[]> {
+    return this.http.get<ProjectHistoryResponse>(`${environment.server_url}projects/developer-history/${developerId}`)
+      .pipe(
+        map(response => response.projects),
+        catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
 }
