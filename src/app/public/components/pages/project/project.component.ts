@@ -72,10 +72,22 @@ export class ProjectComponent implements OnInit {
   first: number = 0;
   
   // Options
-  statusOptions: any[] = [
+  statusOptions = [
+    { label: 'Pendiente', value: 0 },
     { label: 'Activo', value: 1 },
-    { label: 'Inactivo', value: 0 }
+    { label: 'Inactivo', value: 2 },
+    { label: 'Rechazado', value: 3 },
+    { label: 'Completado', value: 4 },
+    //{ label: 'Republicado', value: 5 }
   ];
+
+  public statusMap: any = {
+    0: { label: 'Pendiente', severity: 'warning' },
+    1: { label: 'Activo', severity: 'success' },
+    2: { label: 'Inactivo', severity: 'danger' },
+    3: { label: 'Rechazado', severity: 'danger' },
+    4: { label: 'Completado', severity: 'info' }
+  };
   
   sortOptions: any[] = [
     { label: 'Más nuevo primero', value: 'newest' },
@@ -145,6 +157,18 @@ showProjectDetails(project: any): void {
       this.displayProjectDialog = false;
     }
   });
+}
+
+formatDate(isoDate: string, locale: string = 'es-ES'): string {
+    const date = new Date(isoDate);
+    
+    return new Intl.DateTimeFormat(locale, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date);
 }
 
 confirmApply(): void {
@@ -628,6 +652,27 @@ hasApplied(projectId: number): boolean {
       return JSON.parse(payload)['id'];
     } else {
       return null;
+    }
+  }
+
+   getStatusText(status: number): string {
+    switch (status) {
+      case 0:
+        return "Pendiente";
+      case 1:
+        return "Activo";
+      case 2:
+        return "Inactivo";
+      case 4:
+        return "Completado";
+      case 3:
+        return "Rechazado";
+      case 4:
+        return "Completado";
+      case 5:
+        return "Republicado";
+      default:
+        return "Desconocido";
     }
   }
   

@@ -135,21 +135,28 @@ export class AuctionsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(devSub);
   }
 
-  private loadActiveAuctions(): void {
+private loadActiveAuctions(): void {
     this.loading = true;
     const auctionsSub = this.auctionService.getAuctions().subscribe({
-      next: (auctions) => {
-        this.auctions = auctions.filter((auction: any) => auction.status === "1");
-        this.filteredActiveAuctions = [...this.auctions];
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-      }
+        next: (auctions) => {
+            const now = new Date(); // Fecha y hora actual
+            
+            // Filtra subastas activas (status === "1") y que no hayan vencido (bidding_deadline > ahora)
+            this.auctions = auctions.filter((auction: any) => {
+                const deadline = new Date(auction.bidding_deadline);
+                return auction.status === "1" && deadline > now;
+            });
+
+            this.filteredActiveAuctions = [...this.auctions];
+            this.loading = false;
+        },
+        error: () => {
+            this.loading = false;
+        }
     });
     
     this.subscriptions.add(auctionsSub);
-  }
+}
 
   // Métodos de UI y utilidades
   getStatusLabel(status: any): any {
