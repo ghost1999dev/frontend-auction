@@ -53,17 +53,16 @@
         </td>
         <td style="width:14%; min-width: 10rem;">
           <span class="p-column-title">Estado</span>
-          <span [class]="'project-badge status-' + (project.status === 1 ? 'active' : 'inactive')">
-            {{project.status === 1 ? 'Activo' : 'Inactivo'}}
-          </span>
+          <p-tag [severity]="statusMap[project.status]?.severity || 'secondary'" 
+                        [value]="statusMap[project.status]?.label || 'Desconocido'"></p-tag>
         </td>
         <td>
           <div class="flex">
-            <button [disabled]="project.status === 0" pButton pRipple icon="pi pi-pencil"
+            <button [disabled]="project.status != 0" pButton pRipple icon="pi pi-pencil"
               class="p-button-rounded p-button-success mr-2" (click)="editProject(project)"></button>
             <button [disabled]="project.status === 1" pButton pRipple icon="pi pi-trash"
               class="p-button-rounded p-button-warning mr-2" (click)="deleteProject(project)"></button>
-            <button [disabled]="project.status === 3 || project.status === 4 || projects.length >= 5" pButton pRipple
+            <button [disabled]="project.status != 0 || projects.length >= 5" pButton pRipple
               icon="pi pi-replay" class="p-button-rounded p-button-info" (click)="rePublishProject(project)"></button>
           </div>
         </td>
@@ -147,7 +146,7 @@
               <div class="flex justify-content-between align-items-center mb-3">
                 <span class="text-sm font-medium text-600">{{project.category?.name || 'General'}}</span>
                 <span class="text-sm font-bold bg-blue-100 text-blue-800 px-2 py-1 border-round">
-                  ${{project.budget || '0'}}
+                  {{project.budget || '0' | currency}}
                 </span>
               </div>
 
@@ -369,7 +368,7 @@
               <i class="pi pi-clock text-primary"></i>
               <span class="detail-label font-medium text-600">Fecha de creación</span>
             </div>
-            <p class="text-900 m-0">{{selectedProject.createdAt }}</p>
+            <p class="text-900 m-0">{{formatDate(selectedProject.createdAt) }}</p>
           </div>
         </div>
       </div>
