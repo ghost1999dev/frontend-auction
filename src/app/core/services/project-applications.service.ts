@@ -14,7 +14,6 @@ export class ProjectApplicationsService {
 
   constructor(
     private http: HttpClient,
-    private notificationService: NotificationService,
     private HandlerErrorSrv: HandlerErrorService,
   ) { }
 

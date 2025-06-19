@@ -13,6 +13,8 @@ import { RatingService } from 'src/app/core/services/rating.service';
 import { Rating } from 'src/app/core/models/ratings';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { DomSanitizer } from '@angular/platform-browser';
+import { FavoritesService } from 'src/app/core/services/favorites.service';
+import { AuthService } from 'src/app/core/auth/auth.service';
 
 interface Application {
   id: number;
@@ -57,6 +59,7 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   developer: any;
   projects: Project[] = [];
   id: any = this.getUserInfo();
+  developerId: any;
 
   // Ratings dialog properties
   displayRatingsDialog = false;
@@ -95,9 +98,9 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private projectsService: ProjectsService,
     private ratingService: RatingService,
-    private sanitizer: DomSanitizer,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
+    private sanitizer: DomSanitizer,  
+    private favoritesService: FavoritesService,
+    private authService: AuthService,
     private changeDetectorRef: ChangeDetectorRef
   ) { }
 
@@ -135,9 +138,11 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
                         score: rating.score,
                         comment: rating.comment,
                         createdAt: rating.createdAt,
-                        company_name: rating.company_name || 'Empresa'
+                        company_name: rating.author_name
                     }))
                 };
+
+                console.log(this.developerRatingData)
                 
                 this.updateChartData();
                 this.loadingRatings = false;
@@ -158,6 +163,24 @@ private calculateScoreDistribution(ratings: any[]): any {
         distribution[score.toString() as keyof typeof distribution]++;
     });
     return distribution;
+}
+
+saveToFavorites(projectId: number): void {
+  if (!projectId) {
+    this.notificationService.showErrorCustom('No se pudo identificar al desarrollador');
+    return;
+  }
+
+  const requestData = {
+    project_id: projectId,
+    developer_id: this.id
+  };
+
+  this.favoritesService.addToFavorites(requestData).subscribe({
+    next: () => {
+      this.notificationService.showSuccessCustom('Proyecto agregado a favoritos');
+    }
+  });
 }
 
 private getDefaultRatings(): any {
@@ -229,6 +252,7 @@ private getDefaultRatings(): any {
         next: (developer) => {
           this.developer = developer;
           if (developer) {
+            this.developerId = developer.id
             this.loadApplications(Number(developer.id));
           }
         }
@@ -440,17 +464,17 @@ private getDefaultRatings(): any {
 
   getStatusText(status: number): string {
     const statusTexts: Record<number, string> = {
-      0: 'Pendiente',
-      1: 'Activa',
-      2: 'Rechazada'
+      0: 'Activo',
+      1: 'Ganado',
+      2: 'Rechazado'
     };
     return statusTexts[status] || 'Desconocido';
   }
 
   getStatusSeverity(status: any): any {
     const severityMap: Record<number, string> = {
-      0: 'warning',
-      1: 'success',
+      0: 'success',
+      1: 'warning',
       2: 'danger'
     };
     return severityMap[status] || 'info';

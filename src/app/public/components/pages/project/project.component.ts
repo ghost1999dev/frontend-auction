@@ -8,7 +8,10 @@ import { NotificationService } from 'src/app/core/services/notification.service'
 import { ProjectApplicationsService } from 'src/app/core/services/project-applications.service';
 import { ProjectsService } from 'src/app/core/services/projects.service';
 import { UserService } from 'src/app/core/services/user.service';
-import { switchMap } from 'rxjs/operators';
+import { finalize, switchMap } from 'rxjs/operators';
+import { DomSanitizer } from '@angular/platform-browser';
+import { RatingService } from 'src/app/core/services/rating.service';
+import { LayoutService } from 'src/app/core/services/layout.service';
 
 @Component({
   selector: 'app-project',
@@ -31,6 +34,13 @@ export class ProjectComponent implements OnInit {
   project: Project = {} as Project;
   public isRepublishing: any;
 
+  displayCompanyRatingsDialog = false;
+  companyRatingData: any | null = null;
+  selectedCompany: any;
+  loadingRatings = false;
+  chartData: any;
+  chartOptions: any
+
   projectDialog: boolean = false;
   deleteProjectDialog: boolean = false;
   deleteProjectsDialog: boolean = false;
@@ -40,6 +50,12 @@ export class ProjectComponent implements OnInit {
     { label: 'Activo', value: 1 },
     { label: 'Inactivo', value: 0 }
   ];
+
+  // Project dialog properties
+  displayProjectDialog = false;
+  //selectedProject: any | null = null;
+  loadingProject = false;
+  sanitizedLongDescription: any;
 
   // Filtering and pagination
   filteredProjects: any[] = [];
@@ -56,10 +72,22 @@ export class ProjectComponent implements OnInit {
   first: number = 0;
   
   // Options
-  statusOptions: any[] = [
+  statusOptions = [
+    { label: 'Pendiente', value: 0 },
     { label: 'Activo', value: 1 },
-    { label: 'Inactivo', value: 0 }
+    { label: 'Inactivo', value: 2 },
+    { label: 'Rechazado', value: 3 },
+    { label: 'Completado', value: 4 },
+    //{ label: 'Republicado', value: 5 }
   ];
+
+  public statusMap: any = {
+    0: { label: 'Pendiente', severity: 'warning' },
+    1: { label: 'Activo', severity: 'success' },
+    2: { label: 'Inactivo', severity: 'danger' },
+    3: { label: 'Rechazado', severity: 'danger' },
+    4: { label: 'Completado', severity: 'info' }
+  };
   
   sortOptions: any[] = [
     { label: 'Más nuevo primero', value: 'newest' },
@@ -75,11 +103,15 @@ export class ProjectComponent implements OnInit {
     private notificationServices: NotificationService,
     private developerService: DeveloperService,
     private companiesService: CompaniesService,
+    private sanitizer: DomSanitizer,
+    private ratingService: RatingService,
+    public layoutService: LayoutService,
   ) { }
 
   ngOnInit(): void {
     this.getUserById(this.id)
     this.filteredProjects = [...this.projects];
+    this.initializeChartOptions()
   }
 
   loadCompany(userId: number): void {
@@ -101,13 +133,50 @@ showApplyDialog(project: any): void {
     this.applyDialogVisible = true;
 }
 
+showProjectDetails(project: any): void {
+  if (!project) return;
+
+  this.loadingProject = true;
+  this.displayProjectDialog = true;
+  this.selectedProject = project;
+  
+  this.sanitizedLongDescription = this.selectedProject.long_description || 
+                                 this.selectedProject.full_description || 
+                                 'No hay descripción disponible';
+
+  this.projectsService.getProjectById(project.id).pipe(
+    finalize(() => this.loadingProject = false)
+  ).subscribe({
+    next: (projectDetails) => {
+      this.selectedProject = projectDetails;
+      this.sanitizedLongDescription = this.sanitizer.bypassSecurityTrustHtml(
+        projectDetails.long_description || projectDetails.full_description || 'No hay descripción disponible'
+      );
+    },
+    error: () => {
+      this.displayProjectDialog = false;
+    }
+  });
+}
+
+formatDate(isoDate: string, locale: string = 'es-ES'): string {
+    const date = new Date(isoDate);
+    
+    return new Intl.DateTimeFormat(locale, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date);
+}
+
 confirmApply(): void {
     if (!this.selectedProject || !this.developer) return;
 
     const applicationData = {
         project_id: this.selectedProject.id,
         developer_id: this.developer.id,
-        status: 0
     };
 
     this.projectApplicationsService.createApplication(applicationData)
@@ -161,6 +230,154 @@ loadApplications(id: number): void {
   });
 }
 
+showCompanyRatings(company: any): void {
+  if (!company || !company.id) {
+    this.notificationServices.showErrorCustom('Compañía no válida');
+    return;
+  }
+
+  this.selectedCompany = company;
+  this.loadingRatings = true;
+  this.displayCompanyRatingsDialog = true;
+
+  this.ratingService.getAverageRatingByCompany(company.id).subscribe({
+    next: (response: any) => {
+      this.companyRatingData = {
+        ratingSummary: {
+          averageScore: response?.averageScore || 0,
+          totalRatings: response?.totalRatings || 0,
+          scoreDistribution: this.calculateScoreDistribution(response.ratings || [])
+        },
+        recentRatings: (response.ratings || []).map((rating: any) => ({
+          score: rating.score,
+          comment: rating.comment,
+          createdAt: rating.createdAt,
+          developer_name: rating.author_name || 'Desarrollador'
+        }))
+      };
+      
+      this.updateChartData();
+      this.loadingRatings = false;
+    },
+    error: () => {
+      this.loadingRatings = false;
+      this.companyRatingData = this.getDefaultRatings();
+      this.updateChartData();
+    }
+  });
+}
+
+private calculateScoreDistribution(ratings: any[]): any {
+  const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+  ratings.forEach(rating => {
+    const score = Math.round(rating.score);
+    distribution[score.toString() as keyof typeof distribution]++;
+  });
+  return distribution;
+}
+
+private getDefaultRatings(): any {
+  return {
+    ratingSummary: {
+      averageScore: 0,
+      totalRatings: 0,
+      scoreDistribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }
+    },
+    recentRatings: []
+  };
+}
+
+private updateChartData(): void {
+  if (!this.companyRatingData) {
+    this.companyRatingData = this.getDefaultRatings();
+  }
+
+  const distribution = this.companyRatingData.ratingSummary.scoreDistribution;
+  const isDark = document.body.classList.contains('dark-theme');
+
+  this.chartData = {
+    labels: ['1 estrella', '2 estrellas', '3 estrellas', '4 estrellas', '5 estrellas'],
+    datasets: [{
+      label: 'Distribución de Ratings',
+      backgroundColor: isDark ? [
+        'rgba(110, 142, 251, 0.7)',
+        'rgba(110, 142, 251, 0.8)',
+        'rgba(110, 142, 251, 0.9)',
+        'rgba(110, 142, 251, 1.0)',
+        'rgba(167, 119, 227, 1.0)'
+      ] : [
+        'rgba(66, 165, 245, 0.7)',
+        'rgba(66, 165, 245, 0.8)',
+        'rgba(66, 165, 245, 0.9)',
+        'rgba(66, 165, 245, 1.0)',
+        'rgba(126, 87, 194, 1.0)'
+      ],
+      borderColor: isDark ? '#4a4a4a' : '#fff',
+      borderWidth: 1,
+      borderRadius: 6,
+      data: [
+        distribution['1'] || 0,
+        distribution['2'] || 0,
+        distribution['3'] || 0,
+        distribution['4'] || 0,
+        distribution['5'] || 0
+      ]
+    }]
+  };
+}
+
+getRandomColor(): string {
+  const colors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+    '#98D8C8', '#F06292', '#7986CB', '#9575CD'
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+private initializeChartOptions(): void {
+    const isDark = this.layoutService.config.colorScheme === 'dark';
+    const textColor = isDark ? '#e0e0e0' : '#495057';
+    const surfaceBorder = isDark ? '#4a4a4a' : '#dfe7ef';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+    this.chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: isDark ? '#3e4858' : '#ffffff',
+          titleColor: textColor,
+          bodyColor: textColor,
+          borderColor: surfaceBorder,
+          borderWidth: 1,
+          padding: 10,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: textColor, font: { weight: 500 } },
+          grid: { color: gridColor, drawBorder: false }
+        },
+        y: {
+          ticks: { 
+            color: textColor, 
+            font: { weight: 500 },
+            stepSize: 1,
+            precision: 0
+          },
+          grid: { color: gridColor, drawBorder: false },
+          beginAtZero: true
+        }
+      },
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      }
+    };
+  }
+
 filterProjects() {
     if (!this.projects || !this.applications) return;
 
@@ -175,13 +392,17 @@ filterProjects() {
             project.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
             (project.company?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
             (project.category?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()));
+
+        const hasRemainingDays = project.days_remaining >= 1; // Nueva validación    
+
+        const hasAvailableDays = project.days_available >= 1; // Nueva validación
         
         const matchesStatus = this.developer ? project.status === 1 : 
                             (this.selectedStatus === null || project.status === this.selectedStatus);
         
         const shouldShow = this.developer ? !alreadyApplied : true;
         
-        return matchesSearch && matchesStatus && shouldShow;
+        return matchesSearch && matchesStatus && shouldShow && hasAvailableDays && hasRemainingDays;
     });
 
     console.log('Filtered projects:', this.filteredProjects); // Debug
@@ -300,6 +521,7 @@ hasApplied(projectId: number): boolean {
 
   deleteProject(project: Project): void {
     this.project = { ...project };
+    this.deleteProjectDialog = true; // Abre el diálogo
   }
 
   confirmDelete(): void {
@@ -434,6 +656,27 @@ hasApplied(projectId: number): boolean {
       return JSON.parse(payload)['id'];
     } else {
       return null;
+    }
+  }
+
+   getStatusText(status: number): string {
+    switch (status) {
+      case 0:
+        return "Pendiente";
+      case 1:
+        return "Activo";
+      case 2:
+        return "Inactivo";
+      case 4:
+        return "Completado";
+      case 3:
+        return "Rechazado";
+      case 4:
+        return "Completado";
+      case 5:
+        return "Republicado";
+      default:
+        return "Desconocido";
     }
   }
   
