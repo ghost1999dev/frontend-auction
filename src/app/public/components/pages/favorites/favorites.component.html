@@ -1,59 +1,53 @@
+<!-- src/app/views/favorites/favorites.component.html -->
 <div class="applications-container" [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
-  <h2 class="title">Mis Aplicaciones Favoritas</h2>
+  <h2 class="title">Mis Proyectos Favoritos</h2>
   
   <div *ngIf="loading" class="loading-spinner">
     <mat-spinner diameter="50"></mat-spinner>
   </div>
 
-  <div *ngIf="!loading && savedApplications.length === 0" class="no-applications">
-    <p>No tienes aplicaciones guardadas aún.</p>
+  <div *ngIf="!loading && favoriteProjects.length === 0" class="no-applications">
+    <p>No tienes proyectos favoritos aún.</p>
   </div>
   
   <div class="applications-grid">
-    <div *ngFor="let app of savedApplications" class="application-card">
+    <div *ngFor="let favorite of favoriteProjects" class="application-card">
       <div class="application-header">
         <div class="project-info">
-          <h3 class="project-name">{{ app.project?.project_name }}</h3>
-          <span class="company-name" *ngIf="app.project?.company_profile?.user">
-            {{ app.project.company_profile.user.name }}
+          <h3 class="project-name">{{ favorite.project?.project_name }}</h3>
+          <span class="company-name" *ngIf="favorite.project?.company_profile?.user">
+            {{ favorite.project.company_profile.user.name }}
           </span>
         </div>
-        <span class="status-badge" [ngClass]="getStatusClass(app.status)">
-          {{ getStatusText(app.status) }}
+        <span class="status-badge" [ngClass]="getStatusClass(favorite.project?.status)">
+          {{ getStatusText(favorite.project?.status) }}
         </span>
       </div>
       
       <div class="application-details">
         <div class="detail-item">
           <span class="detail-label">Descripción del Proyecto:</span>
-          <p class="project-description">{{ (app.project.description || 'No se proporciona descripción').slice(0, 100) }}{{ (app.project.description || '').length > 100 ? '...' : '' }}</p>
+          <p class="project-description">{{ favorite.project?.description || 'No se proporciona descripción' }}</p>
         </div>
         
         <div class="detail-row">
           <div class="detail-item">
             <span class="detail-label">Categoría:</span>
-            <span class="detail-value">{{ app.project?.category?.name || 'No especificada' }}</span>
+            <span class="detail-value">{{ favorite.project?.category?.name || 'No especificada' }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">Fecha de Postulación:</span>
-            <span class="detail-value">{{ app.createdAt | date:'mediumDate' }}</span>
-          </div>
-        </div>
-        
-        <div class="detail-row">
-          <div class="detail-item">
-            <span class="detail-label">Última Actualización:</span>
-            <span class="detail-value">{{ app.updatedAt | date:'mediumDate' }}</span>
+            <span class="detail-label">Fecha de Favorito:</span>
+            <span class="detail-value">{{ favorite.createdAt | date:'mediumDate' }}</span>
           </div>
         </div>
       </div>
       
       <div class="application-actions p-card-footer">
-        <div class="flex justify-content-end gap-2">
-<!--           <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" 
-                  (click)="showProjectDetails(app.project_id)" pTooltip="Ver proyecto" tooltipPosition="top"></button> -->
+        <div class="flex justify-content-end gap-2"><!-- 
+          <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" 
+                  (click)="showProjectDetails(favorite.project_id)" pTooltip="Ver proyecto" tooltipPosition="top"></button> -->
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" 
-                  (click)="removeFromFavorites(app.id)" pTooltip="Eliminar de favoritos" tooltipPosition="top"></button>
+                  (click)="removeFromFavorites(favorite.id)" pTooltip="Eliminar de favoritos" tooltipPosition="top"></button>
         </div>
       </div>
     </div>

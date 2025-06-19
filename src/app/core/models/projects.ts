@@ -63,3 +63,28 @@ export interface ProjectResponse {
   export interface ProjectFilter {
     status?: number;
   }
+
+  // Add this interface to projects.ts
+export interface ProjectHistoryResponse {
+  message: string;
+  projects: ProjectHistory[];
+}
+
+export interface ProjectHistory {
+  id: number;
+  project_name: string;
+  description: string;
+  budget: number;
+  status: number;
+  company: {
+    id: number;
+    user: {
+      id: number;
+      name: string;
+      email: string;
+    };
+  };
+  category: {
+    name: string;
+  };
+}

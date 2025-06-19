@@ -116,10 +116,10 @@ export class AddEditAuctionComponent implements OnInit {
         const startDate = new Date(auction.bidding_started_at);
         const deadlineDate = new Date(auction.bidding_deadline);
         
-        // Formatear fechas y horas para los inputs
-        const startDateStr = startDate.toISOString().split('T')[0];
+        // Ajustar a hora local
+        const startDateStr = `${startDate.getFullYear()}-${(startDate.getMonth() + 1).toString().padStart(2, '0')}-${startDate.getDate().toString().padStart(2, '0')}`;
         const startTimeStr = this.formatTime(startDate);
-        const deadlineDateStr = deadlineDate.toISOString().split('T')[0];
+        const deadlineDateStr = `${deadlineDate.getFullYear()}-${(deadlineDate.getMonth() + 1).toString().padStart(2, '0')}-${deadlineDate.getDate().toString().padStart(2, '0')}`;
         const deadlineTimeStr = this.formatTime(deadlineDate);
         
         this.auctionForm.patchValue({
@@ -132,7 +132,7 @@ export class AddEditAuctionComponent implements OnInit {
         });
         
         // Actualizar la fecha mínima para el deadline
-        this.minDeadlineDate = startDate;
+        this.minDeadlineDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
         this.loading = false;
       },
       error: () => {
@@ -147,13 +147,16 @@ export class AddEditAuctionComponent implements OnInit {
     return `${hours}:${minutes}`;
   }
 
-  private combineDateTimeToISO(dateStr: string, timeStr: string): string {
-    const [hours, minutes] = timeStr.split(':');
-    const date = new Date(dateStr);
-    date.setHours(parseInt(hours, 10));
-    date.setMinutes(parseInt(minutes, 10));
-    return date.toISOString();
-  }
+private combineDateTimeToISO(dateStr: string, timeStr: string): string {
+  const [hours, minutes] = timeStr.split(':');
+  const date = new Date(dateStr);
+  date.setHours(parseInt(hours, 10));
+  date.setMinutes(parseInt(minutes, 10));
+
+  // Formato: "YYYY-MM-DDTHH:mm" (sin Z ni conversión UTC)
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${(date.getDate() + 1).toString().padStart(2, '0')}T${hours}:${minutes}:00`;
+}
+
   onSubmit(): void {
     this.submitted = true;
 
@@ -225,17 +228,18 @@ export class AddEditAuctionComponent implements OnInit {
 private calculateDeadline(startDate: string, startTime: string): { date: string, time: string } {
   if (!startDate || !startTime) return { date: '', time: '' };
 
-  // Crear objeto Date con la fecha/hora de inicio
-  const [hours, minutes] = startTime.split(':');
-  const startDateTime = new Date(startDate);
-  startDateTime.setHours(parseInt(hours, 10));
-  startDateTime.setMinutes(parseInt(minutes, 10));
+  // Parsear la fecha y hora localmente
+  const [year, month, day] = startDate.split('-').map(Number);
+  const [hours, minutes] = startTime.split(':').map(Number);
+  
+  // Crear objeto Date con componentes locales
+  const startDateTime = new Date(year, month - 1, day, hours, minutes);
 
   // Agregar 15 minutos
   startDateTime.setMinutes(startDateTime.getMinutes() + 15);
 
-  // Formatear la nueva fecha/hora
-  const deadlineDate = startDateTime.toISOString().split('T')[0];
+  // Formatear la nueva fecha/hora en formato local
+  const deadlineDate = `${startDateTime.getFullYear()}-${(startDateTime.getMonth() + 1).toString().padStart(2, '0')}-${startDateTime.getDate().toString().padStart(2, '0')}`;
   const deadlineTime = `${startDateTime.getHours().toString().padStart(2, '0')}:${startDateTime.getMinutes().toString().padStart(2, '0')}`;
 
   return { date: deadlineDate, time: deadlineTime };
@@ -257,6 +261,42 @@ onStartDateChange(): void {
     // Actualizar validación mínima
     this.minDeadlineDate = new Date(startDate);
   }
+}
+
+syncDeadlineDate() {
+  const startDate = this.auctionForm.value.bidding_started_at_date;
+  this.auctionForm.patchValue({
+    bidding_deadline_date: startDate,
+  }, { emitEvent: false }); // Evita bucles
+}
+
+// Convierte a formato 'YYYY-MM-DDTHH:mm' (sin segundos, compatible con datetime-local)
+formatDateForInput(date: Date): string {
+  const pad = (num: number) => num.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+// Convierte Date a string 'YYYY-MM-DDTHH:mm' (formato datetime-local)
+private toLocalDatetimeString(date: Date): string {
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+// Parsea el valor del input a Date sin UTC
+private parseLocalDatetime(value: string): Date {
+  const [datePart, timePart] = value.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hours, minutes] = timePart.split(':').map(Number);
+  return new Date(year, month - 1, day, hours, minutes);
+}
+
+fixDatetime(event: Event, controlName: string) {
+  const input = event.target as HTMLInputElement;
+  const value = input.value;
+  // Fuerza el re-renderizado con el valor corregido
+  this.auctionForm.patchValue({
+    [controlName]: value,
+  });
 }
 
 
