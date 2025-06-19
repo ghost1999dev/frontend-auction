@@ -60,7 +60,12 @@ export class AddEditAuctionComponent implements OnInit {
       this.loadAuction(this.auctionId);
     }
 
+    // Escuchar cambios tanto en fecha como hora de inicio
     this.auctionForm.get('bidding_started_at_date')?.valueChanges.subscribe(() => {
+      this.onStartDateChange();
+    });
+    
+    this.auctionForm.get('bidding_started_at_time')?.valueChanges.subscribe(() => {
       this.onStartDateChange();
     });
   }
@@ -85,7 +90,7 @@ export class AddEditAuctionComponent implements OnInit {
   private loadCompanyData(userId: number): void {
     this.companiesService.getCompanyByUserId(userId).subscribe({
       next: (company) => {
-        this.loadProjects(company.id);
+        this.loadProjects(company.id, 4);
       },
       error: () => {
         this.loading = false;
@@ -93,12 +98,14 @@ export class AddEditAuctionComponent implements OnInit {
     });
   }
 
-  loadProjects(id: number): void {
-    this.projectService.getProjectsByCompany(id).subscribe({
-      next: (projects) => {
-        this.projects = projects;
-      }
-    });
+  loadProjects(id: number, statusFilter: number): void {
+      this.projectService.getProjectsByCompany(id).subscribe({
+        next: (projects) => {
+          this.projects = statusFilter !== undefined 
+            ? projects.filter(project => project.status === statusFilter)
+            : projects;
+        }
+      });
   }
 
   loadAuction(id: number): void {
@@ -140,6 +147,13 @@ export class AddEditAuctionComponent implements OnInit {
     return `${hours}:${minutes}`;
   }
 
+  private combineDateTimeToISO(dateStr: string, timeStr: string): string {
+    const [hours, minutes] = timeStr.split(':');
+    const date = new Date(dateStr);
+    date.setHours(parseInt(hours, 10));
+    date.setMinutes(parseInt(minutes, 10));
+    return date.toISOString();
+  }
   onSubmit(): void {
     this.submitted = true;
 
@@ -207,24 +221,44 @@ export class AddEditAuctionComponent implements OnInit {
 
   // Cambia la definición del validador a:
 
+  // Agrega este método para calcular la fecha/hora final
+private calculateDeadline(startDate: string, startTime: string): { date: string, time: string } {
+  if (!startDate || !startTime) return { date: '', time: '' };
 
-private combineDateTimeToISO(dateStr: string, timeStr: string): string {
-  const [hours, minutes] = timeStr.split(':');
-  return `${dateStr}T${hours}:${minutes}:00.000Z`;
+  // Crear objeto Date con la fecha/hora de inicio
+  const [hours, minutes] = startTime.split(':');
+  const startDateTime = new Date(startDate);
+  startDateTime.setHours(parseInt(hours, 10));
+  startDateTime.setMinutes(parseInt(minutes, 10));
+
+  // Agregar 15 minutos
+  startDateTime.setMinutes(startDateTime.getMinutes() + 15);
+
+  // Formatear la nueva fecha/hora
+  const deadlineDate = startDateTime.toISOString().split('T')[0];
+  const deadlineTime = `${startDateTime.getHours().toString().padStart(2, '0')}:${startDateTime.getMinutes().toString().padStart(2, '0')}`;
+
+  return { date: deadlineDate, time: deadlineTime };
 }
 
-  onStartDateChange(): void {
-    const startDate = this.auctionForm.get('bidding_started_at_date')?.value;
-    if (startDate) {
-      this.minDeadlineDate = new Date(startDate);
-      
-      // Si el deadline actual es anterior a la nueva fecha de inicio, lo reseteamos
-      const currentDeadlineDate = this.auctionForm.get('bidding_deadline_date')?.value;
-      if (currentDeadlineDate && currentDeadlineDate <= startDate) {
-        this.auctionForm.get('bidding_deadline_date')?.setValue(null);
-      }
-    }
+// Modifica el onStartDateChange para actualizar automáticamente el deadline
+onStartDateChange(): void {
+  const startDate = this.auctionForm.get('bidding_started_at_date')?.value;
+  const startTime = this.auctionForm.get('bidding_started_at_time')?.value;
+
+  if (startDate && startTime) {
+    const deadline = this.calculateDeadline(startDate, startTime);
+    
+    this.auctionForm.patchValue({
+      bidding_deadline_date: deadline.date,
+      bidding_deadline_time: deadline.time
+    }, { emitEvent: false });
+
+    // Actualizar validación mínima
+    this.minDeadlineDate = new Date(startDate);
   }
+}
+
 
   onCancel(): void {
     this.cancelled.emit();
