@@ -80,7 +80,7 @@ export class PublicAuctionViewComponent implements OnInit, OnDestroy {
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    this.timeRemaining = `${minutes}m ${seconds}s`;
+    this.timeRemaining = `${days}d ${hours}h ${minutes}m ${seconds}s`;
   }
 
   getStatusLabel(status: any): string {
