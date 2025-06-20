@@ -8,6 +8,7 @@ import { FavoritesService } from 'src/app/core/services/favorites.service';
 import { FavoriteProject } from 'src/app/core/models/favorites';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { UserService } from 'src/app/core/services/user.service';
+import { DeveloperService } from 'src/app/core/services/developer.service';
 
 @Component({
   selector: 'app-favorites',
@@ -27,6 +28,7 @@ export class FavoritesComponent implements OnInit {
   constructor(
     public layoutService: LayoutService,
     private notificationService: NotificationService,
+    private developerSrv: DeveloperService,
     private projectsService: ProjectsService,
     private favoritesService: FavoritesService,
     private authService: AuthService,
@@ -35,13 +37,12 @@ export class FavoritesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadFavoriteProjects(this.id);
+    this.getUserById(this.id)
   }
 
-  loadFavoriteProjects(id: number): void {
+  loadFavoriteProjects(id: any) {
     this.loading = true;
   
-
     this.favoritesService.getAllFavorites(id).subscribe({
       next: (response) => {
         this.favoriteProjects = response.favoriteProjects || [];
@@ -104,12 +105,21 @@ export class FavoritesComponent implements OnInit {
     return statusTexts[status] || 'Desconocido';
   }
 
+  loadDeveloper(id: any){
+    this.developerSrv.getDeveloperByIdUser(id)
+    .subscribe({
+      next: (dev: any) => {
+        this.loadFavoriteProjects(Number(dev.id))
+      }
+    })
+  }
+
   public getUserById(id: any){
     this.userService.getUsersById(id)
     .subscribe((next: any) => {
       if(next){
         if(next.role_id === 2){
-          this.loadFavoriteProjects(next.id)
+          this.loadDeveloper(next.id)
         }
       }
     })

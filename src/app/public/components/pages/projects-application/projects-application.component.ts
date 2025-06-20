@@ -173,7 +173,7 @@ saveToFavorites(projectId: number): void {
 
   const requestData = {
     project_id: projectId,
-    developer_id: this.id
+    developer_id: this.developer.id
   };
 
   this.favoritesService.addToFavorites(requestData).subscribe({
