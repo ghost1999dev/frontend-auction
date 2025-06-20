@@ -92,24 +92,24 @@ export class PublicAuctionViewComponent implements OnInit, OnDestroy {
 
   }
 
-  getStatusLabel(status: any): string {
-    switch(status) {
-      case "0": return 'Pendiente';
-      case "1": return 'Activa';
-      case "2": return 'Completada';
-      case "3": return 'Cancelada';
-      default: return 'Desconocido';
-    }
+  getStatusLabel(status: any): any {
+    const statusMap: Record<string, string> = {
+      '0': 'Pendiente',
+      '1': 'Activa',
+      '2': 'Completada',
+      '3': 'Cancelada'
+    };
+    return statusMap[status] || 'Desconocido';
   }
 
   getStatusSeverity(status: any): any {
-    switch(status) {
-      case "0": return 'warning';
-      case "1": return 'success';
-      case "2": return 'info';
-      case "3": return 'danger';
-      default: return '';
-    }
+    const severityMap: Record<string, string> = {
+      '0': 'warning',
+      '1': 'success',
+      '2': 'info',
+      '3': 'danger'
+    };
+    return severityMap[status] || '';
   }
 
   goBack(): void {
