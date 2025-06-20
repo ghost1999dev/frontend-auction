@@ -184,7 +184,6 @@ private combineDateTimeToISO(dateStr: string, timeStr: string): string {
     }
 
     console.log('Datos a enviar:', {
-      ...formData,
       bidding_started_at: formData.bidding_started_at,
       bidding_deadline: formData.bidding_deadline
     });
