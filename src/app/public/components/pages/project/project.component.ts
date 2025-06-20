@@ -221,7 +221,8 @@ confirmApply(): void {
 loadApplications(id: number): void {
   this.projectApplicationsService.getApplicationsByDeveloper(id).subscribe({
     next: (apps: any) => {
-      this.applications = apps;
+      // Filtra las aplicaciones con estado diferente de 3 (Rechazado)
+      this.applications = apps.filter((app: any) => app.status !== 3);
       this.filterProjects(); // Vuelve a filtrar cuando se cargan las aplicaciones
     },
     error: (err) => {
@@ -420,7 +421,8 @@ loadDeveloper(id: number): void {
       // Cargar aplicaciones primero
       this.projectApplicationsService.getApplicationsByDeveloper(Number(data.id)).subscribe({
         next: (apps: any) => {
-          this.applications = apps;
+          // Filtra las aplicaciones con estado diferente de 3 (Rechazado)
+          this.applications = apps.filter((app: any) => app.status !== 3);
           // Luego cargar proyectos y aplicar filtros
           this.loadAllProjects();
         },
@@ -486,7 +488,7 @@ loadAllProjects(): void {
 
 // project.component.ts
 hasApplied(projectId: number): boolean {
-  return this.applications?.some(app => app.project_id === projectId) || false;
+  return this.applications?.some(app => app.project_id === projectId && app.status !== 3) || false;
 }
 
 /*   openNew(): void {

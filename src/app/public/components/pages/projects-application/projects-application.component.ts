@@ -260,47 +260,49 @@ private getDefaultRatings(): any {
     );
   }
 
-  private loadProjectsAndApplications(companyId: number): void {
-    this.loading = true;
-    this.subscriptions.add(
-      forkJoin([
-        this.projectsService.getProjectsByCompany(companyId),
-        this.applicationsService.getAllApplications()
-      ]).pipe(
-        finalize(() => this.loading = false)
-      ).subscribe({
-        next: ([projects, applications]) => {
-          this.projects = projects;
-          this.projectOptions = [
-            { label: 'Todos los proyectos', value: null },
-            ...projects.map((project: Project) => ({
-              label: project.project_name,
-              value: project.id
-            }))
-          ];
-          
-          this.applications = applications.filter((app: any) => 
-            this.projects.some(project => project.id === app.project_id)
-          );
-          this.filteredApplications = [...this.applications];
-        }
-      })
-    );
-  }
+private loadProjectsAndApplications(companyId: number): void {
+  this.loading = true;
+  this.subscriptions.add(
+    forkJoin([
+      this.projectsService.getProjectsByCompany(companyId),
+      this.applicationsService.getAllApplications()
+    ]).pipe(
+      finalize(() => this.loading = false)
+    ).subscribe({
+      next: ([projects, applications]) => {
+        this.projects = projects;
+        this.projectOptions = [
+          { label: 'Todos los proyectos', value: null },
+          ...projects.map((project: Project) => ({
+            label: project.project_name,
+            value: project.id
+          }))
+        ];
+        
+        // Filtrar aplicaciones con estado diferente de 3 (Rechazado)
+        this.applications = applications.filter((app: any) => 
+          this.projects.some(project => project.id === app.project_id) && app.status !== 3
+        );
+        this.filteredApplications = [...this.applications];
+      }
+    })
+  );
+}
 
-  private loadApplications(developerId: number): void {
-    this.loading = true;
-    this.subscriptions.add(
-      this.applicationsService.getApplicationsByDeveloper(developerId).pipe(
-        finalize(() => this.loading = false)
-      ).subscribe({
-        next: (apps) => {
-          this.applications = apps;
-          this.filteredApplications = [...this.applications];
-        }
-      })
-    );
-  }
+private loadApplications(developerId: number): void {
+  this.loading = true;
+  this.subscriptions.add(
+    this.applicationsService.getApplicationsByDeveloper(developerId).pipe(
+      finalize(() => this.loading = false)
+    ).subscribe({
+      next: (apps) => {
+        // Filtrar aplicaciones con estado diferente de 3 (Rechazado)
+        this.applications = apps.filter((app: any) => app.status !== 3);
+        this.filteredApplications = [...this.applications];
+      }
+    })
+  );
+}
 
   private updateChartData(): void {
     if (!this.developerRatingData) {
