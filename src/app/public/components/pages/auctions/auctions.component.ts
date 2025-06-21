@@ -88,7 +88,6 @@ export class AuctionsComponent implements OnInit, OnDestroy {
   }
 
   private loadCompanyData(userId: number): void {
-    console.log(userId)
     const companySub = this.companiesService.getCompanyByUserId(userId)
     .subscribe({
       next: (company) => {

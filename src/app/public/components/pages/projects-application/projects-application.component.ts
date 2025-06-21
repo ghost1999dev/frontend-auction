@@ -141,8 +141,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
                         company_name: rating.author_name
                     }))
                 };
-
-                console.log(this.developerRatingData)
                 
                 this.updateChartData();
                 this.loadingRatings = false;

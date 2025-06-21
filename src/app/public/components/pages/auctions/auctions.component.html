@@ -36,11 +36,11 @@
                 </td>
                 <td>
                     <span class="p-column-title">Fecha inicio</span>
-                    {{auction.bidding_started_at | date:'medium'}}
+                    {{auction.bidding_started_at | date:'medium':'UTC'}}
                 </td>
                 <td>
                     <span class="p-column-title">Fecha límite</span>
-                    {{auction.bidding_deadline | date:'medium'}}
+                    {{auction.bidding_deadline | date:'medium':'UTC'}}
                 </td>
                 <td>
                     <span class="p-column-title">Estado</span>

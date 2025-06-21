@@ -75,7 +75,6 @@ export class HistoryProjectsComponent implements OnInit, OnDestroy {
     const historySub = this.projectsService.getProjectsHistoryByDeveloper(developerId).subscribe({
       next: (projects) => {
         this.projects = projects;
-        console.log(projects)
         this.loading = false;
       },
       error: () => {

@@ -49,7 +49,6 @@ export class AddEditAuctionComponent implements OnInit {
       bidding_started_at_time: ['00:00', Validators.required],
       bidding_deadline_date: [null, Validators.required],
       bidding_deadline_time: ['00:00', Validators.required],
-      status: [0]
     })
   }
 
@@ -182,11 +181,6 @@ private combineDateTimeToISO(dateStr: string, timeStr: string): string {
         formData.bidding_deadline_time
       );
     }
-
-    console.log('Datos a enviar:', {
-      bidding_started_at: formData.bidding_started_at,
-      bidding_deadline: formData.bidding_deadline
-    });
 
     // Eliminar los campos temporales que ya no necesitamos
     delete formData.bidding_started_at_date;

@@ -381,10 +381,6 @@ private initializeChartOptions(): void {
 
 filterProjects() {
     if (!this.projects || !this.applications) return;
-
-    console.log('Filtering projects...'); // Debug
-    console.log('Current applications:', this.applications); // Debug
-
     this.filteredProjects = this.projects.filter(project => {
         const alreadyApplied = this.applications.some(app => app.project_id === project.id);
         
@@ -405,8 +401,6 @@ filterProjects() {
         
         return matchesSearch && matchesStatus && shouldShow && hasAvailableDays && hasRemainingDays;
     });
-
-    console.log('Filtered projects:', this.filteredProjects); // Debug
     
     this.sortProjects();
     this.page = 1;
