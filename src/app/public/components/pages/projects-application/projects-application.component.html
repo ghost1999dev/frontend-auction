@@ -195,14 +195,14 @@
           </div>
           <div class="detail-item">
             <span class="detail-label">Fecha de Postulación:</span>
-            <span class="detail-value">{{ app.createdAt | date:'mediumDate' }}</span>
+            <span class="detail-value">{{ app.createProject | date:'mediumDate' }}</span>
           </div>
         </div>
         
         <div class="detail-row">
           <div class="detail-item">
             <span class="detail-label">Última Actualización:</span>
-            <span class="detail-value">{{ app.updatedAt | date:'mediumDate' }}</span>
+            <span class="detail-value">{{ app.updateProject | date:'mediumDate' }}</span>
           </div>
           <!-- <div class="detail-item">
             <span class="detail-label">Email de Contacto:</span>
@@ -283,7 +283,7 @@
                 <i class="pi pi-clock text-primary"></i>
                 <span class="detail-label font-medium text-600">Última actualización</span>
               </div>
-              <p class="text-900 m-0">{{selectedProject.updated_at || 'No disponible'}}</p>
+              <p class="text-900 m-0">{{selectedProject.updateProject | date:'mediumDate'}}</p>
             </div>
           </div>
         </div>
@@ -326,6 +326,13 @@
     <div class="flex align-items-center gap-3 mb-3">
       <i class="pi pi-exclamation-triangle text-2xl text-yellow-500"></i>
       <span>¿Estás seguro de que quieres retirar tu aplicación?</span>
+    </div>
+    
+    <div class="field mt-4">
+      <label for="withdrawReason" class="block mb-2">Razón del retiro:</label>
+      <textarea id="withdrawReason" [(ngModel)]="withdrawReason" rows="3" 
+                pInputTextarea class="w-full" [autoResize]="true"
+                placeholder="Por favor explica por qué retiras tu aplicación..."></textarea>
     </div>
   </div>
   <ng-template pTemplate="footer">

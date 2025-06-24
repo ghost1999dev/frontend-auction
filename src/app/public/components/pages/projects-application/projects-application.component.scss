@@ -1551,3 +1551,17 @@ $dark-colors: (
 .p-chart {
     animation: chartUpdate 0.5s ease-out;
 }
+
+.confirmation-content {
+  .field {
+    label {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+    
+    textarea {
+      width: 100%;
+      min-height: 100px;
+    }
+  }
+}

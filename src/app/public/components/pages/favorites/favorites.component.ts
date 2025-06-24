@@ -22,6 +22,7 @@ export class FavoritesComponent implements OnInit {
   loading = false;
   applications: any[] = [];
   developer: any;
+  withdrawReason: string = '';
 
   // Project dialog properties
   selectedProject: any | null = null;
@@ -135,10 +136,6 @@ export class FavoritesComponent implements OnInit {
                 console.error('Error loading applications:', err);
               }
             });
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom('Error al Aplica al proyecto');
-          console.error('Error applying to project:', err);
         }
       });
   }

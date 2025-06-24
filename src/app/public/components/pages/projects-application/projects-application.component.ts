@@ -70,6 +70,7 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   loadingRatings = false;
   chartData: any;
   chartOptions: any;
+  withdrawReason: string = '';
 
   // Project dialog properties
   displayProjectDialog = false;
@@ -226,6 +227,36 @@ private getDefaultRatings(): any {
       })
     );
   }
+
+  confirmWithdraw(): void {
+  if (!this.selectedApplicationId || !this.developer || !this.withdrawReason.trim()) {
+    this.notificationService.showErrorCustom('Por favor ingresa una razón para retirar tu aplicación');
+    return;
+  }
+  
+  this.withdrawLoading = true;
+  
+  // Aquí puedes usar this.withdrawReason para enviar la razón al servicio
+  console.log('Razón de retiro:', this.withdrawReason); // Esto es temporal
+  
+  this.subscriptions.add(
+    this.applicationsService.deleteApplication(this.selectedApplicationId).pipe(
+      finalize(() => {
+        this.withdrawLoading = false;
+        this.withdrawReason = ''; // Limpiar el textarea después
+      })
+    ).subscribe({
+      next: () => {
+        this.notificationService.showSuccessCustom('Aplicación retirada correctamente');
+        this.loadApplications(Number(this.developer.id));
+        this.displayWithdrawDialog = false;
+      },
+      error: (error) => {
+        this.notificationService.showErrorCustom('Error al retirar la aplicación');
+      }
+    })
+  );
+}
 
   private loadCompanyData(userId: number): void {
     this.loading = true;
@@ -424,23 +455,6 @@ private loadApplications(developerId: number): void {
   openWithdrawDialog(applicationId: number): void {
     this.selectedApplicationId = applicationId;
     this.displayWithdrawDialog = true;
-  }
-
-  confirmWithdraw(): void {
-    if (!this.selectedApplicationId || !this.developer) return;
-    
-    this.withdrawLoading = true;
-    this.subscriptions.add(
-      this.applicationsService.deleteApplication(this.selectedApplicationId).pipe(
-        finalize(() => this.withdrawLoading = false)
-      ).subscribe({
-        next: () => {
-          this.notificationService.showSuccessCustom('Aplicación retirada correctamente');
-          this.loadApplications(Number(this.developer.id));
-          this.displayWithdrawDialog = false;
-        }
-      })
-    );
   }
 
   onProjectFilterChange(): void {

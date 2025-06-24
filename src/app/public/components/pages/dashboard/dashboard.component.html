@@ -20,7 +20,7 @@
                             <div class="card-content">
                                 <i class="pi pi-code card-icon"></i>
                                 <span class="card-title">Desarrollador</span>
-                                <span class="card-description">Regístrate como desarrollador freelance</span>
+                                <span class="card-description">Regístrate como desarrollador</span>
                             </div>
                         </p-card>
 
@@ -44,7 +44,7 @@
 
                                         <!-- Address -->
                                         <div class="field-container">
-                                            <label for="address" class="input-label">Dirección</label>
+                                            <label for="address" class="input-label">Dirección *</label>
                                             <input id="address" type="text" pInputText formControlName="address" 
                                                     class="centered-input"
                                                     [ngClass]="{'p-invalid': submitted && developerForm.get('address')?.errors}">
@@ -55,7 +55,7 @@
 
                                         <!-- Phone -->
                                         <div class="field-container">
-                                            <label for="phone" class="input-label">Teléfono</label>
+                                            <label for="phone" class="input-label">Teléfono *</label>
                                             <input id="phone" type="text" 
                                             (input)="formatPhone($event)" 
                                             pInputText class="centered-input"
@@ -68,7 +68,7 @@
 
                                         <!-- Password -->
                                         <div class="field-container">
-                                            <label for="password" class="input-label">Contraseña</label>
+                                            <label for="password" class="input-label">Contraseña *</label>
                                             <div class="password-input-container">
                                                 <p-password 
                                                     id="password" 
@@ -115,7 +115,7 @@
                                         </div>
 
                                         <div class="field-container">
-                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña</label>
+                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña *</label>
                                             <div class="password-input-container">
                                                 <p-password 
                                                     id="confirmPassword" 
@@ -179,7 +179,7 @@
                                     <div class="form-column">
                                                                                 <!-- Address -->
                                         <div class="field-container">
-                                            <label for="address" class="input-label">Dirección</label>
+                                            <label for="address" class="input-label">Dirección *</label>
                                             <input id="address" type="text" pInputText formControlName="address" 
                                                     class="centered-input"
                                                     [ngClass]="{'p-invalid': submitted && companyForm.get('address')?.errors}">
@@ -190,7 +190,7 @@
 
                                                                                <!-- NRC Number -->
                                         <div class="field-container">
-                                            <label for="nrc_number" class="input-label">Número de NRC</label>
+                                            <label for="nrc_number" class="input-label">Número de NRC *</label>
                                             <input id="nrc_number" type="text" 
                                                 (input)="formatNrcNumber($event)"
                                                 pInputText 
@@ -205,7 +205,7 @@
                                         
                                         <!-- Password -->
                                         <div class="field-container">
-                                            <label for="password" class="input-label">Contraseña</label>
+                                            <label for="password" class="input-label">Contraseña *</label>
                                             <div class="password-input-container">
                                                 <p-password 
                                                     id="password" 
@@ -257,7 +257,7 @@
                                     <div class="form-column">
                                         <!-- Phone -->
                                         <div class="field-container">
-                                            <label for="phone" class="input-label">Teléfono</label>
+                                            <label for="phone" class="input-label">Teléfono *</label>
                                             <input id="phone" type="text" 
                                             (input)="formatPhoneCompany($event)" 
                                             pInputText class="centered-input"
@@ -270,7 +270,7 @@
 
                                         <!-- Business Type -->
                                         <div class="field-container">
-                                            <label for="business_type" class="input-label">Tipo de Negocio</label>
+                                            <label for="business_type" class="input-label">Tipo de Negocio *</label>
                                             <div class="chips-container">
                                                 <p-chips id="business_type" 
                                                         [(ngModel)]="businessTypeTags"
@@ -293,7 +293,7 @@
                                         </div>
 
                                         <div class="field-container">
-                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña</label>
+                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña *</label>
                                             <div class="password-input-container">
                                                 <p-password 
                                                     id="confirmPassword" 
@@ -333,10 +333,10 @@
 
     <ng-template pTemplate="footer">
         <div class="footer-buttons">
-            <button pButton type="button" label="Regresar" icon="pi pi-arrow-left" 
+            <button pButton type="button" label="Regresar"
                     (click)="goBack()" 
                     class="p-button-outlined p-button-secondary"></button>
-            <button pButton type="submit" label="Registrar" icon="pi pi-check" 
+            <button pButton type="submit" label="Registrar" 
                     (click)="register()" 
                     class="p-button-success"
                     [disabled]="clicked"></button>

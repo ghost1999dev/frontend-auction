@@ -225,10 +225,6 @@ confirmApply(): void {
                         console.error('Error loading applications:', err);
                     }
                 });
-        },
-        error: (err) => {
-            this.notificationServices.showErrorCustom('Error al Aplica al proyecto');
-            console.error('Error applying to project:', err);
         }
     });
 }

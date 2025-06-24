@@ -143,7 +143,7 @@ private loadActiveAuctions(): void {
             // Filtra subastas activas (status === "1") y que no hayan vencido (bidding_deadline > ahora)
             this.auctions = auctions.filter((auction: any) => {
                 const deadline = new Date(auction.bidding_deadline);
-                return auction.status === "1" && deadline > now;
+                return auction.status === 1 && deadline > now;
             });
 
             this.filteredActiveAuctions = [...this.auctions];

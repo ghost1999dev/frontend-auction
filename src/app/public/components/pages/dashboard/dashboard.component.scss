@@ -16,6 +16,34 @@
     overflow: hidden;
 }
 
+  .password-checklist {
+    background-color: var(--surface-50);
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    border: 1px solid var(--surface-200);
+    
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.5rem;
+    }
+    
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+    
+    .pi {
+      font-size: 1rem;
+    }
+  }
+
 .field-container {
   margin-bottom: 1rem;
 }
@@ -380,8 +408,8 @@
 /* Estilos para el footer del diálogo */
 ::ng-deep .p-dialog .p-dialog-footer {
     padding: 1rem;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
+    //border-top: 1px solid #e5e7eb;
+    //background: #f9fafb;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
 }
@@ -405,8 +433,7 @@
 /* Botón Atrás */
 .footer-buttons .p-button-outlined.p-button-secondary {
     border: 1px solid #6b7280;
-    color: #6b7280;
-    background: transparent;
+    color: #fff;
 }
 
 .footer-buttons .p-button-outlined.p-button-secondary:hover {

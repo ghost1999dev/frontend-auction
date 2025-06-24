@@ -87,7 +87,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           asyncValidators: [this.nrcValidator.bind(this)],
           updateOn: 'blur' // Opcional: para que no valide con cada tecla presionada
         }],           
-        web_site: ['', Validators.required],
+        web_site: [''],
         nit_number: [''],       
       });
   } 
