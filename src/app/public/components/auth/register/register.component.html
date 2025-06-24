@@ -37,7 +37,7 @@
                 <!-- Developer Form -->
                 <div *ngIf="userType === 'developer'" class="form-container">
                     <form [formGroup]="developerForm" (ngSubmit)="onSubmitDeveloper()">
-                        <label for="name" class="block text-900 text-xl font-medium mb-2">Nombre del desarrollador</label>
+                        <label for="name" class="block text-900 text-xl font-medium mb-2">Nombre del desarrollador *</label>
                         <input id="name" type="text" pInputText class="w-full mb-2" 
                                style="padding:1rem" formControlName="name"
                                placeholder="Ingrese su nombre completo">
@@ -45,7 +45,7 @@
                             Nombre es requerido
                         </small>
 
-                        <label for="email" class="block text-900 text-xl font-medium mb-2 mt-3">Correo electrónico</label>
+                        <label for="email" class="block text-900 text-xl font-medium mb-2 mt-3">Correo electrónico *</label>
                         <input id="email" type="email" pInputText class="w-full mb-2" 
                                style="padding:1rem" formControlName="email"
                                placeholder="ejemplo@correo.com">
@@ -56,7 +56,7 @@
                             Formato de email inválido
                         </small>
 
-                        <label for="password" class="block text-900 text-xl font-medium mb-2 mt-3">Contraseña</label>
+                        <label for="password" class="block text-900 text-xl font-medium mb-2 mt-3">Contraseña *</label>
                         <p-password 
                             id="password"
                             formControlName="password"
@@ -110,7 +110,7 @@
                 <!-- Company Form -->
                 <div *ngIf="userType === 'company'" class="form-container">
                     <form [formGroup]="companyForm" (ngSubmit)="onSubmitCompany()">
-                        <label for="companyName" class="block text-900 text-xl font-medium mb-2">Nombre de la empresa</label>
+                        <label for="companyName" class="block text-900 text-xl font-medium mb-2">Nombre de la empresa *</label>
                         <input id="companyName" type="text" pInputText class="w-full mb-2" 
                                style="padding:1rem" formControlName="name"
                                placeholder="Ingrese el nombre de la empresa">
@@ -118,7 +118,7 @@
                             Nombre de empresa es requerido
                         </small>
 
-                        <label for="companyEmail" class="block text-900 text-xl font-medium mb-2 mt-3">Correo electrónico</label>
+                        <label for="companyEmail" class="block text-900 text-xl font-medium mb-2 mt-3">Correo electrónico *</label>
                         <input id="companyEmail" type="email" pInputText class="w-full mb-2" 
                                style="padding:1rem" formControlName="email"
                                placeholder="empresa@correo.com">
@@ -129,7 +129,7 @@
                             Formato de email inválido
                         </small>
 
-                        <label for="companyPassword" class="block text-900 text-xl font-medium mb-2 mt-3">Contraseña</label>
+                        <label for="companyPassword" class="block text-900 text-xl font-medium mb-2 mt-3">Contraseña *</label>
                         <p-password 
                             id="companyPassword"
                             formControlName="password"
@@ -183,3 +183,35 @@
         </div>
     </div>
 </div>
+
+<p-dialog 
+  header="Información importante" 
+  [(visible)]="displayRequirementsDialog" 
+  [style]="{width: '50vw'}" 
+  [modal]="true"
+  [draggable]="false" 
+  [resizable]="false">
+  
+  <div [innerHTML]="requirementsMessage"></div>
+  
+  <ng-template pTemplate="footer">
+    <button 
+      pButton 
+      pRipple 
+      label="Cancelar" 
+      icon="pi pi-times" 
+      class="p-button-text" 
+      (click)="displayRequirementsDialog = false">
+    </button>
+    <button 
+      pButton 
+      pRipple 
+      label="Continuar" 
+      icon="pi pi-check" 
+      (click)="userType = 'company'; submitted = false; displayRequirementsDialog = false">
+    </button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

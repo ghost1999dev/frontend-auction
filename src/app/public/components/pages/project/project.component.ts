@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
 import { forkJoin } from 'rxjs';
-import { Project, UpdateProject } from 'src/app/core/models/projects';
+import { Category, Project, UpdateProject } from 'src/app/core/models/projects';
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
@@ -12,6 +12,8 @@ import { finalize, switchMap } from 'rxjs/operators';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RatingService } from 'src/app/core/services/rating.service';
 import { LayoutService } from 'src/app/core/services/layout.service';
+import { FavoritesService } from 'src/app/core/services/favorites.service';
+import { CategoryService } from 'src/app/core/services/categories.service';
 
 @Component({
   selector: 'app-project',
@@ -24,6 +26,8 @@ export class ProjectComponent implements OnInit {
   public company: any;
   public company_id!: number;
   public developer: any;
+  selectedCategory: number | null = null;
+  categories: Category[] = [];
 
   applyDialogVisible: boolean = false;
   selectedProject: any = null;
@@ -106,12 +110,15 @@ export class ProjectComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private ratingService: RatingService,
     public layoutService: LayoutService,
+    private favoritesService: FavoritesService,
+    private categoryService: CategoryService
   ) { }
 
   ngOnInit(): void {
     this.getUserById(this.id)
     this.filteredProjects = [...this.projects];
     this.initializeChartOptions()
+    this.loadCategories();
   }
 
   loadCompany(userId: number): void {
@@ -127,11 +134,19 @@ export class ProjectComponent implements OnInit {
     });
   }
 
+  loadCategories(): void {
+    this.categoryService.getAllCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      }
+    });
+  }
+
   // Añade este método para mostrar el diálogo
-showApplyDialog(project: any): void {
-    this.selectedProject = project;
-    this.applyDialogVisible = true;
-}
+  showApplyDialog(project: any): void {
+      this.selectedProject = project;
+      this.applyDialogVisible = true;
+  }
 
 showProjectDetails(project: any): void {
   if (!project) return;
@@ -212,7 +227,7 @@ confirmApply(): void {
                 });
         },
         error: (err) => {
-            this.notificationServices.showErrorCustom('Error al aplicar al proyecto');
+            this.notificationServices.showErrorCustom('Error al Aplica al proyecto');
             console.error('Error applying to project:', err);
         }
     });
@@ -390,22 +405,25 @@ filterProjects() {
             (project.company?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
             (project.category?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()));
 
-        const hasRemainingDays = project.days_remaining >= 1; // Nueva validación    
+        const matchesCategory = !this.selectedCategory || 
+                              (project.category && project.category.id === this.selectedCategory);
 
-        const hasAvailableDays = project.days_available >= 1; // Nueva validación
+        const hasRemainingDays = project.days_remaining >= 1;
+        const hasAvailableDays = project.days_available >= 1;
         
         const matchesStatus = this.developer ? project.status === 1 : 
                             (this.selectedStatus === null || project.status === this.selectedStatus);
         
         const shouldShow = this.developer ? !alreadyApplied : true;
         
-        return matchesSearch && matchesStatus && shouldShow && hasAvailableDays && hasRemainingDays;
+        return matchesSearch && matchesStatus && shouldShow && hasAvailableDays && hasRemainingDays && matchesCategory;
     });
     
     this.sortProjects();
     this.page = 1;
     this.first = 0;
 }
+
 
 loadDeveloper(id: number): void {
   this.developerService.getDeveloperByIdUser(id)
@@ -537,6 +555,24 @@ hasApplied(projectId: number): boolean {
     this.submitted = false;
   }
 
+  saveToFavorites(projectId: any): void {
+  if (!projectId) {
+    this.notificationServices.showErrorCustom('No se pudo identificar al desarrollador');
+    return;
+  }
+
+  const requestData = {
+    project_id: projectId,
+    developer_id: this.developer.id
+  };
+
+  this.favoritesService.addToFavorites(requestData).subscribe({
+    next: () => {
+      this.notificationServices.showSuccessCustom('Proyecto agregado a favoritos');
+    }
+  });
+}
+
   saveProject(id: any): void {
     this.submitted = true;
 
@@ -635,6 +671,7 @@ hasApplied(projectId: number): boolean {
     this.searchTerm = '';
     this.selectedStatus = null;
     this.selectedSort = 'newest';
+    this.selectedCategory = null;
     this.filterProjects();
   }
 

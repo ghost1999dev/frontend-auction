@@ -23,6 +23,7 @@
         <th>Empresa</th>
         <th>Categoría</th>
         <th pSortableColumn="budget">Presupuesto <p-sortIcon field="budget"></p-sortIcon></th>
+        <th>Fecha de Aplicación</th>
         <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
       </tr>
     </ng-template>
@@ -43,6 +44,10 @@
         <td>
           <span class="p-column-title">Presupuesto</span>
           {{project.project.budget | currency}}
+        </td>
+        <td>
+          <span class="p-column-title">Fecha de Aplicación</span>
+          {{project.createdAt | date:'medium':'UTC' }}
         </td>
         <td>
           <span class="p-column-title">Estado</span>

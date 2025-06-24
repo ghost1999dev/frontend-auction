@@ -114,7 +114,7 @@
         <div *ngIf="applications.length > 0 && filteredProjects.length === 0" class="col-12 text-center mt-5">
           <p class="text-600 text-xl">Ya has aplicado a todos los proyectos disponibles</p>
           <button pButton pRipple type="button" label="Ver mis aplicaciones" icon="pi pi-list"
-            class="p-button-outlined mt-3" routerLink="/projects/applications"></button>
+            class="p-button-outlined mt-3" routerLink="/main/projects-application"></button>
         </div>
 
         <!-- Barra de búsqueda y filtros -->
@@ -130,6 +130,15 @@
           </div>
 
           <div class="flex mt-3 gap-2">
+            <p-dropdown [options]="categories" [(ngModel)]="selectedCategory" 
+              optionLabel="name" optionValue="id" placeholder="Todas las categorías"
+              (onChange)="filterProjects()" [showClear]="true">
+              <ng-template let-category pTemplate="item">
+                <div class="flex align-items-center">
+                  <span>{{category.name}}</span>
+                </div>
+              </ng-template>
+            </p-dropdown>
             <!--<p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatus" 
                              optionLabel="label" optionValue="value" placeholder="Estado"
                              (onChange)="filterProjects()" [showClear]="true"></p-dropdown>-->
@@ -158,7 +167,12 @@
               <div class="flex justify-content-between align-items-center">
                 <div class="flex align-items-center">
                   <i class="pi pi-building text-600 mr-2"></i>
-                  <span class="text-sm text-600">{{project.company?.name || 'Empresa'}}</span>
+                  <span class="text-sm text-600">{{project.company?.user?.name || 'Empresa'}}</span>
+
+                  <div class="ml-2">
+                    <i class="pi pi-clock text-600 mr-1"></i>
+                    <span class="text-sm text-600">{{project.days_remaining || '0'}} días</span>
+                  </div>
                 </div>
                 <span class="text-sm font-bold"
                   [ngClass]="{'text-green-500': project.status === 1, 'text-red-500': project.status === 0}">
@@ -170,9 +184,10 @@
                 <div class="flex align-items-center gap-3">
                   <!-- Días disponibles -->
                   <div class="flex align-items-center">
-                    <i class="pi pi-clock text-600 mr-1"></i>
-                    <span class="text-sm text-600">{{project.days_remaining || '0'}} días</span>
+                    <i class="pi pi-bookmark text-600 mr-1"></i>
+                    <span class="text-sm text-600" style="cursor: pointer" (click)="saveToFavorites(project.id)">Guardar</span>
                   </div>
+
 
                   <!-- Ratings -->
                   <div class="flex align-items-center">
@@ -182,14 +197,14 @@
                 </div>
 
                 <button *ngIf="project.status === 1 && !hasApplied(project.id) && applications.length < 5" pButton
-                  pRipple type="button" label="Aplicar a este Proyecto" icon="pi pi-arrow-right" iconPos="right"
+                  pRipple type="button" label="Aplica a este Proyecto" icon="pi pi-arrow-right" iconPos="right"
                   class="p-button-sm p-button-text" (click)="showApplyDialog(project)"></button>
 
                 <span *ngIf="hasApplied(project.id)" class="text-sm font-medium text-green-500">
                   <i class="pi pi-check-circle"></i> Ya aplicaste
                 </span>
                 <h6 *ngIf="project.status === 1 && applications.length >= 5" class="text-700 font-normal"
-                  style="color: red !important; margin-top: 03px;">Aplicar a 5 Proyectos Maximo</h6>
+                  style="color: red !important; margin-top: 03px;">Aplica a 5 Proyectos Maximo</h6>
               </div>
             </div>
           </div>
@@ -309,7 +324,6 @@
     </ng-template>
 </p-dialog>
 
-<!-- Dentro del @else if (this.developer), después del p-dialog de confirmación de aplicación -->
 <p-dialog [(visible)]="displayProjectDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '1200px'}"
   [draggable]="false" [resizable]="false" [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
   header="Detalles del Proyecto" styleClass="project-dialog">
@@ -369,7 +383,7 @@
               <i class="pi pi-clock text-primary"></i>
               <span class="detail-label font-medium text-600">Fecha de creación</span>
             </div>
-            <p class="text-900 m-0">{{formatDate(selectedProject.createdAt) }}</p>
+            <p class="text-900 m-0">{{selectedProject.createProject | date:'medium':'UTC'}}</p>
           </div>
         </div>
       </div>
@@ -397,16 +411,13 @@
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayProjectDialog = false"
       class="p-button-outlined p-button-secondary"></button>
-    <button *ngIf="selectedProject?.status === 1 && !hasApplied(selectedProject.id) && applications.length < 5" pButton
-      pRipple label="Aplicar a este proyecto" icon="pi pi-check"
-      (click)="showApplyDialog(selectedProject); displayProjectDialog = false" class="p-button-success"></button>
   </ng-template>
 </p-dialog>
 
 <p-dialog [(visible)]="applyDialogVisible" [style]="{width: '450px'}" header="Confirmar Aplicación" [modal]="true">
   <div class="flex align-items-center justify-content-center">
     <i class="pi pi-exclamation-circle mr-3" style="font-size: 2rem"></i>
-    <span>¿Estás seguro que deseas aplicar al proyecto <b>{{selectedProject?.project_name}}</b>?</span>
+    <span>¿Estás seguro que deseas Aplica al proyecto <b>{{selectedProject?.project_name}}</b>?</span>
   </div>
   <ng-template pTemplate="footer">
     <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Cancelar"
