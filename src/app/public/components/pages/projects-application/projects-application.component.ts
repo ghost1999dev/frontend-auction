@@ -229,8 +229,11 @@ private getDefaultRatings(): any {
   }
 
   confirmWithdraw(): void {
-  if (!this.selectedApplicationId || !this.developer || !this.withdrawReason.trim()) {
-    this.notificationService.showErrorCustom('Por favor ingresa una razón para retirar tu aplicación');
+  if (
+    !this.selectedApplicationId 
+    //|| !this.developer || !this.withdrawReason.trim()
+  ) {
+    //this.notificationService.showErrorCustom('Por favor ingresa una razón para retirar tu aplicación');
     return;
   }
   
