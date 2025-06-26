@@ -480,7 +480,8 @@ private loadApplications(developerId: number): void {
     const statusTexts: Record<number, string> = {
       0: 'Activo',
       1: 'Ganado',
-      2: 'Rechazado'
+      2: 'Rechazado',
+      3: 'Eliminado'
     };
     return statusTexts[status] || 'Desconocido';
   }
@@ -489,7 +490,8 @@ private loadApplications(developerId: number): void {
     const severityMap: Record<number, string> = {
       0: 'success',
       1: 'warning',
-      2: 'danger'
+      2: 'danger',
+      3: 'danger'
     };
     return severityMap[status] || 'info';
   }

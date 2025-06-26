@@ -22,4 +22,8 @@ export class ImageUploadService {
     ? `${environment.server_url}${imagePath}` 
     : 'assets/images/default-user.png'; // Imagen por defecto
   }
+
+  uploadAttachments(formData: FormData): Observable<{ids: number[]}> {
+    return this.http.post<{ids: number[]}>(`${environment.server_url}/attachments`, formData);
+  }
 }

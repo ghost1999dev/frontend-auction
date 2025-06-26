@@ -22,7 +22,7 @@ export class FavoritesComponent implements OnInit {
   loading = false;
   applications: any[] = [];
   developer: any;
-  withdrawReason: string = '';
+  //withdrawReason: string = '';
 
   // Project dialog properties
   selectedProject: any | null = null;

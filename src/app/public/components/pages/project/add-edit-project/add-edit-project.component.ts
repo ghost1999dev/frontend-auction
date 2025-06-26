@@ -21,6 +21,8 @@ export class AddEditProjectComponent implements OnInit {
   @Output() saved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
   @Input() isRepublishing: boolean = false;
+  uploadedFiles: any[] = [];
+  attachmentsToDelete: number[] = []; // Para manejar eliminaciones en edición
 
   categories: Category[] = []; // Add this property
 
@@ -120,6 +122,30 @@ export class AddEditProjectComponent implements OnInit {
     }
   }
 
+  onFileSelect(event: any) {
+    this.uploadedFiles = [...this.uploadedFiles, ...event.files];
+  }
+
+  onFileRemove(event: any) {
+    const index = this.uploadedFiles.indexOf(event.file);
+    if (index !== -1) {
+      this.uploadedFiles.splice(index, 1);
+    }
+    
+    // Si es una edición y el archivo ya estaba en el servidor
+    if (event.file.id) {
+      this.attachmentsToDelete.push(event.file.id);
+    }
+  }
+
+  formatSize(bytes: number): any {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i]);
+  }
+
    // Add these methods
    showTermsDialog() {
     this.displayTermsDialog = true;
@@ -140,18 +166,28 @@ export class AddEditProjectComponent implements OnInit {
     this.displayTermsDialog = false;
   }
 
-  loadProject(id: number): void {
-    this.loading = true;
-    this.projectsService.getProjectById(id).subscribe({
-      next: (project) => {
-        this.project = project;
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
+loadProject(id: number): void {
+  this.loading = true;
+  this.projectsService.getProjectById(id).subscribe({
+    next: (project: any) => {
+      this.project = project;
+      // Cargar archivos adjuntos existentes
+      if (project.attachments) {
+        this.uploadedFiles = project.attachments.map((att: any) => ({
+          name: att.fileName,
+          size: att.fileSize,
+          id: att.id,
+          // Puedes agregar más propiedades según necesites
+        }));
       }
-    });
-  }
+      this.loading = false;
+    },
+    error: () => {
+      this.loading = false;
+    }
+  });
+}
+
 
   saveProject(): void {
     this.submitted = true;

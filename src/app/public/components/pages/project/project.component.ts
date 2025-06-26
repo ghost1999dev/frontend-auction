@@ -35,6 +35,7 @@ export class ProjectComponent implements OnInit {
   projects: any[] = [];
   selectedProjects: Project[] = [];
   applications: any[] = [];
+  rejectedApplications: any[] = []; // New array for rejected applications
   project: Project = {} as Project;
   public isRepublishing: any;
 
@@ -44,6 +45,9 @@ export class ProjectComponent implements OnInit {
   loadingRatings = false;
   chartData: any;
   chartOptions: any
+  withdrawReason: string = '';
+  public filteredProjects: any[] = [];
+  public isLoading: boolean = true; 
 
   projectDialog: boolean = false;
   deleteProjectDialog: boolean = false;
@@ -55,34 +59,27 @@ export class ProjectComponent implements OnInit {
     { label: 'Inactivo', value: 0 }
   ];
 
-  // Project dialog properties
   displayProjectDialog = false;
-  //selectedProject: any | null = null;
   loadingProject = false;
   sanitizedLongDescription: any;
 
-  // Filtering and pagination
-  filteredProjects: any[] = [];
   searchTerm: string = '';
-  selectedStatus: number | 1 | null = null ;
+  selectedStatus: number | 1 | null = null;
   selectedSort: string = 'newest';
 
   showAddEditDialog: boolean = false;
   currentProjectId?: number;
   
-  // Pagination
   page: number = 1;
   pageSize: number = 6;
   first: number = 0;
   
-  // Options
   statusOptions = [
     { label: 'Pendiente', value: 0 },
     { label: 'Activo', value: 1 },
     { label: 'Inactivo', value: 2 },
     { label: 'Rechazado', value: 3 },
     { label: 'Completado', value: 4 },
-    //{ label: 'Republicado', value: 5 }
   ];
 
   public statusMap: any = {
@@ -116,7 +113,6 @@ export class ProjectComponent implements OnInit {
 
   ngOnInit(): void {
     this.getUserById(this.id)
-    this.filteredProjects = [...this.projects];
     this.initializeChartOptions()
     this.loadCategories();
   }
@@ -142,41 +138,39 @@ export class ProjectComponent implements OnInit {
     });
   }
 
-  // Añade este método para mostrar el diálogo
   showApplyDialog(project: any): void {
       this.selectedProject = project;
       this.applyDialogVisible = true;
   }
 
-showProjectDetails(project: any): void {
-  if (!project) return;
+  showProjectDetails(project: any): void {
+    if (!project) return;
 
-  this.loadingProject = true;
-  this.displayProjectDialog = true;
-  this.selectedProject = project;
-  
-  this.sanitizedLongDescription = this.selectedProject.long_description || 
-                                 this.selectedProject.full_description || 
-                                 'No hay descripción disponible';
-
-  this.projectsService.getProjectById(project.id).pipe(
-    finalize(() => this.loadingProject = false)
-  ).subscribe({
-    next: (projectDetails) => {
-      this.selectedProject = projectDetails;
-      this.sanitizedLongDescription = this.sanitizer.bypassSecurityTrustHtml(
-        projectDetails.long_description || projectDetails.full_description || 'No hay descripción disponible'
-      );
-    },
-    error: () => {
-      this.displayProjectDialog = false;
-    }
-  });
-}
-
-formatDate(isoDate: string, locale: string = 'es-ES'): string {
-    const date = new Date(isoDate);
+    this.loadingProject = true;
+    this.displayProjectDialog = true;
+    this.selectedProject = project;
     
+    this.sanitizedLongDescription = this.selectedProject.long_description || 
+                                   this.selectedProject.full_description || 
+                                   'No hay descripción disponible';
+
+    this.projectsService.getProjectById(project.id).pipe(
+      finalize(() => this.loadingProject = false)
+    ).subscribe({
+      next: (projectDetails) => {
+        this.selectedProject = projectDetails;
+        this.sanitizedLongDescription = this.sanitizer.bypassSecurityTrustHtml(
+          projectDetails.long_description || projectDetails.full_description || 'No hay descripción disponible'
+        );
+      },
+      error: () => {
+        this.displayProjectDialog = false;
+      }
+    });
+  }
+
+  formatDate(isoDate: string, locale: string = 'es-ES'): string {
+    const date = new Date(isoDate);
     return new Intl.DateTimeFormat(locale, {
         day: 'numeric',
         month: 'long',
@@ -184,9 +178,9 @@ formatDate(isoDate: string, locale: string = 'es-ES'): string {
         hour: '2-digit',
         minute: '2-digit',
     }).format(date);
-}
+  }
 
-confirmApply(): void {
+  confirmApply(): void {
     if (!this.selectedProject || !this.developer) return;
 
     const applicationData = {
@@ -200,26 +194,12 @@ confirmApply(): void {
             this.notificationServices.showSuccessCustom('Has aplicado al proyecto correctamente');
             this.applyDialogVisible = false;
             
-            // 1. Actualizar las aplicaciones primero
             this.projectApplicationsService.getApplicationsByDeveloper(this.developer.id)
                 .subscribe({
                     next: (apps) => {
-                        this.applications = apps;
-                        
-                        // 2. Volver a cargar todos los proyectos
-                        this.projectsService.getAllProjects()
-                            .subscribe({
-                                next: (projects) => {
-                                    this.projects = projects.filter(p => p.status === 1);
-                                    
-                                    // 3. Aplicar filtros nuevamente
-                                    this.filterProjects();
-                                    this.selectedProject = null;
-                                },
-                                error: (err) => {
-                                    console.error('Error loading projects:', err);
-                                }
-                            });
+                        this.applications = apps.filter(app => app.status !== 3);
+                        this.rejectedApplications = apps.filter(app => app.status === 3);
+                        this.loadAllProjects();
                     },
                     error: (err) => {
                         console.error('Error loading applications:', err);
@@ -227,126 +207,126 @@ confirmApply(): void {
                 });
         }
     });
-}
-
-loadApplications(id: number): void {
-  this.projectApplicationsService.getApplicationsByDeveloper(id).subscribe({
-    next: (apps: any) => {
-      // Filtra las aplicaciones con estado diferente de 3 (Rechazado)
-      this.applications = apps.filter((app: any) => app.status !== 3);
-      this.filterProjects(); // Vuelve a filtrar cuando se cargan las aplicaciones
-    },
-    error: (err) => {
-      console.error('Error de carga del application Projects:', err);
-    }
-  });
-}
-
-showCompanyRatings(company: any): void {
-  if (!company || !company.id) {
-    this.notificationServices.showErrorCustom('Compañía no válida');
-    return;
   }
 
-  this.selectedCompany = company;
-  this.loadingRatings = true;
-  this.displayCompanyRatingsDialog = true;
+  loadApplications(id: number): void {
+    this.projectApplicationsService.getApplicationsByDeveloper(id).subscribe({
+      next: (apps: any) => {
+        this.applications = apps.filter((app: any) => app.status !== 3);
+        this.rejectedApplications = apps.filter((app: any) => app.status === 3);
+        this.filterProjects();
+      },
+      error: (err) => {
+        console.error('Error de carga del application Projects:', err);
+      }
+    });
+  }
 
-  this.ratingService.getAverageRatingByCompany(company.id).subscribe({
-    next: (response: any) => {
-      this.companyRatingData = {
-        ratingSummary: {
-          averageScore: response?.averageScore || 0,
-          totalRatings: response?.totalRatings || 0,
-          scoreDistribution: this.calculateScoreDistribution(response.ratings || [])
-        },
-        recentRatings: (response.ratings || []).map((rating: any) => ({
-          score: rating.score,
-          comment: rating.comment,
-          createdAt: rating.createdAt,
-          developer_name: rating.author_name || 'Desarrollador'
-        }))
-      };
-      
-      this.updateChartData();
-      this.loadingRatings = false;
-    },
-    error: () => {
-      this.loadingRatings = false;
+  showCompanyRatings(company: any): void {
+    if (!company || !company.id) {
+      this.notificationServices.showErrorCustom('Compañía no válida');
+      return;
+    }
+
+    this.selectedCompany = company;
+    this.loadingRatings = true;
+    this.displayCompanyRatingsDialog = true;
+
+    this.ratingService.getAverageRatingByCompany(company.id).subscribe({
+      next: (response: any) => {
+        this.companyRatingData = {
+          ratingSummary: {
+            averageScore: response?.averageScore || 0,
+            totalRatings: response?.totalRatings || 0,
+            scoreDistribution: this.calculateScoreDistribution(response.ratings || [])
+          },
+          recentRatings: (response.ratings || []).map((rating: any) => ({
+            score: rating.score,
+            comment: rating.comment,
+            createdAt: rating.createdAt,
+            developer_name: rating.author_name || 'Desarrollador'
+          }))
+        };
+        
+        this.updateChartData();
+        this.loadingRatings = false;
+      },
+      error: () => {
+        this.loadingRatings = false;
+        this.companyRatingData = this.getDefaultRatings();
+        this.updateChartData();
+      }
+    });
+  }
+
+  private calculateScoreDistribution(ratings: any[]): any {
+    const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+    ratings.forEach(rating => {
+      const score = Math.round(rating.score);
+      distribution[score.toString() as keyof typeof distribution]++;
+    });
+    return distribution;
+  }
+
+  private getDefaultRatings(): any {
+    return {
+      ratingSummary: {
+        averageScore: 0,
+        totalRatings: 0,
+        scoreDistribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }
+      },
+      recentRatings: []
+    };
+  }
+
+  private updateChartData(): void {
+    if (!this.companyRatingData) {
       this.companyRatingData = this.getDefaultRatings();
-      this.updateChartData();
     }
-  });
-}
 
-private calculateScoreDistribution(ratings: any[]): any {
-  const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
-  ratings.forEach(rating => {
-    const score = Math.round(rating.score);
-    distribution[score.toString() as keyof typeof distribution]++;
-  });
-  return distribution;
-}
+    const distribution = this.companyRatingData.ratingSummary.scoreDistribution;
+    const isDark = document.body.classList.contains('dark-theme');
 
-private getDefaultRatings(): any {
-  return {
-    ratingSummary: {
-      averageScore: 0,
-      totalRatings: 0,
-      scoreDistribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }
-    },
-    recentRatings: []
-  };
-}
-
-private updateChartData(): void {
-  if (!this.companyRatingData) {
-    this.companyRatingData = this.getDefaultRatings();
+    this.chartData = {
+      labels: ['1 estrella', '2 estrellas', '3 estrellas', '4 estrellas', '5 estrellas'],
+      datasets: [{
+        label: 'Distribución de Ratings',
+        backgroundColor: isDark ? [
+          'rgba(110, 142, 251, 0.7)',
+          'rgba(110, 142, 251, 0.8)',
+          'rgba(110, 142, 251, 0.9)',
+          'rgba(110, 142, 251, 1.0)',
+          'rgba(167, 119, 227, 1.0)'
+        ] : [
+          'rgba(66, 165, 245, 0.7)',
+          'rgba(66, 165, 245, 0.8)',
+          'rgba(66, 165, 245, 0.9)',
+          'rgba(66, 165, 245, 1.0)',
+          'rgba(126, 87, 194, 1.0)'
+        ],
+        borderColor: isDark ? '#4a4a4a' : '#fff',
+        borderWidth: 1,
+        borderRadius: 6,
+        data: [
+          distribution['1'] || 0,
+          distribution['2'] || 0,
+          distribution['3'] || 0,
+          distribution['4'] || 0,
+          distribution['5'] || 0
+        ]
+      }]
+    };
   }
 
-  const distribution = this.companyRatingData.ratingSummary.scoreDistribution;
-  const isDark = document.body.classList.contains('dark-theme');
+  getRandomColor(): string {
+    const colors = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+      '#98D8C8', '#F06292', '#7986CB', '#9575CD'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
 
-  this.chartData = {
-    labels: ['1 estrella', '2 estrellas', '3 estrellas', '4 estrellas', '5 estrellas'],
-    datasets: [{
-      label: 'Distribución de Ratings',
-      backgroundColor: isDark ? [
-        'rgba(110, 142, 251, 0.7)',
-        'rgba(110, 142, 251, 0.8)',
-        'rgba(110, 142, 251, 0.9)',
-        'rgba(110, 142, 251, 1.0)',
-        'rgba(167, 119, 227, 1.0)'
-      ] : [
-        'rgba(66, 165, 245, 0.7)',
-        'rgba(66, 165, 245, 0.8)',
-        'rgba(66, 165, 245, 0.9)',
-        'rgba(66, 165, 245, 1.0)',
-        'rgba(126, 87, 194, 1.0)'
-      ],
-      borderColor: isDark ? '#4a4a4a' : '#fff',
-      borderWidth: 1,
-      borderRadius: 6,
-      data: [
-        distribution['1'] || 0,
-        distribution['2'] || 0,
-        distribution['3'] || 0,
-        distribution['4'] || 0,
-        distribution['5'] || 0
-      ]
-    }]
-  };
-}
-
-getRandomColor(): string {
-  const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
-    '#98D8C8', '#F06292', '#7986CB', '#9575CD'
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-}
-
-private initializeChartOptions(): void {
+  private initializeChartOptions(): void {
     const isDark = this.layoutService.config.colorScheme === 'dark';
     const textColor = isDark ? '#e0e0e0' : '#495057';
     const surfaceBorder = isDark ? '#4a4a4a' : '#dfe7ef';
@@ -390,9 +370,16 @@ private initializeChartOptions(): void {
     };
   }
 
-filterProjects() {
+  filterProjects() {
     if (!this.projects || !this.applications) return;
-    this.filteredProjects = this.projects.filter(project => {
+    
+    this.filteredProjects = this.projects.filter((project:any) => {
+        // Check if project is in rejected applications
+        const isRejected = this.rejectedApplications.some(app => app.project_id === project.id);
+        
+        // If it's a rejected application, don't show it
+        if (isRejected) return false;
+        
         const alreadyApplied = this.applications.some(app => app.project_id === project.id);
         
         const matchesSearch = !this.searchTerm || 
@@ -418,31 +405,33 @@ filterProjects() {
     this.sortProjects();
     this.page = 1;
     this.first = 0;
-}
-
+  }
 
 loadDeveloper(id: number): void {
+  this.isLoading = true;
   this.developerService.getDeveloperByIdUser(id)
-  .subscribe({
-    next: (data: any) => {
-      this.developer = data;
-      // Cargar aplicaciones primero
-      this.projectApplicationsService.getApplicationsByDeveloper(Number(data.id)).subscribe({
-        next: (apps: any) => {
-          // Filtra las aplicaciones con estado diferente de 3 (Rechazado)
-          this.applications = apps.filter((app: any) => app.status !== 3);
-          // Luego cargar proyectos y aplicar filtros
-          this.loadAllProjects();
-        },
-        error: (err) => {
-          console.error('Error loading applications:', err);
-        }
-      });
-    },
-    error: (error) => {
-      console.error('Error loading developer:', error);
-    }
-  });
+    .pipe(finalize(() => this.isLoading = false))
+    .subscribe({
+      next: (data: any) => {
+        this.developer = data;
+        this.projectApplicationsService.getApplicationsByDeveloper(Number(data.id))
+          .subscribe({
+            next: (apps: any) => {
+              this.applications = apps.filter((app: any) => app.status !== 3);
+              this.rejectedApplications = apps.filter((app: any) => app.status === 3);
+              this.loadAllProjects();
+            },
+            error: (err) => {
+              console.error('Error loading applications:', err);
+              this.isLoading = false;
+            }
+          });
+      },
+      error: (error) => {
+        console.error('Error loading developer:', error);
+        this.isLoading = false;
+      }
+    });
 }
 
   public getUserById(id: any){
@@ -455,55 +444,57 @@ loadDeveloper(id: number): void {
           this.loadDeveloper(next.id)
           this.loadAllProjects()
         }
-      }else{
-        
       }
     })
   }
 
-  loadProjects(id: any): void {
-    this.projectsService.getProjectsByCompany(id)
+loadProjects(id: any): void {
+  this.isLoading = true;
+  this.projectsService.getProjectsByCompany(id)
+    .pipe(finalize(() => this.isLoading = false))
     .subscribe({
       next: (data: any) => {
         this.projects = data;
+        this.filterProjects(); // Filtrado inmediato
+      },
+      error: () => {
+        this.isLoading = false;
       }
     });
-  }
+}
 
   rePublishProject(project: Project): void {
     this.currentProjectId = project.id;
     this.showAddEditDialog = true;
-    this.isRepublishing = true; // Añade esta propiedad en la clase
+    this.isRepublishing = true;
   }
 
 loadAllProjects(): void {
-    this.projectsService.getAllProjects()
+  this.isLoading = true; // Activar carga
+  this.projectsService.getAllProjects()
+    .pipe(finalize(() => this.isLoading = false)) // Desactivar carga al final
     .subscribe({
-        next: (data) => {
-            // Solo mantener proyectos activos para desarrolladores
-            this.projects = this.developer 
-                ? data.filter(project => project.status === 1)
-                : data;
-            
-            // Aplicar filtros después de cargar
-            this.filterProjects();
-        },
-        error: (error) => {
-            this.notificationServices.showErrorCustom('No se pudo cargar proyectos');
-        }
+      next: (data) => {
+        this.projects = this.developer 
+          ? data.filter(project => project.status === 1)
+          : data;
+        this.filterProjects(); // Filtrado inmediato
+      },
+      error: (error) => {
+        this.notificationServices.showErrorCustom('No se pudo cargar proyectos');
+        this.isLoading = false;
+      }
     });
 }
 
-// project.component.ts
-hasApplied(projectId: number): boolean {
-  return this.applications?.some(app => app.project_id === projectId && app.status !== 3) || false;
-}
+  hasApplied(projectId: number): boolean {
+    return this.applications?.some(app => app.project_id === projectId) || false;
+  }
 
-/*   openNew(): void {
-    this.project = {} as Project;
-    this.submitted = false;
-    this.projectDialog = true;
-  } */
+  countValidApplications(): number {
+    if (!this.applications) return 0;
+    return this.applications.length;
+  }
 
   openNew(): void {
     this.currentProjectId = undefined;
@@ -523,19 +514,20 @@ hasApplied(projectId: number): boolean {
       this.loadAllProjects();
     }
   }
-/* 
-  editProject(project: Project): void {
-    this.project = { ...project };
-    this.projectDialog = true;
-  } */
 
   deleteProject(project: Project): void {
     this.project = { ...project };
-    this.deleteProjectDialog = true; // Abre el diálogo
+    this.deleteProjectDialog = true;
   }
 
   confirmDelete(): void {
-    this.projectsService.deactivateProject(this.project.id)
+
+    if (!this.withdrawReason.trim()) {
+      this.notificationServices.showErrorCustom('Por favor ingresa una razón para retirar tu proyecto');
+      return;
+    }
+            
+    this.projectsService.deactivateProject(this.project.id, this.withdrawReason)
     .subscribe({
       next: () => {
         this.notificationServices.showSuccessCustom('Proyecto desactivado')
@@ -552,29 +544,28 @@ hasApplied(projectId: number): boolean {
   }
 
   saveToFavorites(projectId: any): void {
-  if (!projectId) {
-    this.notificationServices.showErrorCustom('No se pudo identificar al desarrollador');
-    return;
-  }
-
-  const requestData = {
-    project_id: projectId,
-    developer_id: this.developer.id
-  };
-
-  this.favoritesService.addToFavorites(requestData).subscribe({
-    next: () => {
-      this.notificationServices.showSuccessCustom('Proyecto agregado a favoritos');
+    if (!projectId) {
+      this.notificationServices.showErrorCustom('No se pudo identificar al desarrollador');
+      return;
     }
-  });
-}
+
+    const requestData = {
+      project_id: projectId,
+      developer_id: this.developer.id
+    };
+
+    this.favoritesService.addToFavorites(requestData).subscribe({
+      next: () => {
+        this.notificationServices.showSuccessCustom('Proyecto agregado a favoritos');
+      }
+    });
+  }
 
   saveProject(id: any): void {
     this.submitted = true;
 
     if (this.project.project_name?.trim()) {
       if (this.project.id) {
-        // Update existing project
         const updateData: UpdateProject = {
           company_id: Number(id),
           category_id: 1, 
@@ -594,7 +585,6 @@ hasApplied(projectId: number): boolean {
           }
         });
       } else {
-        // Create new project
         const newProject: any = {
           company_id: Number(id),
           category_id: 1,
@@ -602,7 +592,6 @@ hasApplied(projectId: number): boolean {
           description: this.project.description,
           budget: this.project.budget,
           days_available: this.project.days_available,
-          //status: this.project.status || 1
         };
 
         this.projectsService.createProject(newProject)
@@ -622,27 +611,6 @@ hasApplied(projectId: number): boolean {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  confirmDeleteSelected(): void {
-    this.deleteProjectsDialog = false;
-    if (!this.selectedProjects || this.selectedProjects.length === 0) {
-      this.notificationServices.showErrorCustom('No hay proyectos seleccionados')
-      return;
-    }
-  
-    // Create array of delete operations
-    const deleteOperations = this.selectedProjects.map(project => 
-      this.projectsService.deactivateProject(project.id)
-    );
-  
-    // Execute all delete operations in parallel
-    forkJoin(deleteOperations).subscribe({
-      next: () => {
-        this.notificationServices.showSuccessCustom(`${this.selectedProjects.length} proyectos desactivados`)
-        this.loadProjects(this.company.id);
-        this.selectedProjects = [];
-      }
-    });
-  }
 
   sortProjects() {
     switch(this.selectedSort) {
@@ -688,7 +656,7 @@ hasApplied(projectId: number): boolean {
     }
   }
 
-   getStatusText(status: number): string {
+  getStatusText(status: number): string {
     switch (status) {
       case 0:
         return "Pendiente";
@@ -714,5 +682,4 @@ hasApplied(projectId: number): boolean {
   }
 
   id: any = this.getUserInfo();
-
 }

@@ -19,6 +19,7 @@
                       rows="5" class="w-full"></textarea>
             <small class="p-error" *ngIf="submitted && !project.description">La descripción corta es requerida.</small>
           </div>
+
         </div>
         
         <!-- Columna Derecha -->
@@ -63,6 +64,26 @@
             <label for="full_description">Descripción Completa</label>
             <angular-editor [(ngModel)]="project.long_description" [placeholder]="'Ingrese el texto aquí...'" height="15rem" class="_angular-editor" name="description" id="description"></angular-editor>
             </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="field">
+            <label for="attachments">Anexos (PDF/Imágenes)</label>
+            <p-fileUpload 
+              id="attachments"
+              name="attachments"
+              [multiple]="true"
+              [accept]="'image/*,.pdf'"
+              [maxFileSize]="10000000"
+              (onSelect)="onFileSelect($event)"
+              (onRemove)="onFileRemove($event)"
+              [showUploadButton]="false"
+              [showCancelButton]="false"
+              [disabled]="shouldDisableFields()"
+              chooseLabel="Seleccionar archivos">
+            </p-fileUpload>
+            <small class="p-text-secondary">Formatos aceptados: PDF, JPG, PNG. Tamaño máximo: 10MB por archivo.</small>
           </div>
         </div>
       

@@ -58,6 +58,8 @@ import { PublicAuctionViewComponent } from './auctions/public-auction-view/publi
 import { BidsComponent } from './bids/bids.component';
 import { AddEditBidComponent } from './bids/add-edit-bid/add-edit-bid.component';
 import { HistoryProjectsComponent } from './history-projects/history-projects.component';
+import { FileUploadModule } from 'primeng/fileupload';
+import { ProjectDetailComponent } from './project/project-detail/project-detail.component';
 
 const routes: Routes = [
   {
@@ -92,6 +94,12 @@ const routes: Routes = [
         component: ProjectComponent,
         canActivate: [RoleGuard],
         data: { allowedRoles: [1, 2] } 
+      },
+      {
+        path: 'view/projects/:id',
+        component: ProjectDetailComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
       },
       {
         path: 'favorites',
@@ -151,7 +159,8 @@ const routes: Routes = [
     PublicAuctionViewComponent,
     BidsComponent,
     AddEditBidComponent,
-    HistoryProjectsComponent
+    HistoryProjectsComponent,
+    ProjectDetailComponent
   ],
   imports: [
     CommonModule,
@@ -177,6 +186,7 @@ const routes: Routes = [
     
     StyleClassModule,
     PanelMenuModule,
+    FileUploadModule,
 
     InputTextModule,
     SidebarModule,
