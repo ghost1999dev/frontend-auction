@@ -47,7 +47,7 @@
           <td>
             <div class="flex gap-2">
               <button pButton pRipple icon="pi pi-star" class="p-button-rounded p-button-help" 
-                      tooltip="Ver ratings" tooltipPosition="top" (click)="showDeveloperRatings(app.developer)"></button>
+                      tooltip="Ver Calificaciones" tooltipPosition="top" (click)="showDeveloperRatings(app.developer)"></button>
               <!-- <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success" 
                       *ngIf="app.status === 0" tooltip="Aceptar" tooltipPosition="top"></button>
               <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger" 
@@ -60,7 +60,7 @@
   </div>
 
 <p-dialog [(visible)]="displayRatingsDialog" [modal]="true" [style]="{width: '1200px'}" 
-          [draggable]="false" [resizable]="false" header="Ratings del Desarrollador"
+          [draggable]="false" [resizable]="false" header="Calificaciones del Desarrollador"
           [styleClass]="'ratings-dialog'" [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
           [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
     <div *ngIf="loadingRatings; else ratingContent">
@@ -94,7 +94,7 @@
                 </div>
                 
                 <div class="chart-container">
-                    <h4>Distribución de Ratings</h4>
+                    <h4>Distribución de Calificaciones</h4>
                     <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions" 
                             width="100%" height="300px"></p-chart>
                 </div>
