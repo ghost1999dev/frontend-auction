@@ -745,3 +745,114 @@
         }
     }
 }
+
+// Añadir al final del archivo existente
+
+// Estilos para los badges de estado
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  
+  &.status-0 {
+    background-color: var(--yellow-100);
+    color: var(--yellow-800);
+  }
+  
+  &.status-1 {
+    background-color: var(--green-100);
+    color: var(--green-800);
+  }
+  
+  &.status-2 {
+    background-color: var(--red-100);
+    color: var(--red-800);
+  }
+  
+  &.status-3 {
+    background-color: var(--pink-100);
+    color: var(--pink-800);
+  }
+  
+  &.status-4 {
+    background-color: var(--blue-100);
+    color: var(--blue-800);
+  }
+}
+
+// Estilos para las tarjetas de resumen
+.summary-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .summary-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    
+    i {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+// Loader
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+/* Añade esto al final del archivo SCSS */
+
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  h5 {
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+  }
+}
+
+.chart-wrapper {
+  flex: 1;
+  min-height: 0; // Esto es importante para el flexbox en algunos navegadores
+  padding: 0 1rem 1rem;
+  
+  ::ng-deep canvas {
+    max-width: 100%;
+    height: auto !important;
+  }
+}
+
+// Asegurar que el contenedor del gráfico tenga un tamaño adecuado
+:host ::ng-deep .p-chart {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+// Opcional: ajustar el tamaño del texto en los gráficos para dispositivos móviles
+@media screen and (max-width: 768px) {
+  :host ::ng-deep .p-chart {
+    font-size: 12px;
+  }
+}

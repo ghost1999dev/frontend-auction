@@ -7,9 +7,11 @@ import { AuthService } from 'src/app/core/auth/auth.service';
 import { Product } from 'src/app/core/models/product';
 import { LayoutService } from 'src/app/core/services/app.layout.service';
 import { CompaniesService } from 'src/app/core/services/companies.service';
+import { DashboardService } from 'src/app/core/services/dashboard.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { ProductService } from 'src/app/core/services/product.service';
+import { ProjectsService } from 'src/app/core/services/projects.service';
 import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
@@ -20,25 +22,32 @@ import { UserService } from 'src/app/core/services/user.service';
 export class DashboardComponent implements OnInit, OnDestroy {
 
   items!: MenuItem[];
-
   products!: Product[];
-
   chartData: any;
-
   chartOptions: any;
-
   public user: any;
-
   subscription!: Subscription;
-
-  displayAlert = false; // Control para mostrar el diálogo
-
+  displayAlert = false;
   userType: 'developer' | 'company' | null = null;
   developerForm!: FormGroup;
   companyForm!: FormGroup;
-  submitted = false
-  clicked = false
+  submitted = false;
+  clicked = false;
   businessTypeTags: string[] = [];
+  loading: boolean = true;
+  projectsByStatusChartData: any;
+  ratingsChartData: any;
+
+  // Datos para developer
+  totalApplications: number = 0;
+  totalFavorites: number = 0;
+  myRatingsDistribution: any = {};
+  myAverageRating: number = 0;
+  featuredProjects: any[] = [];
+
+  // Datos para company
+  myProjectsByStatus: any = {};
+  myProjectsWithApplicants: any[] = [];
 
   passwordChecks = {
     length: false,
@@ -55,54 +64,240 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public developerService: DeveloperService,
     public companyService: CompaniesService,
     public userRoleService: UserService,
-		private router: Router,
+    private router: Router,
     private fb: FormBuilder,
     private authSvc: AuthService,
     private usersService: UserService,
     private developerSrv: DeveloperService,
     private notificationServices: NotificationService,
-    private companiesServices: CompaniesService) {
-      this.subscription = this.layoutService.configUpdate$.subscribe(() => {
-          this.initChart();
-      });
+    private companiesServices: CompaniesService,
+    private dashboardService: DashboardService,
+    private projectsService: ProjectsService
+  ) {
 
-      this.developerForm = this.fb.group({
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        address: ['', Validators.required],
-        phone: ['', [Validators.required, Validators.pattern(/^\+\(503\) \d{4}-\d{4}$/)]],
-        bio: [''],
-        linkedin: [''],
-        occupation: [''],
-        portfolio: ['']
-      });
+    this.developerForm = this.fb.group({
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      address: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern(/^\+\(503\) \d{4}-\d{4}$/)]],
+      bio: [''],
+      linkedin: [''],
+      occupation: [''],
+      portfolio: ['']
+    });
 
-      this.companyForm = this.fb.group({
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        image: [''],
-        address: ['', Validators.required],
-        phone: ['', [Validators.required, Validators.pattern(/^\+\(503\) \d{4}-\d{4}$/)]],
-        business_type: ['', Validators.required],
-        nrc_number: ['', {
-          validators: [Validators.required, Validators.pattern(/^\d{6}-\d$/)],
-          asyncValidators: [this.nrcValidator.bind(this)],
-          updateOn: 'blur' // Opcional: para que no valide con cada tecla presionada
-        }],           
-        web_site: [''],
-        nit_number: [''],       
-      });
+    this.companyForm = this.fb.group({
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      image: [''],
+      address: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern(/^\+\(503\) \d{4}-\d{4}$/)]],
+      business_type: ['', Validators.required],
+      nrc_number: ['', {
+        validators: [Validators.required, Validators.pattern(/^\d{6}-\d$/)],
+        asyncValidators: [this.nrcValidator.bind(this)],
+        updateOn: 'blur'
+      }],           
+      web_site: [''],
+      nit_number: [''],       
+    });
   } 
 
   ngOnInit() {
-    this.initChart();
-    //this.productService.getProductsSmall().then(data => this.products = data);
-    this.validateUserRole(); // Nueva función para validar developers
-    this.getUserById(this.id)
-    this.items = [
-      { label: 'Add New', icon: 'pi pi-fw pi-plus' },
-      { label: 'Remove', icon: 'pi pi-fw pi-minus' }
-    ];
+    this.validateUserRole();
+    this.getUserById(this.id);
+    this.initMenuItems();
   }
 
+loadDeveloperDashboard() {
+  forkJoin([
+    this.dashboardService.getTotalProjectApplications(),
+    this.dashboardService.getTotalFavoriteProjects(),
+    this.dashboardService.getMyRatingsDistribution(),
+    this.dashboardService.getMyAverageRating(),
+    this.projectsService.getAllProjects({ status: 1 }) // Proyectos activos
+  ]).subscribe({
+    next: ([applications, favorites, ratings, avgRating, projects]) => {
+      this.totalApplications = applications.total;
+      this.totalFavorites = favorites.total;
+      this.myRatingsDistribution = ratings.distribution;
+      this.myAverageRating = avgRating.average;
+      this.featuredProjects = projects.slice(0, 5);
+      
+      this.updateDeveloperChart();
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Error loading developer dashboard:', err);
+      this.loading = false;
+    }
+  });
+}
+
+
+loadCompanyDashboard() {
+  forkJoin([
+    this.dashboardService.getMyProjectsByStatus(),
+    this.dashboardService.getMyProjectsWithApplicantCount(),
+    this.dashboardService.getMyRatingsDistribution(),
+    this.dashboardService.getMyAverageRating()
+  ]).subscribe({
+    next: ([projectsStatus, projectsWithApplicants, ratings, avgRating]) => {
+      this.myProjectsByStatus = projectsStatus;
+      this.myProjectsWithApplicants = projectsWithApplicants.data;
+      this.myRatingsDistribution = ratings.distribution;
+      this.myAverageRating = avgRating.average;
+      
+      this.updateCompanyCharts();
+      this.loading = false;
+      console.log(this.myProjectsWithApplicants)
+    },
+    error: (err) => {
+      console.error('Error loading company dashboard:', err);
+      this.loading = false;
+    }
+  });
+}
+
+updateCompanyCharts() {
+  const documentStyle = getComputedStyle(document.documentElement);
+  
+  // Gráfico de proyectos por estado
+  this.projectsByStatusChartData = {
+    labels: ['Pendiente', 'Activo', 'Inactivo', 'Rechazado', 'Finalizado'],
+    datasets: [
+      {
+        data: [
+          this.myProjectsByStatus.Pendiente || 0,
+          this.myProjectsByStatus.Activo || 0,
+          this.myProjectsByStatus.Inactivo || 0,
+          this.myProjectsByStatus.Rechazado || 0,
+          this.myProjectsByStatus.Finalizado || 0
+        ],
+        backgroundColor: [
+          documentStyle.getPropertyValue('--yellow-500'),
+          documentStyle.getPropertyValue('--green-500'),
+          documentStyle.getPropertyValue('--red-500'),
+          documentStyle.getPropertyValue('--pink-500'),
+          documentStyle.getPropertyValue('--blue-500')
+        ]
+      }
+    ]
+  };
+
+  // Gráfico de distribución de calificaciones (igual que developers pero para company)
+  this.ratingsChartData = {
+    labels: ['1 Estrella', '2 Estrellas', '3 Estrellas', '4 Estrellas', '5 Estrellas'],
+    datasets: [
+      {
+        data: [
+          this.myRatingsDistribution[1] || 0,
+          this.myRatingsDistribution[2] || 0,
+          this.myRatingsDistribution[3] || 0,
+          this.myRatingsDistribution[4] || 0,
+          this.myRatingsDistribution[5] || 0
+        ],
+        backgroundColor: [
+          documentStyle.getPropertyValue('--red-500'),
+          documentStyle.getPropertyValue('--orange-500'),
+          documentStyle.getPropertyValue('--yellow-500'),
+          documentStyle.getPropertyValue('--green-500'),
+          documentStyle.getPropertyValue('--blue-500')
+        ]
+      }
+    ]
+  };
+}
+
+updateDeveloperChart() {
+  const documentStyle = getComputedStyle(document.documentElement);
+  
+  this.chartData = {
+    labels: ['1 Estrella', '2 Estrellas', '3 Estrellas', '4 Estrellas', '5 Estrellas'],
+    datasets: [
+      {
+        label: 'Distribución de Calificaciones',
+        data: [
+          this.myRatingsDistribution[1] || 0,
+          this.myRatingsDistribution[2] || 0,
+          this.myRatingsDistribution[3] || 0,
+          this.myRatingsDistribution[4] || 0,
+          this.myRatingsDistribution[5] || 0
+        ],
+        backgroundColor: [
+          documentStyle.getPropertyValue('--red-500'),
+          documentStyle.getPropertyValue('--orange-500'),
+          documentStyle.getPropertyValue('--yellow-500'),
+          documentStyle.getPropertyValue('--green-500'),
+          documentStyle.getPropertyValue('--blue-500')
+        ],
+        hoverBackgroundColor: [
+          documentStyle.getPropertyValue('--red-400'),
+          documentStyle.getPropertyValue('--orange-400'),
+          documentStyle.getPropertyValue('--yellow-400'),
+          documentStyle.getPropertyValue('--green-400'),
+          documentStyle.getPropertyValue('--blue-400')
+        ]
+      }
+    ]
+  };
+
+  this.chartOptions = {
+    plugins: {
+      legend: {
+        labels: {
+          usePointStyle: true,
+          color: documentStyle.getPropertyValue('--text-color')
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const total = this.getTotalRatings();
+            const value = context.raw as number;
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+            return `${context.label}: ${value} (${percentage}%)`;
+          }
+        }
+      }
+    },
+    responsive: true,
+    maintainAspectRatio: false
+  };
+}
+
+  // Agrega este método en la clase DashboardComponent (después del método getUserInfo por ejemplo)
+getTotalRatings(): number {
+  if (!this.myRatingsDistribution) return 0;
+  
+  return Object.values(this.myRatingsDistribution).reduce((sum: number, count: any) => {
+    return sum + (count || 0);
+  }, 0);
+}
+
+// También agreguemos este método para obtener los proyectos por estado para companies
+getCompanyProjectsStatusArray(): any[] {
+  if (!this.myProjectsByStatus) return [];
+  
+  return [
+    { label: 'Pendiente', value: this.myProjectsByStatus['Pendiente'] || 0 },
+    { label: 'Activo', value: this.myProjectsByStatus['Activo'] || 0 },
+    { label: 'Inactivo', value: this.myProjectsByStatus['Inactivo'] || 0 },
+    { label: 'Rechazado', value: this.myProjectsByStatus['Rechazado'] || 0 },
+    { label: 'Finalizado', value: this.myProjectsByStatus['Finalizado'] || 0 }
+  ];
+}
+
+  getStatusText(status: number): string {
+    const statusMap: {[key: number]: string} = {
+      0: 'Pendiente',
+      1: 'Activo',
+      2: 'Inactivo',
+      3: 'Rechazado',
+      4: 'Finalizado'
+    };
+    return statusMap[status] || 'Desconocido';
+  }
+
+  /* Todos los demás métodos existentes se mantienen igual */
   updatePasswordChecks() {
     const value = this.userType === 'developer' 
       ? this.developerForm.get('password')?.value || ''
@@ -124,18 +319,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return password === this.confirmPassword;
   }
 
-  public getUserById(id: any){
+  public getUserById(id: any) {
     this.usersService.getUsersById(id)
     .subscribe((next: any) => {
-      if(next){
+      if(next) {
         this.user = next;
+        console.log(next.role_id)
+        if (next.role_id === 2) { // Developer
+          this.loadDeveloperDashboard();
+        } else if (next.role_id === 1) { // Company
+          this.loadCompanyDashboard();
+        }
       }
-    })
+    });
   }
 
   nrcValidator(control: AbstractControl): Observable<ValidationErrors | null> {
     return of(control.value).pipe(
-      delay(500), // Simula llamada a API
+      delay(500),
       map(value => {
         return value && value.match(/^\d{6}-\d$/) ? null : { invalidNrc: true };
       })
@@ -146,7 +347,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/[^0-9]/g, '');
   
-    // Permitir borrado completo
     if (value.length === 0) {
       this.companyForm.get('nit_number')?.setValue('');
       return;
@@ -155,17 +355,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     let formattedValue = '';
   
     if (value.length <= 9) {
-      // DUI: 00000000-0
       formattedValue = value.substring(0, 8);
       if (value.length > 8) {
         formattedValue += '-' + value.substring(8, 9);
       }
     } else {
-      // NIT: 0000-000000-000-00
-      const a = value.substring(0, 4);   // 4 dígitos
-      const b = value.substring(4, 10);  // 6 dígitos
-      const c = value.substring(10, 13); // 3 dígitos
-      const d = value.substring(13, 15); // 2 dígitos
+      const a = value.substring(0, 4);
+      const b = value.substring(4, 10);
+      const c = value.substring(10, 13);
+      const d = value.substring(13, 15);
   
       formattedValue = a;
       if (b) formattedValue += '-' + b;
@@ -173,11 +371,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (d) formattedValue += '-' + d;
     }
   
-    // Actualizar en form y DOM
     this.companyForm.get('nit_number')?.setValue(formattedValue);
     input.value = formattedValue;
   
-    // Posicionar cursor al final
     requestAnimationFrame(() => {
       const len = input.value.length;
       input.setSelectionRange(len, len);
@@ -188,21 +384,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
     
-    // Permitir borrado completo
     if (value.length === 0) {
       this.developerForm.get('phone')?.setValue('');
       return;
     }
     
-    // Asegurar que el código de país sea 503
     const countryCode = '503';
     let mainNumber = value;
     
-    // Si el valor comienza con 503, lo usamos
     if (value.startsWith('503')) {
       mainNumber = value.substring(3);
     }
-    // Si no, asumimos que es parte del número principal
     
     let formattedValue = `+(${countryCode})`;
     
@@ -215,7 +407,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
     this.developerForm.get('phone')?.setValue(formattedValue);
     
-    // Manejo básico del cursor
     setTimeout(() => {
       const newCursorPosition = formattedValue.length;
       input.setSelectionRange(newCursorPosition, newCursorPosition);
@@ -226,21 +417,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
     
-    // Permitir borrado completo
     if (value.length === 0) {
       this.companyForm.get('phone')?.setValue('');
       return;
     }
     
-    // Asegurar que el código de país sea 503
     const countryCode = '503';
     let mainNumber = value;
     
-    // Si el valor comienza con 503, lo usamos
     if (value.startsWith('503')) {
       mainNumber = value.substring(3);
     }
-    // Si no, asumimos que es parte del número principal
     
     let formattedValue = `+(${countryCode})`;
     
@@ -253,7 +440,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
     this.companyForm.get('phone')?.setValue(formattedValue);
     
-    // Manejo básico del cursor
     setTimeout(() => {
       const newCursorPosition = formattedValue.length;
       input.setSelectionRange(newCursorPosition, newCursorPosition);
@@ -264,13 +450,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
     
-    // Permitir borrado completo
     if (value.length === 0) {
       this.companyForm.get('nrc_number')?.setValue('');
       return;
     }
     
-    // Aplicar formato
     let formattedValue = value.substring(0, 6);
     if (value.length > 6) {
       formattedValue += '-' + value.substring(6, 7);
@@ -278,7 +462,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     
     this.companyForm.get('nrc_number')?.setValue(formattedValue);
     
-    // Manejar posición del cursor
     setTimeout(() => {
       const newCursorPosition = formattedValue.length;
       input.setSelectionRange(newCursorPosition, newCursorPosition);
@@ -286,20 +469,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onBusinessTypeAdd(event: any) {
-      // Validar el input antes de agregar
-      const value = event.value;
-      if (value && /^[a-zA-ZÑñ\s,]+$/.test(value)) {
-          // Actualizar el formControl
-          this.companyForm.get('business_type')?.setValue(value);
-      } else {
-          // Mostrar error o revertir
-          this.businessTypeTags = this.businessTypeTags.filter(tag => tag !== value);
-      }
+    const value = event.value;
+    if (value && /^[a-zA-ZÑñ\s,]+$/.test(value)) {
+      this.companyForm.get('business_type')?.setValue(value);
+    } else {
+      this.businessTypeTags = this.businessTypeTags.filter(tag => tag !== value);
+    }
   }
 
   onBusinessTypeRemove(event: any) {
-      this.companyForm.get('business_type')?.setValue(this.businessTypeTags);
+    this.companyForm.get('business_type')?.setValue(this.businessTypeTags);
   }
+
+  getTotalCompanyProjects(): number {
+  if (!this.myProjectsByStatus) return 0;
+  
+  return Object.values(this.myProjectsByStatus).reduce((sum: number, count: any) => sum + (count || 0), 0);
+}
 
   validateUserRole() {
     this.displayAlert = false;
@@ -358,7 +544,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.usersService.updatedUsersPassport(userToCreate, this.id)
     .subscribe({
       next: (response: any) => {
-
         const developerAdd: any = {
           bio: bio, 
           user_id: this.id, 
@@ -369,14 +554,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         this.developerSrv.createDeveloper(developerAdd)
         .subscribe((next: any) => {
-          if(next){
+          if(next) {
             this.displayAlert = false;
-            this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.")
+            this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.");
           }
-        })
+        });
       }
     });
-  
   }
 
   onSubmitCompany() {
@@ -399,7 +583,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.usersService.updatedUsersPassport(userToCreate, this.id)
     .subscribe({
       next: (response: any) => {
-
         const adminAdd: any = {
           user_id: this.id, 
           nrc_number: nrc_number, 
@@ -410,26 +593,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         this.companiesServices.createCompanies(adminAdd)
         .subscribe((next: any) => {
-          if(next){
+          if(next) {
             this.displayAlert = false;
-            this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.")
+            this.notificationServices.showSuccessCustom("¡Felicidades! Su cuenta se ha actualizado con éxito.");
           }
-        })
+        });
       }
     });
-
   }
 
-    goBack() {
-        if (this.userType) {
-            // Si ya seleccionó un tipo de usuario, volver a la selección
-            this.userType = null;
-        } else {
-            // Si no hay tipo de usuario seleccionado, cerrar el diálogo
-            this.displayAlert = false;
-            this.authSvc.logout();
-        }
+  goBack() {
+    if (this.userType) {
+      this.userType = null;
+    } else {
+      this.displayAlert = false;
+      this.authSvc.logout();
     }
+  }
 
   register() {
     this.submitted = true;
@@ -440,7 +620,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validate password strength
     if (!Object.values(this.passwordChecks).every(Boolean)) {
       this.notificationServices.showErrorCustom('La contraseña no cumple con todos los requisitos');
       return;
@@ -461,69 +640,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  initChart() {
-      const documentStyle = getComputedStyle(document.documentElement);
-      const textColor = documentStyle.getPropertyValue('--text-color');
-      const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-      const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-      this.chartData = {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-          datasets: [
-              {
-                  label: 'First Dataset',
-                  data: [65, 59, 80, 81, 56, 55, 40],
-                  fill: false,
-                  backgroundColor: documentStyle.getPropertyValue('--bluegray-700'),
-                  borderColor: documentStyle.getPropertyValue('--bluegray-700'),
-                  tension: .4
-              },
-              {
-                  label: 'Second Dataset',
-                  data: [28, 48, 40, 19, 86, 27, 90],
-                  fill: false,
-                  backgroundColor: documentStyle.getPropertyValue('--green-600'),
-                  borderColor: documentStyle.getPropertyValue('--green-600'),
-                  tension: .4
-              }
-          ]
-      };
-
-      this.chartOptions = {
-          plugins: {
-              legend: {
-                  labels: {
-                      color: textColor
-                  }
-              }
-          },
-          scales: {
-              x: {
-                  ticks: {
-                      color: textColorSecondary
-                  },
-                  grid: {
-                      color: surfaceBorder,
-                      drawBorder: false
-                  }
-              },
-              y: {
-                  ticks: {
-                      color: textColorSecondary
-                  },
-                  grid: {
-                      color: surfaceBorder,
-                      drawBorder: false
-                  }
-              }
-          }
-      };
+  initMenuItems() {
+    this.items = [
+      { label: 'Actualizar', icon: 'pi pi-refresh'},
+      { label: 'Exportar', icon: 'pi pi-download' }
+    ];
   }
 
   ngOnDestroy() {
-      if (this.subscription) {
-          this.subscription.unsubscribe();
-      }
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   getUserInfo() {
@@ -543,5 +671,4 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   id: any = this.getUserInfo();
-
 }
