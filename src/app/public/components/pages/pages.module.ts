@@ -136,6 +136,12 @@ const routes: Routes = [
         component: HistoryProjectsComponent,
         canActivate: [RoleGuard],
         data: { allowedRoles: [2] } 
+      },
+      {
+        path: 'bidding-room/:id', 
+        component: AddEditBidComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1, 2] } 
       }
     ]
   },

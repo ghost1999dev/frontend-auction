@@ -1,28 +1,27 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Table } from 'primeng/table';
-import { forkJoin } from 'rxjs';
-import { Category, Project, UpdateProject } from 'src/app/core/models/projects';
-import { CompaniesService } from 'src/app/core/services/companies.service';
-import { DeveloperService } from 'src/app/core/services/developer.service';
-import { NotificationService } from 'src/app/core/services/notification.service';
-import { ProjectApplicationsService } from 'src/app/core/services/project-applications.service';
-import { ProjectsService } from 'src/app/core/services/projects.service';
-import { UserService } from 'src/app/core/services/user.service';
-import { finalize, switchMap } from 'rxjs/operators';
-import { DomSanitizer } from '@angular/platform-browser';
-import { RatingService } from 'src/app/core/services/rating.service';
-import { LayoutService } from 'src/app/core/services/layout.service';
-import { FavoritesService } from 'src/app/core/services/favorites.service';
-import { CategoryService } from 'src/app/core/services/categories.service';
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { Table } from "primeng/table";
+import { forkJoin } from "rxjs";
+import { Category, Project, UpdateProject } from "src/app/core/models/projects";
+import { CompaniesService } from "src/app/core/services/companies.service";
+import { DeveloperService } from "src/app/core/services/developer.service";
+import { NotificationService } from "src/app/core/services/notification.service";
+import { ProjectApplicationsService } from "src/app/core/services/project-applications.service";
+import { ProjectsService } from "src/app/core/services/projects.service";
+import { UserService } from "src/app/core/services/user.service";
+import { finalize, switchMap } from "rxjs/operators";
+import { DomSanitizer } from "@angular/platform-browser";
+import { RatingService } from "src/app/core/services/rating.service";
+import { LayoutService } from "src/app/core/services/layout.service";
+import { FavoritesService } from "src/app/core/services/favorites.service";
+import { CategoryService } from "src/app/core/services/categories.service";
 
 @Component({
-  selector: 'app-project',
-  templateUrl: './project.component.html',
-  styleUrls: ['./project.component.scss'],
+  selector: "app-project",
+  templateUrl: "./project.component.html",
+  styleUrls: ["./project.component.scss"],
 })
 export class ProjectComponent implements OnInit {
-
-  @ViewChild('dt') dt: Table | undefined;
+  @ViewChild("dt") dt: Table | undefined;
   public company: any;
   public company_id!: number;
   public developer: any;
@@ -44,10 +43,10 @@ export class ProjectComponent implements OnInit {
   selectedCompany: any;
   loadingRatings = false;
   chartData: any;
-  chartOptions: any
-  withdrawReason: string = '';
+  chartOptions: any;
+  withdrawReason: string = "";
   public filteredProjects: any[] = [];
-  public isLoading: boolean = true; 
+  public isLoading: boolean = true;
 
   projectDialog: boolean = false;
   deleteProjectDialog: boolean = false;
@@ -55,46 +54,51 @@ export class ProjectComponent implements OnInit {
 
   submitted: boolean = false;
   statuses: any[] = [
-    { label: 'Activo', value: 1 },
-    { label: 'Inactivo', value: 0 }
+    { label: "Activo", value: 1 },
+    { label: "Inactivo", value: 0 },
   ];
 
   displayProjectDialog = false;
   loadingProject = false;
   sanitizedLongDescription: any;
 
-  searchTerm: string = '';
+  searchTerm: string = "";
   selectedStatus: number | 1 | null = null;
-  selectedSort: string = 'newest';
+  selectedSort: string = "newest";
 
   showAddEditDialog: boolean = false;
   currentProjectId?: number;
-  
+
   page: number = 1;
   pageSize: number = 6;
   first: number = 0;
-  
+  public applicationCounts: { [projectId: number]: number } = {};
+
   statusOptions = [
-    { label: 'Pendiente', value: 0 },
-    { label: 'Activo', value: 1 },
-    { label: 'Inactivo', value: 2 },
-    { label: 'Rechazado', value: 3 },
-    { label: 'Completado', value: 4 },
+    { label: "Pendiente", value: 0 },
+    { label: "Activo", value: 1 },
+    { label: "Inactivo", value: 2 },
+    { label: "Rechazado", value: 3 },
+    { label: "Completado", value: 4 },
   ];
 
   public statusMap: any = {
-    0: { label: 'Pendiente', severity: 'warning' },
-    1: { label: 'Activo', severity: 'success' },
-    2: { label: 'Inactivo', severity: 'danger' },
-    3: { label: 'Rechazado', severity: 'danger' },
-    4: { label: 'Completado', severity: 'info' }
+    0: { label: "Pendiente", severity: "warning" },
+    1: { label: "Activo", severity: "success" },
+    2: { label: "Inactivo", severity: "danger" },
+    3: { label: "Rechazado", severity: "danger" },
+    4: { label: "Completado", severity: "info" },
   };
-  
+
   sortOptions: any[] = [
-    { label: 'Más nuevo primero', value: 'newest' },
-    { label: 'Más antiguo primero', value: 'oldest' },
-    { label: 'Presupuesto mas alto', value: 'highest' },
-    { label: 'Presupuesto mas bajo', value: 'lowest' }
+    { label: "Más nuevo primero", value: "newest" },
+    { label: "Más antiguo primero", value: "oldest" },
+    { label: "Presupuesto mas alto", value: "highest" },
+    { label: "Presupuesto mas bajo", value: "lowest" },
+    {
+      label: "Proyectos con más aplicaciones recibidas",
+      value: "most_applications",
+    },
   ];
 
   constructor(
@@ -109,24 +113,24 @@ export class ProjectComponent implements OnInit {
     public layoutService: LayoutService,
     private favoritesService: FavoritesService,
     private categoryService: CategoryService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.getUserById(this.id)
-    this.initializeChartOptions()
+    this.getUserById(this.id);
+    this.initializeChartOptions();
     this.loadCategories();
+    this.loadAllAplicationProjects();
   }
 
   loadCompany(userId: number): void {
-    this.companiesService.getCompanyByUserId(userId)
-    .subscribe({
+    this.companiesService.getCompanyByUserId(userId).subscribe({
       next: (data: any) => {
         this.company = data;
-        this.loadProjects(data.id)
+        this.loadProjects(data.id);
       },
       error: (error: any) => {
-        console.error('Error de carga de la empresa:', error);
-      }
+        console.error("Error de carga de la empresa:", error);
+      },
     });
   }
 
@@ -134,13 +138,13 @@ export class ProjectComponent implements OnInit {
     this.categoryService.getAllCategories().subscribe({
       next: (categories) => {
         this.categories = categories;
-      }
+      },
     });
   }
 
   showApplyDialog(project: any): void {
-      this.selectedProject = project;
-      this.applyDialogVisible = true;
+    this.selectedProject = project;
+    this.applyDialogVisible = true;
   }
 
   showProjectDetails(project: any): void {
@@ -149,34 +153,39 @@ export class ProjectComponent implements OnInit {
     this.loadingProject = true;
     this.displayProjectDialog = true;
     this.selectedProject = project;
-    
-    this.sanitizedLongDescription = this.selectedProject.long_description || 
-                                   this.selectedProject.full_description || 
-                                   'No hay descripción disponible';
 
-    this.projectsService.getProjectById(project.id).pipe(
-      finalize(() => this.loadingProject = false)
-    ).subscribe({
-      next: (projectDetails) => {
-        this.selectedProject = projectDetails;
-        this.sanitizedLongDescription = this.sanitizer.bypassSecurityTrustHtml(
-          projectDetails.long_description || projectDetails.full_description || 'No hay descripción disponible'
-        );
-      },
-      error: () => {
-        this.displayProjectDialog = false;
-      }
-    });
+    this.sanitizedLongDescription =
+      this.selectedProject.long_description ||
+      this.selectedProject.full_description ||
+      "No hay descripción disponible";
+
+    this.projectsService
+      .getProjectById(project.id)
+      .pipe(finalize(() => (this.loadingProject = false)))
+      .subscribe({
+        next: (projectDetails) => {
+          this.selectedProject = projectDetails;
+          this.sanitizedLongDescription =
+            this.sanitizer.bypassSecurityTrustHtml(
+              projectDetails.long_description ||
+                projectDetails.full_description ||
+                "No hay descripción disponible"
+            );
+        },
+        error: () => {
+          this.displayProjectDialog = false;
+        },
+      });
   }
 
-  formatDate(isoDate: string, locale: string = 'es-ES'): string {
+  formatDate(isoDate: string, locale: string = "es-ES"): string {
     const date = new Date(isoDate);
     return new Intl.DateTimeFormat(locale, {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(date);
   }
 
@@ -184,29 +193,35 @@ export class ProjectComponent implements OnInit {
     if (!this.selectedProject || !this.developer) return;
 
     const applicationData = {
-        project_id: this.selectedProject.id,
-        developer_id: this.developer.id,
+      project_id: this.selectedProject.id,
+      developer_id: this.developer.id,
     };
 
-    this.projectApplicationsService.createApplication(applicationData)
-    .subscribe({
+    this.projectApplicationsService
+      .createApplication(applicationData)
+      .subscribe({
         next: () => {
-            this.notificationServices.showSuccessCustom('Has aplicado al proyecto correctamente');
-            this.applyDialogVisible = false;
-            
-            this.projectApplicationsService.getApplicationsByDeveloper(this.developer.id)
-                .subscribe({
-                    next: (apps) => {
-                        this.applications = apps.filter(app => app.status !== 3);
-                        this.rejectedApplications = apps.filter(app => app.status === 3);
-                        this.loadAllProjects();
-                    },
-                    error: (err) => {
-                        console.error('Error loading applications:', err);
-                    }
-                });
-        }
-    });
+          this.notificationServices.showSuccessCustom(
+            "Has aplicado al proyecto correctamente"
+          );
+          this.applyDialogVisible = false;
+
+          this.projectApplicationsService
+            .getApplicationsByDeveloper(this.developer.id)
+            .subscribe({
+              next: (apps) => {
+                this.applications = apps.filter((app) => app.status !== 3);
+                this.rejectedApplications = apps.filter(
+                  (app) => app.status === 3
+                );
+                this.loadAllProjects();
+              },
+              error: (err) => {
+                console.error("Error loading applications:", err);
+              },
+            });
+        },
+      });
   }
 
   loadApplications(id: number): void {
@@ -217,14 +232,25 @@ export class ProjectComponent implements OnInit {
         this.filterProjects();
       },
       error: (err) => {
-        console.error('Error de carga del application Projects:', err);
-      }
+        console.error("Error de carga del application Projects:", err);
+      },
+    });
+  }
+
+  loadAllAplicationProjects() {
+    this.projectApplicationsService.getAllApplications().subscribe({
+      next: (apps: any) => {
+        console.log(apps);
+      },
+      error: (err) => {
+        console.error("Error de carga del application Projects:", err);
+      },
     });
   }
 
   showCompanyRatings(company: any): void {
     if (!company || !company.id) {
-      this.notificationServices.showErrorCustom('Compañía no válida');
+      this.notificationServices.showErrorCustom("Compañía no válida");
       return;
     }
 
@@ -238,16 +264,18 @@ export class ProjectComponent implements OnInit {
           ratingSummary: {
             averageScore: response?.averageScore || 0,
             totalRatings: response?.totalRatings || 0,
-            scoreDistribution: this.calculateScoreDistribution(response.ratings || [])
+            scoreDistribution: this.calculateScoreDistribution(
+              response.ratings || []
+            ),
           },
           recentRatings: (response.ratings || []).map((rating: any) => ({
             score: rating.score,
             comment: rating.comment,
             createdAt: rating.createdAt,
-            developer_name: rating.author_name || 'Desarrollador'
-          }))
+            developer_name: rating.author_name || "Desarrollador",
+          })),
         };
-        
+
         this.updateChartData();
         this.loadingRatings = false;
       },
@@ -255,13 +283,13 @@ export class ProjectComponent implements OnInit {
         this.loadingRatings = false;
         this.companyRatingData = this.getDefaultRatings();
         this.updateChartData();
-      }
+      },
     });
   }
 
   private calculateScoreDistribution(ratings: any[]): any {
-    const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
-    ratings.forEach(rating => {
+    const distribution = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 };
+    ratings.forEach((rating) => {
       const score = Math.round(rating.score);
       distribution[score.toString() as keyof typeof distribution]++;
     });
@@ -273,9 +301,9 @@ export class ProjectComponent implements OnInit {
       ratingSummary: {
         averageScore: 0,
         totalRatings: 0,
-        scoreDistribution: { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 }
+        scoreDistribution: { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
       },
-      recentRatings: []
+      recentRatings: [],
     };
   }
 
@@ -285,52 +313,70 @@ export class ProjectComponent implements OnInit {
     }
 
     const distribution = this.companyRatingData.ratingSummary.scoreDistribution;
-    const isDark = document.body.classList.contains('dark-theme');
+    const isDark = document.body.classList.contains("dark-theme");
 
     this.chartData = {
-      labels: ['1 estrella', '2 estrellas', '3 estrellas', '4 estrellas', '5 estrellas'],
-      datasets: [{
-        label: 'Distribución de Calificaciones',
-        backgroundColor: isDark ? [
-          'rgba(110, 142, 251, 0.7)',
-          'rgba(110, 142, 251, 0.8)',
-          'rgba(110, 142, 251, 0.9)',
-          'rgba(110, 142, 251, 1.0)',
-          'rgba(167, 119, 227, 1.0)'
-        ] : [
-          'rgba(66, 165, 245, 0.7)',
-          'rgba(66, 165, 245, 0.8)',
-          'rgba(66, 165, 245, 0.9)',
-          'rgba(66, 165, 245, 1.0)',
-          'rgba(126, 87, 194, 1.0)'
-        ],
-        borderColor: isDark ? '#4a4a4a' : '#fff',
-        borderWidth: 1,
-        borderRadius: 6,
-        data: [
-          distribution['1'] || 0,
-          distribution['2'] || 0,
-          distribution['3'] || 0,
-          distribution['4'] || 0,
-          distribution['5'] || 0
-        ]
-      }]
+      labels: [
+        "1 estrella",
+        "2 estrellas",
+        "3 estrellas",
+        "4 estrellas",
+        "5 estrellas",
+      ],
+      datasets: [
+        {
+          label: "Distribución de Calificaciones",
+          backgroundColor: isDark
+            ? [
+                "rgba(110, 142, 251, 0.7)",
+                "rgba(110, 142, 251, 0.8)",
+                "rgba(110, 142, 251, 0.9)",
+                "rgba(110, 142, 251, 1.0)",
+                "rgba(167, 119, 227, 1.0)",
+              ]
+            : [
+                "rgba(66, 165, 245, 0.7)",
+                "rgba(66, 165, 245, 0.8)",
+                "rgba(66, 165, 245, 0.9)",
+                "rgba(66, 165, 245, 1.0)",
+                "rgba(126, 87, 194, 1.0)",
+              ],
+          borderColor: isDark ? "#4a4a4a" : "#fff",
+          borderWidth: 1,
+          borderRadius: 6,
+          data: [
+            distribution["1"] || 0,
+            distribution["2"] || 0,
+            distribution["3"] || 0,
+            distribution["4"] || 0,
+            distribution["5"] || 0,
+          ],
+        },
+      ],
     };
   }
 
   getRandomColor(): string {
     const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
-      '#98D8C8', '#F06292', '#7986CB', '#9575CD'
+      "#FF6B6B",
+      "#4ECDC4",
+      "#45B7D1",
+      "#FFA07A",
+      "#98D8C8",
+      "#F06292",
+      "#7986CB",
+      "#9575CD",
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
   private initializeChartOptions(): void {
-    const isDark = this.layoutService.config.colorScheme === 'dark';
-    const textColor = isDark ? '#e0e0e0' : '#495057';
-    const surfaceBorder = isDark ? '#4a4a4a' : '#dfe7ef';
-    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const isDark = this.layoutService.config.colorScheme === "dark";
+    const textColor = isDark ? "#e0e0e0" : "#495057";
+    const surfaceBorder = isDark ? "#4a4a4a" : "#dfe7ef";
+    const gridColor = isDark
+      ? "rgba(255, 255, 255, 0.1)"
+      : "rgba(0, 0, 0, 0.1)";
 
     this.chartOptions = {
       responsive: true,
@@ -338,130 +384,157 @@ export class ProjectComponent implements OnInit {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: isDark ? '#3e4858' : '#ffffff',
+          backgroundColor: isDark ? "#3e4858" : "#ffffff",
           titleColor: textColor,
           bodyColor: textColor,
           borderColor: surfaceBorder,
           borderWidth: 1,
           padding: 10,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-        }
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        },
       },
       scales: {
         x: {
           ticks: { color: textColor, font: { weight: 500 } },
-          grid: { color: gridColor, drawBorder: false }
+          grid: { color: gridColor, drawBorder: false },
         },
         y: {
-          ticks: { 
-            color: textColor, 
+          ticks: {
+            color: textColor,
             font: { weight: 500 },
             stepSize: 1,
-            precision: 0
+            precision: 0,
           },
           grid: { color: gridColor, drawBorder: false },
-          beginAtZero: true
-        }
+          beginAtZero: true,
+        },
       },
       animation: {
         duration: 1000,
-        easing: 'easeOutQuart'
-      }
+        easing: "easeOutQuart",
+      },
     };
   }
 
   filterProjects() {
     if (!this.projects || !this.applications) return;
-    
-    this.filteredProjects = this.projects.filter((project:any) => {
-        // Check if project is in rejected applications
-        const isRejected = this.rejectedApplications.some(app => app.project_id === project.id);
-        
-        // If it's a rejected application, don't show it
-        if (isRejected) return false;
-        
-        const alreadyApplied = this.applications.some(app => app.project_id === project.id);
-        
-        const matchesSearch = !this.searchTerm || 
-            project.project_name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            project.description?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-            (project.company?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
-            (project.category?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()));
 
-        const matchesCategory = !this.selectedCategory || 
-                              (project.category && project.category.id === this.selectedCategory);
+    this.filteredProjects = this.projects.filter((project: any) => {
+      // Check if project is in rejected applications
+      const isRejected = this.rejectedApplications.some(
+        (app) => app.project_id === project.id
+      );
 
-        const hasRemainingDays = project.days_remaining >= 1;
-        const hasAvailableDays = project.days_available >= 1;
-        
-        const matchesStatus = this.developer ? project.status === 1 : 
-                            (this.selectedStatus === null || project.status === this.selectedStatus);
-        
-        const shouldShow = this.developer ? !alreadyApplied : true;
-        
-        return matchesSearch && matchesStatus && shouldShow && hasAvailableDays && hasRemainingDays && matchesCategory;
+      // If it's a rejected application, don't show it
+      if (isRejected) return false;
+
+      const alreadyApplied = this.applications.some(
+        (app) => app.project_id === project.id
+      );
+
+      const matchesSearch =
+        !this.searchTerm ||
+        project.project_name
+          ?.toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        project.description
+          ?.toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        project.company?.name
+          ?.toLowerCase()
+          .includes(this.searchTerm.toLowerCase()) ||
+        project.category?.name
+          ?.toLowerCase()
+          .includes(this.searchTerm.toLowerCase());
+
+      const matchesCategory =
+        !this.selectedCategory ||
+        (project.category && project.category.id === this.selectedCategory);
+
+      const hasRemainingDays = project.days_remaining >= 1;
+      const hasAvailableDays = project.days_available >= 1;
+
+      const matchesStatus = this.developer
+        ? project.status === 1
+        : this.selectedStatus === null ||
+          project.status === this.selectedStatus;
+
+      const shouldShow = this.developer ? !alreadyApplied : true;
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        shouldShow &&
+        hasAvailableDays &&
+        hasRemainingDays &&
+        matchesCategory
+      );
     });
-    
+
     this.sortProjects();
     this.page = 1;
     this.first = 0;
   }
 
-loadDeveloper(id: number): void {
-  this.isLoading = true;
-  this.developerService.getDeveloperByIdUser(id)
-    .pipe(finalize(() => this.isLoading = false))
-    .subscribe({
-      next: (data: any) => {
-        this.developer = data;
-        this.projectApplicationsService.getApplicationsByDeveloper(Number(data.id))
-          .subscribe({
-            next: (apps: any) => {
-              this.applications = apps.filter((app: any) => app.status !== 3);
-              this.rejectedApplications = apps.filter((app: any) => app.status === 3);
-              this.loadAllProjects();
-            },
-            error: (err) => {
-              console.error('Error loading applications:', err);
-              this.isLoading = false;
-            }
-          });
-      },
-      error: (error) => {
-        console.error('Error loading developer:', error);
-        this.isLoading = false;
-      }
-    });
-}
-
-  public getUserById(id: any){
-    this.userService.getUsersById(id)
-    .subscribe((next: any) => {
-      if(next){
-        if(next.role_id === 1){
-          this.loadCompany(next.id)
-        }else if(next.role_id === 2){
-          this.loadDeveloper(next.id)
-          this.loadAllProjects()
-        }
-      }
-    })
+  loadDeveloper(id: number): void {
+    this.isLoading = true;
+    this.developerService
+      .getDeveloperByIdUser(id)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: (data: any) => {
+          this.developer = data;
+          this.projectApplicationsService
+            .getApplicationsByDeveloper(Number(data.id))
+            .subscribe({
+              next: (apps: any) => {
+                this.applications = apps.filter((app: any) => app.status !== 3);
+                this.rejectedApplications = apps.filter(
+                  (app: any) => app.status === 3
+                );
+                this.loadAllProjects();
+              },
+              error: (err) => {
+                console.error("Error loading applications:", err);
+                this.isLoading = false;
+              },
+            });
+        },
+        error: (error) => {
+          console.error("Error loading developer:", error);
+          this.isLoading = false;
+        },
+      });
   }
 
-loadProjects(id: any): void {
-  this.isLoading = true;
-  this.projectsService.getProjectsByCompany(id)
-    .pipe(finalize(() => this.isLoading = false))
-    .subscribe({
-      next: (data: any) => {
-        this.projects = data;
-        this.filterProjects(); // Filtrado inmediato
-      },
-      error: () => {
-        this.isLoading = false;
+  public getUserById(id: any) {
+    this.userService.getUsersById(id).subscribe((next: any) => {
+      if (next) {
+        if (next.role_id === 1) {
+          this.loadCompany(next.id);
+        } else if (next.role_id === 2) {
+          this.loadDeveloper(next.id);
+          this.loadAllProjects();
+        }
       }
     });
-}
+  }
+
+  loadProjects(id: any): void {
+    this.isLoading = true;
+    this.projectsService
+      .getProjectsByCompany(id)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: (data: any) => {
+          this.projects = data;
+          this.filterProjects(); // Filtrado inmediato
+        },
+        error: () => {
+          this.isLoading = false;
+        },
+      });
+  }
 
   rePublishProject(project: Project): void {
     this.currentProjectId = project.id;
@@ -469,26 +542,47 @@ loadProjects(id: any): void {
     this.isRepublishing = true;
   }
 
-loadAllProjects(): void {
-  this.isLoading = true; // Activar carga
-  this.projectsService.getAllProjects()
-    .pipe(finalize(() => this.isLoading = false)) // Desactivar carga al final
-    .subscribe({
-      next: (data) => {
-        this.projects = this.developer 
-          ? data.filter(project => project.status === 1)
-          : data;
-        this.filterProjects(); // Filtrado inmediato
-      },
-      error: (error) => {
-        this.notificationServices.showErrorCustom('No se pudo cargar proyectos');
-        this.isLoading = false;
-      }
-    });
-}
+  loadAllProjects(): void {
+    this.isLoading = true;
+
+    forkJoin([
+      this.projectsService.getAllProjects(),
+      this.projectApplicationsService.getAllApplications(),
+    ])
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: ([projects, apps]) => {
+          this.projects = this.developer
+            ? projects.filter((project) => project.status === 1)
+            : projects;
+
+          // Procesar aplicaciones para obtener conteos
+          this.applicationCounts = apps.reduce(
+            (acc: { [key: number]: number }, app: any) => {
+              const projectId = app.project_id;
+              acc[projectId] = (acc[projectId] || 0) + 1;
+              return acc;
+            },
+            {}
+          );
+
+          console.log(this.applicationCounts)
+
+          this.filterProjects();
+        },
+        error: (error) => {
+          this.notificationServices.showErrorCustom(
+            "No se pudo cargar proyectos"
+          );
+          this.isLoading = false;
+        },
+      });
+  }
 
   hasApplied(projectId: number): boolean {
-    return this.applications?.some(app => app.project_id === projectId) || false;
+    return (
+      this.applications?.some((app) => app.project_id === projectId) || false
+    );
   }
 
   countValidApplications(): number {
@@ -520,22 +614,24 @@ loadAllProjects(): void {
     this.deleteProjectDialog = true;
   }
 
-  confirmDelete(): void {
-
-    if (!this.withdrawReason.trim()) {
-      this.notificationServices.showErrorCustom('Por favor ingresa una razón para retirar tu proyecto');
+  confirmDelete(status: any): void {
+    if (status === 1 && !this.withdrawReason.trim()) {
+      this.notificationServices.showErrorCustom(
+        "Por favor ingresa una razón para retirar tu proyecto"
+      );
       return;
     }
-            
-    this.projectsService.deactivateProject(this.project.id, this.withdrawReason)
-    .subscribe({
-      next: () => {
-        this.notificationServices.showSuccessCustom('Proyecto desactivado')
-        this.loadProjects(this.company.id);
-        this.deleteProjectDialog = false;
-        this.project = {} as Project;
-      }
-    });
+
+    this.projectsService
+      .deactivateProject(this.project.id, this.withdrawReason)
+      .subscribe({
+        next: () => {
+          this.notificationServices.showSuccessCustom("Proyecto desactivado");
+          this.loadProjects(this.company.id);
+          this.deleteProjectDialog = false;
+          this.project = {} as Project;
+        },
+      });
   }
 
   hideDialog(): void {
@@ -545,19 +641,23 @@ loadAllProjects(): void {
 
   saveToFavorites(projectId: any): void {
     if (!projectId) {
-      this.notificationServices.showErrorCustom('No se pudo identificar al desarrollador');
+      this.notificationServices.showErrorCustom(
+        "No se pudo identificar al desarrollador"
+      );
       return;
     }
 
     const requestData = {
       project_id: projectId,
-      developer_id: this.developer.id
+      developer_id: this.developer.id,
     };
 
     this.favoritesService.addToFavorites(requestData).subscribe({
       next: () => {
-        this.notificationServices.showSuccessCustom('Proyecto agregado a favoritos');
-      }
+        this.notificationServices.showSuccessCustom(
+          "Proyecto agregado a favoritos"
+        );
+      },
     });
   }
 
@@ -568,22 +668,26 @@ loadAllProjects(): void {
       if (this.project.id) {
         const updateData: UpdateProject = {
           company_id: Number(id),
-          category_id: 1, 
+          category_id: 1,
           project_name: this.project.project_name,
           description: this.project.description,
           budget: this.project.budget,
           days_available: this.project.days_available,
-          status: this.project.status
+          status: this.project.status,
         };
 
-        this.projectsService.updateProject(this.project.id, updateData).subscribe({
-          next: () => {
-            this.notificationServices.showSuccessCustom('Proyecto actualizado')
-            this.loadProjects(this.company.id);
-            this.projectDialog = false;
-            this.project = {} as Project;
-          }
-        });
+        this.projectsService
+          .updateProject(this.project.id, updateData)
+          .subscribe({
+            next: () => {
+              this.notificationServices.showSuccessCustom(
+                "Proyecto actualizado"
+              );
+              this.loadProjects(this.company.id);
+              this.projectDialog = false;
+              this.project = {} as Project;
+            },
+          });
       } else {
         const newProject: any = {
           company_id: Number(id),
@@ -594,47 +698,51 @@ loadAllProjects(): void {
           days_available: this.project.days_available,
         };
 
-        this.projectsService.createProject(newProject)
-        .subscribe({
+        this.projectsService.createProject(newProject).subscribe({
           next: () => {
-            this.notificationServices.showSuccessCustom('Proyecto creado')
+            this.notificationServices.showSuccessCustom("Proyecto creado");
             this.loadProjects(this.company.id);
             this.projectDialog = false;
             this.project = {} as Project;
-          }
+          },
         });
       }
     }
   }
 
   onGlobalFilter(table: Table, event: Event): void {
-    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    table.filterGlobal((event.target as HTMLInputElement).value, "contains");
   }
 
-
-  sortProjects() {
-    switch(this.selectedSort) {
-      case 'newest':
-        this.filteredProjects.sort((a, b) => 
-          new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
-        break;
-      case 'oldest':
-        this.filteredProjects.sort((a, b) => 
-          new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime());
-        break;
-      case 'highest':
-        this.filteredProjects.sort((a, b) => (b.budget || 0) - (a.budget || 0));
-        break;
-      case 'lowest':
-        this.filteredProjects.sort((a, b) => (a.budget || 0) - (b.budget || 0));
-        break;
-    }
+sortProjects() {
+  switch(this.selectedSort) {
+    case 'newest':
+      this.filteredProjects.sort((a, b) => 
+        new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
+      break;
+    case 'oldest':
+      this.filteredProjects.sort((a, b) => 
+        new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime());
+      break;
+    case 'highest':
+      this.filteredProjects.sort((a, b) => (b.budget || 0) - (a.budget || 0));
+      break;
+    case 'lowest':
+      this.filteredProjects.sort((a, b) => (a.budget || 0) - (b.budget || 0));
+      break;
+    case 'most_applications':
+      this.filteredProjects.sort((a, b) => {
+        const countA = this.applicationCounts[a.id] || 0;
+        const countB = this.applicationCounts[b.id] || 0;
+        return countB - countA; // Orden descendente (mayor a menor)
+      });
+      break;
   }
-
+}
   clearFilters() {
-    this.searchTerm = '';
+    this.searchTerm = "";
     this.selectedStatus = null;
-    this.selectedSort = 'newest';
+    this.selectedSort = "newest";
     this.selectedCategory = null;
     this.filterProjects();
   }
@@ -650,7 +758,7 @@ loadAllProjects(): void {
     if (token) {
       payload = token.split(".")[1];
       payload = window.atob(payload);
-      return JSON.parse(payload)['id'];
+      return JSON.parse(payload)["id"];
     } else {
       return null;
     }
@@ -676,7 +784,7 @@ loadAllProjects(): void {
         return "Desconocido";
     }
   }
-  
+
   getTokens() {
     return localStorage.getItem("login-token");
   }

@@ -140,7 +140,7 @@
         <div class="detail-item">
           <i class="pi pi-building"></i>
           <div>
-            <span class="detail-label">Tipo de Negocio</span>
+            <span class="detail-label">Tipo de Negocio (Giro Empresarial)</span>
             <span class="detail-value">{{ company.business_type || 'No especificado' }}</span>
           </div>
         </div>
@@ -276,7 +276,7 @@
             </div>
 
             <div class="field">
-                <label for="business_type">Tipo de Negocio</label>
+                <label for="business_type">Tipo de Negocio (Giro Empresarial)</label>
                 <input type="text" pInputText id="business_type" [(ngModel)]="companyUpdate.business_type" 
                 required [ngClass]="{'ng-invalid ng-dirty': submitted && !companyUpdate.business_type}"/>
                 <small *ngIf="submitted && !companyUpdate.business_type" 

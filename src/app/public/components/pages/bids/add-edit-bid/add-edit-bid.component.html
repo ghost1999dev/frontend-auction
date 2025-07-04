@@ -1,1 +1,140 @@
-<p>add-edit-bid works!</p>
+<div class="auction-room-container">
+    <div class="main-card">
+        <div class="auction-room-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1 class="auction-room-title">SALA DE OFERTAS</h1>
+                    <p class="auction-room-subtitle">Participa en las subastas activas</p>
+                </div>
+                <button pButton pRipple 
+                        icon="pi pi-sign-out" 
+                        label="Salir de la sala" 
+                        class="p-button-text p-button-sm exit-button"
+                        routerLink="/main/bids"></button>
+            </div>
+        </div>
+        <div class="grid-container">
+            <div class="grid">
+                <!-- Columna izquierda - Lista de subastas activas -->
+                <div class="col-3">
+                    <div class="card">
+                        <h3 class="mb-3">Subastas Activas</h3>
+                        <div class="auction-list">
+                            <div *ngFor="let auction of activeAuctions" class="auction-item"
+                                [ngClass]="{'selected': selectedAuction?.id === auction.id}"
+                                (click)="selectAuction(auction)">
+                                <h4>{{auction.project.project_name}}</h4>
+                                <p class="text-sm">Presupuesto: {{auction.project.budget |
+                                    currency:'USD':'symbol':'1.2-2'}}</p>
+                                <div class="flex justify-content-between align-items-center mt-2">
+                                    <p-tag [severity]="getStatusSeverity(auction.status)"
+                                        [value]="getStatusLabel(auction.status)"></p-tag>
+                                    <small class="text-500">{{auction.bidding_deadline | date:'shortDate'}}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna central - Sala de ofertas -->
+                <div class="col-6">
+                    <div class="card">
+                        <div *ngIf="selectedAuction; else noAuctionSelected" class="flex flex-column h-full">
+                            <!-- Información del proyecto -->
+                            <div class="text-center mb-4">
+                                <h1 class="text-3xl">{{selectedAuction.project.project_name}}</h1>
+                                <p class="text-lg">{{selectedAuction.project.description}}</p>
+                            </div>
+
+                            <!-- Precio actual y temporizador -->
+                            <div class="current-bid-section">
+                                <div class="text-4xl font-bold text-primary mb-2">
+                                    {{currentLowestBid | currency:'USD':'symbol':'1.2-2'}}
+                                </div>
+                                <div class="timer mb-4">
+                                    <p-tag *ngIf="auctionEnded" severity="danger" value="SUBASTA FINALIZADA"></p-tag>
+                                    <p-tag *ngIf="!auctionEnded" severity="info"
+                                        [value]="'Tiempo restante: ' + timeLeft"></p-tag>
+                                </div>
+                            </div>
+
+                            <!-- Botones de oferta rápida -->
+                            <div class="quick-bid-buttons mb-4 text-center">
+                                <h4 class="mb-3">Ofertar:</h4>
+                                <div *ngIf="getValidQuickBidAmounts().length > 0; else noQuickBids"
+                                    class="flex justify-content-center gap-2 flex-wrap">
+                                    <button *ngFor="let amount of quickBidAmounts" pButton pRipple
+                                        label="{{amount | currency:'USD':'symbol':'1.2-2'}}" class="p-button-outlined"
+                                        (click)="placeBid(amount)" [disabled]="auctionEnded"></button>
+                                </div>
+                                <ng-template #noQuickBids>
+                                    <p class="text-500">No hay ofertas rápidas disponibles</p>
+                                </ng-template>
+                            </div>
+
+                            <!-- Área de chat/ofetas -->
+                            <div class="chat-area">
+                                <div class="messages-container">
+                                    <div *ngFor="let bid of auctionBids" class="bid-message mb-3">
+                                        <div class="flex align-items-center gap-2">
+                                            <span class="font-bold">{{bid.developer.user.name}}</span>
+                                            <small class="text-500 ml-auto">{{bid.createdAt | date:'shortTime'}}</small>
+                                        </div>
+                                        <div class="bid-amount mt-1">
+                                            {{bid.amount | currency:'USD':'symbol':'1.2-2'}}
+                                            <span *ngIf="bid.amount === currentLowestBid"
+                                                class="current-bid-tag ml-2">OFERTA ACTUAL</span>
+                                            <span *ngIf="bid.developer_id === currentUserId" class="my-bid-tag ml-2">MI
+                                                OFERTA</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Input para ofertar -->
+                                <div class="bid-input">
+                                    <div class="p-inputgroup">
+                                        <span class="p-inputgroup-addon">$</span>
+                                        <input type="number" pInputText [(ngModel)]="bidAmount"
+                                            placeholder="Ingresa tu oferta" class="w-full" [disabled]="auctionEnded">
+                                        <button pButton pRipple icon="pi pi-send" (click)="placeBid(bidAmount || 0)"
+                                            [disabled]="auctionEnded"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <ng-template #noAuctionSelected>
+                            <div class="flex align-items-center justify-content-center h-full">
+                                <p class="text-500">Selecciona una subasta para participar</p>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- Columna derecha - MI Historial de Ofertas -->
+                <div class="col-3">
+                    <div class="card">
+                        <h3 class="mb-3">Mis Ofertas</h3>
+                        <div class="bid-history">
+                            <div *ngFor="let bid of filterUserBids(bidHistory)" class="bid-card mb-2">
+                                <div class="flex justify-content-between align-items-center">
+                                    <div>
+                                        <h4 class="mb-1">{{bid.auction.project.project_name}}</h4>
+                                    </div>
+                                    <span class="font-bold">{{bid.amount | currency:'USD':'symbol':'1.2-2'}}</span>
+                                </div>
+                                <p class="text-xs text-500 mt-2">{{bid.createdAt | date:'short'}}</p>
+                                <p-tag *ngIf="bid.amount === currentLowestBid && bid.auction_id === selectedAuction?.id"
+                                    severity="success" value="Actual" class="mt-1"></p-tag>
+                            </div>
+
+                            <div *ngIf="filterUserBids(bidHistory).length === 0" class="text-center p-4 text-500">
+                                No has realizado ofertas aún
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

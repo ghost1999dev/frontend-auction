@@ -61,7 +61,7 @@
             <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info ml-2 mr-2" [routerLink]="['/main/view/projects/', project.id]"></button>
             <button [disabled]="project.status !== 0" pButton pRipple icon="pi pi-pencil"
               class="p-button-rounded p-button-success mr-2" (click)="editProject(project)"></button>
-            <button [disabled]="project.status !== 0" pButton pRipple icon="pi pi-trash"
+            <button [disabled]="project.status !== 0 && project.status !== 1" pButton pRipple icon="pi pi-trash"
               class="p-button-rounded p-button-warning mr-2" (click)="deleteProject(project)"></button>
             <button [disabled]="project.status !== 0 || projects.length >= 5" pButton pRipple
               icon="pi pi-replay" class="p-button-rounded p-button-info" (click)="rePublishProject(project)"></button>
@@ -83,10 +83,10 @@
   <div class="confirmation-content">
     <div class="flex align-items-center gap-3 mb-3">
       <i class="pi pi-exclamation-triangle text-2xl text-yellow-500"></i>
-    <span *ngIf="project">¿Estás seguro que deseas desactivar el Proyecto:  <b>{{project.project_name}}</b>?</span>
+    <span *ngIf="project">¿Estás seguro que deseas desactivar el Proyecto: <b>{{project.project_name}}</b>?</span>
     </div>
     
-    <div class="field mt-4">
+    <div class="field mt-4" *ngIf="project.status === 1">
       <label for="withdrawReason" class="block mb-2">Razón del retiro:</label>
       <textarea id="withdrawReason" [(ngModel)]="withdrawReason" rows="3" 
                 pInputTextarea class="w-full" [autoResize]="true"
@@ -97,7 +97,7 @@
     <button pButton pRipple label="Cancelar" icon="pi pi-times" 
             (click)="deleteProjectDialog = false" class="p-button-text"></button>
     <button pButton pRipple label="Sí, desactivar" icon="pi pi-check" 
-            (click)="confirmDelete()" class="p-button-danger"></button>
+            (click)="confirmDelete(project.status)" class="p-button-danger"></button>
   </ng-template>
 </p-dialog>
 
@@ -194,7 +194,7 @@
                   <!-- Ratings -->
                   <div class="flex align-items-center">
                     <i class="pi pi-star text-600 mr-1"></i>
-                    <a class="text-sm text-600 p-button-text" (click)="showCompanyRatings(project.company)" style="cursor: pointer">Ver Calificaciones</a>
+                    <a class="text-sm text-600 p-button-text" (click)="showCompanyRatings(project.company)" style="cursor: pointer">Calificaciones</a>
                   </div>
                 </div>
 

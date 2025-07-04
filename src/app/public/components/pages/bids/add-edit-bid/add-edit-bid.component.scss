@@ -1,0 +1,412 @@
+/* add-edit-bid.component.scss */
+.auction-room-container {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow: hidden;
+
+  .main-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 6px;
+  }
+
+  .grid {
+    display: flex;
+    flex: 1;
+    margin: 0;
+    overflow: hidden;
+    min-height: 0;
+    height: 100%;
+
+    .col-3, .col-6 {
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .col-3 {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+
+    .col-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
+
+  .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface-card);
+    border-radius: 4px;
+    padding: 1rem;
+    height: 100%;
+  }
+
+  /* Common scrollable container styles */
+  .scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    
+    // Scrollbar styles for WebKit browsers
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--surface-ground);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--primary-color);
+      border-radius: 4px;
+      border: 2px solid var(--surface-ground);
+      
+      &:hover {
+        background-color: var(--primary-400);
+      }
+    }
+
+    // Scrollbar styles for Firefox
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--surface-ground);
+  }
+
+  /* Specific containers */
+  .auction-list, .bid-history, .messages-container {
+    @extend .scroll-container;
+    margin-bottom: 1rem;
+  }
+
+  /* Auction item styles */
+  .auction-item {
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: var(--surface-ground);
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-hover);
+    }
+
+    &.selected {
+      border-left-color: var(--primary-color);
+      background: var(--highlight-bg);
+    }
+  }
+
+  /* Current bid section */
+  .current-bid-section {
+    background: var(--surface-ground);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  /* Chat area specific styles */
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .messages-container {
+    gap: 0.5rem;
+  }
+
+  .bid-message {
+    flex-shrink: 0;
+    padding: 0.75rem;
+    background: var(--surface-ground);
+    border-radius: 4px;
+  }
+
+  /* Bid card styles */
+  .bid-card {
+    border-left: 3px solid var(--primary-color);
+    background: var(--surface-ground);
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* User avatar */
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  /* Quick bid buttons */
+  .quick-bid-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    
+    button {
+      min-width: 120px;
+    }
+  }
+
+  /* Bid input area */
+  .bid-input {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+
+  /* Responsive styles */
+  @media screen and (max-width: 992px) {
+    height: auto;
+    min-height: 100vh;
+
+    .grid {
+      flex-direction: column;
+
+      .col-3, .col-6 {
+        width: 100%;
+        flex: 1 1 auto;
+        max-width: 100%;
+        padding: 0.5rem 0;
+        min-height: 300px;
+      }
+    }
+
+    .auction-list, .bid-history, .messages-container {
+      height: auto;
+      max-height: 300px;
+    }
+  }
+
+  /* Dark mode support */
+  body.dark & {
+    .card {
+      background: var(--surface-card);
+      color: var(--text-color);
+    }
+
+    .auction-item, 
+    .current-bid-section,
+    .messages-container, 
+    .bid-card,
+    .bid-message {
+      background: var(--surface-50);
+    }
+
+    .text-500 {
+      color: var(--text-color-secondary);
+    }
+
+    .scroll-container::-webkit-scrollbar-track {
+      background: var(--surface-50);
+    }
+  }
+}
+
+/* Agrega esto en tu archivo SCSS */
+
+.bid-amount {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: var(--surface-ground);
+  margin-top: 0.5rem !important; // Sobrescribe mt-1 si es necesario
+
+  // Tags comunes
+  span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    margin-left: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  // Tag de oferta actual
+  .current-bid-tag {
+    background-color: var(--primary-100);
+    color: var(--primary-700);
+    border: 1px solid var(--primary-300);
+    
+    body.dark & {
+      background-color: var(--primary-900);
+      color: var(--primary-100);
+      border-color: var(--primary-700);
+    }
+  }
+
+  // Tag de mi oferta
+  .my-bid-tag {
+    background-color: var(--green-100);
+    color: var(--green-800);
+    border: 1px solid var(--green-300);
+    
+    body.dark & {
+      background-color: var(--green-900);
+      color: var(--green-100);
+      border-color: var(--green-700);
+    }
+  }
+
+  // Efecto hover para mejor interactividad
+  &:hover {
+    background: var(--surface-hover);
+    transition: background-color 0.2s ease;
+  }
+}
+
+/* Si necesitas más énfasis en el monto */
+.bid-amount {
+  .highlight-amount {
+    font-weight: 700;
+    color: var(--primary-color);
+    
+    body.dark & {
+      color: var(--primary-300);
+    }
+  }
+}
+
+.auction-room-header {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background: var(--primary-color);
+  //color: white;
+  margin-bottom: 1rem;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .auction-room-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--surface-border);
+  }
+
+  .auction-room-subtitle {
+    font-size: 1rem;
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+    color: var(--surface-border);
+  }
+
+  /* Estilo para dark mode */
+  body.dark & {
+    background: var(--primary-700);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.auction-room-header {
+  position: relative;
+  padding: 1rem;
+  background: var(--primary-color);
+  color: white;
+  margin-bottom: 1rem;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .header-title {
+    flex: 1;
+    text-align: center;
+  }
+
+  .auction-room-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .auction-room-subtitle {
+    font-size: 1rem;
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+  }
+
+  .exit-button {
+    color: var(--surface-border);
+    background: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    &:active {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+  }
+
+  /* Estilo para dark mode */
+  body.dark & {
+    background: var(--primary-700);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    .exit-button {
+      color: var(--primary-100) !important;
+      background: rgba(0, 0, 0, 0.2) !important;
+      border: 1px solid var(--primary-500) !important;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .auction-room-title {
+      font-size: 1.5rem;
+    }
+
+    .exit-button {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+
+      .p-button-label {
+        display: none;
+      }
+
+      .pi {
+        margin-right: 0;
+      }
+    }
+  }
+}

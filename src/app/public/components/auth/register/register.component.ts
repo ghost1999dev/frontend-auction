@@ -43,7 +43,7 @@ export class RegisterComponent {
     <p><strong>Al registrarse como compañía, deberá completar los siguientes campos adicionales:</strong></p>
     <ul style="text-align: left; margin-left: 20px;">
       <li>Número de NRC (formato: 000000-0)</li>
-      <li>Tipo de negocio</li>
+      <li>Tipo de negocio (Giro Empresarial)</li>
       <li>Sitio web (Si Existe)</li>
       <li>Número de NIT (formato: 0000-000000-000-00)</li>
     </ul>
