@@ -51,8 +51,15 @@
                         <!-- En la sección de acciones de la tabla, agrega este botón -->
                         <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info mr-2" 
                                 pTooltip="Información de la subasta" (click)="viewPublicAuction(auction)"></button>
-                         <button [disabled]="auction.status !== 2" pButton pRipple icon="pi pi-chart-bar" class="p-button-rounded p-button-success mr-2" 
+                        <!--[disabled]="auction.status !== 2"-->
+                        <button 
+                         [routerLink]="['/main/winner-bid/auction', 1]"
+                         pButton pRipple icon="pi pi-chart-bar" class="p-button-rounded p-button-success mr-2" 
                                 pTooltip="Ganadores de la subasta"></button> 
+                        <button pButton pRipple icon="pi pi-dollar" 
+                                class="p-button-rounded p-button-info" 
+                                [routerLink]="['/main/bidding-room', 1]"
+                                pTooltip="Ver sala de ofertas" tooltipPosition="top"></button>
                         <!-- <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" 
                                 (click)="deleteAuction(auction)"></button> -->
                     </div>

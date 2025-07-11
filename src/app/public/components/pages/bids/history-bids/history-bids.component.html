@@ -1,17 +1,13 @@
-@if (this.developer) {
+@if (this.company) {
     <div class="card">
         <div class="flex justify-content-between align-items-center mb-4">
-            <h1>Mis ofertas</h1>
-            <div class="flex gap-3 flex-wrap">
-                <span class="p-input-icon-left w-full md:w-auto">
+            <h1>Historial ofertas recibidas</h1>
+            <div class="flex gap-3">
+                <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
-                    <input pInputText type="text" placeholder="Buscar mis ofertas..." 
-                           (input)="onGlobalFilter(dt, $event)" class="w-full"/>
+                    <input pInputText type="text" placeholder="Buscar ofertas..." 
+                           (input)="onGlobalFilter(dt, $event)"/>
                 </span>
-                <p-dropdown [options]="projects" [(ngModel)]="selectedProject" 
-                          optionLabel="project_name" placeholder="Filtrar por proyecto"
-                          (onChange)="filterBids()" [showClear]="true" class="w-full md:w-14rem">
-                </p-dropdown>
                 <p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatus" 
                           optionLabel="label" optionValue="value" placeholder="Filtrar por estado"
                           (onChange)="filterBids()" [showClear]="true" class="w-full md:w-14rem">
@@ -20,21 +16,26 @@
         </div>
 
         <p-table #dt [value]="filteredBids" [loading]="loading" responsiveLayout="scroll" [rows]="10" 
-                [globalFilterFields]="['auction.project.project_name','amount']" [paginator]="true" 
+                [globalFilterFields]="['auction.project.project_name','developer.user.name','amount']" [paginator]="true" 
                 [rowsPerPageOptions]="[5,10,20]" [showCurrentPageReport]="true" 
                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas" 
                 [(selection)]="selectedBids" selectionMode="multiple" [rowHover]="true" dataKey="id">
             <ng-template pTemplate="header">
                 <tr>
+                    <th pSortableColumn="developer.user.name">Desarrollador <p-sortIcon field="developer.user.name"></p-sortIcon></th>
                     <th pSortableColumn="auction.project.project_name">Proyecto <p-sortIcon field="auction.project.project_name"></p-sortIcon></th>
                     <th pSortableColumn="amount">Monto <p-sortIcon field="amount"></p-sortIcon></th>
                     <th pSortableColumn="auction.status">Estado <p-sortIcon field="auction.status"></p-sortIcon></th>
                     <th pSortableColumn="createdAt">Fecha <p-sortIcon field="createdAt"></p-sortIcon></th>
-                    <th>Acciones</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-bid>
                 <tr>
+                    <td>
+                        <div class="flex align-items-center gap-2">
+                            <span>{{bid.developer.user.name}}</span>
+                        </div>
+                    </td>
                     <td>
                         <strong>{{bid.auction.project?.project_name}}</strong>
                     </td>
@@ -49,23 +50,15 @@
                     <td>
                         {{bid.createdAt | date:'shortDate'}}
                     </td>
-                    <td>
-                        <div class="flex gap-2">
-                            <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info" 
-                                   [routerLink]="['/main/bidding-room', 1]" pTooltip="Ver detalles" tooltipPosition="top"></button>
-                        </div>
-                    </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="empty">
                 <tr>
-                    <td colspan="5" class="text-center py-5">
-                        <p class="text-500">No has realizado ninguna oferta aún</p>
-                        <button pButton pRipple label="Explorar subastas" icon="pi pi-search" 
-                                class="p-button-text mt-3" routerLink="/main/auctions"></button>
+                    <td colspan="6" class="text-center py-5">
+                        <p class="text-500">No hay ofertas recibidas</p>
                     </td>
                 </tr>
             </ng-template>
         </p-table>
     </div>
-}
+} 

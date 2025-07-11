@@ -87,6 +87,20 @@ export class AuctionsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(userSub);
   }
 
+    private loadDeveloperData(userId: number): void {
+    const devSub = this.developerService.getDeveloperByIdUser(userId).subscribe({
+      next: (developer) => {
+        this.developer = developer;
+        this.loadActiveAuctions();
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+    
+    this.subscriptions.add(devSub);
+  }
+
   private loadCompanyData(userId: number): void {
     const companySub = this.companiesService.getCompanyByUserId(userId)
     .subscribe({
@@ -120,19 +134,6 @@ export class AuctionsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadDeveloperData(userId: number): void {
-    const devSub = this.developerService.getDeveloperByIdUser(userId).subscribe({
-      next: (developer) => {
-        this.developer = developer;
-        this.loadActiveAuctions();
-      },
-      error: () => {
-        this.loading = false;
-      }
-    });
-    
-    this.subscriptions.add(devSub);
-  }
 
 private loadActiveAuctions(): void {
     this.loading = true;

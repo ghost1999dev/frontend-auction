@@ -41,6 +41,8 @@ import { MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
 import { ToolbarModule } from 'primeng/toolbar';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { MessageModule } from 'primeng/message';
 
 import { ChipsModule } from 'primeng/chips';
 
@@ -60,6 +62,9 @@ import { AddEditBidComponent } from './bids/add-edit-bid/add-edit-bid.component'
 import { HistoryProjectsComponent } from './history-projects/history-projects.component';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ProjectDetailComponent } from './project/project-detail/project-detail.component';
+import { HistoryBidsComponent } from './bids/history-bids/history-bids.component';
+import { WinnerBidsComponent } from './bids/winner-bids/winner-bids.component';
+import { RatingModule } from 'primeng/rating';
 
 const routes: Routes = [
   {
@@ -129,7 +134,7 @@ const routes: Routes = [
         path: 'bids', 
         component: BidsComponent,
         canActivate: [RoleGuard],
-        data: { allowedRoles: [1, 2] } 
+        data: { allowedRoles: [2] } 
       },
       {
         path: 'history-application', 
@@ -142,6 +147,18 @@ const routes: Routes = [
         component: AddEditBidComponent,
         canActivate: [RoleGuard],
         data: { allowedRoles: [1, 2] } 
+      },
+      {
+        path: 'history-bid/auction/:id', 
+        component: HistoryBidsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
+      },
+      {
+        path: 'winner-bid/auction/:id', 
+        component: WinnerBidsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
       }
     ]
   },
@@ -166,7 +183,9 @@ const routes: Routes = [
     BidsComponent,
     AddEditBidComponent,
     HistoryProjectsComponent,
-    ProjectDetailComponent
+    ProjectDetailComponent,
+    HistoryBidsComponent,
+    WinnerBidsComponent
   ],
   imports: [
     CommonModule,
@@ -187,7 +206,7 @@ const routes: Routes = [
     PaginatorModule,
     AngularEditorModule,
     PdfViewerModule,
-
+    MessageModule,
     HttpClientModule,
     
     StyleClassModule,
@@ -207,9 +226,11 @@ const routes: Routes = [
     BadgeModule,
     ButtonModule,
     CardModule,
+    RatingModule,
     DividerModule,
     TagModule,
     TooltipModule,
+    DynamicDialogModule,
     SkeletonModule,
     FormsModule,
     ProgressSpinnerModule,

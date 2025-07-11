@@ -187,40 +187,16 @@
                                     <!-- Columna 1 -->
                                     <div class="form-column">
                                         <!-- Address -->
-                                        <div class="field-container">
-                                            <label for="address" class="input-label">Dirección *</label>
-                                            <input id="address" type="text" pInputText formControlName="address"
-                                                class="centered-input"
-                                                [ngClass]="{'p-invalid': submitted && companyForm.get('address')?.errors}">
-                                            <small *ngIf="submitted && companyForm.get('address')?.errors"
-                                                class="error-message">
-                                                Dirección es requerida
-                                            </small>
-                                        </div>
 
-                                        <!-- NRC Number -->
-                                        <div class="field-container">
-                                            <label for="nrc_number" class="input-label">Número de NRC *</label>
-                                            <input id="nrc_number" type="text" (input)="formatNrcNumber($event)"
-                                                pInputText class="centered-input" formControlName="nrc_number"
-                                                [ngClass]="{ 'p-invalid': submitted && companyForm.get('nrc_number')?.errors }">
-                                            <small *ngIf="submitted && companyForm.get('nrc_number')?.errors"
-                                                class="error-message">
-                                                <span *ngIf="companyForm.get('nrc_number')?.errors?.['required']">Número
-                                                    de NRC es requerido</span>
-                                                <span
-                                                    *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">Formato:
-                                                    123456-7 (6 dígitos, guión, 1 dígito)</span>
-                                            </small>
-                                        </div>
-
-                                        <!-- Password -->
+                                                                                <!-- Password -->
                                         <div class="field-container">
                                             <label for="password" class="input-label">Contraseña *</label>
                                             <div class="password-input-container">
                                                 <p-password id="password" formControlName="password"
                                                     [toggleMask]="false" [feedback]="false"
                                                     (input)="updatePasswordChecks()"
+                                                    [style]="{'width':'100%'}"
+
                                                     [ngClass]="{'p-invalid': submitted && companyForm.get('password')?.errors}"
                                                     class="full-width-password">
                                                 </p-password>
@@ -274,10 +250,54 @@
                                             </small>
                                         </div>
 
+                                        <div class="field-container">
+                                            <label for="address" class="input-label">Dirección *</label>
+                                            <input id="address" type="text" pInputText formControlName="address"
+                                                class="centered-input"
+                                                [ngClass]="{'p-invalid': submitted && companyForm.get('address')?.errors}">
+                                            <small *ngIf="submitted && companyForm.get('address')?.errors"
+                                                class="error-message">
+                                                Dirección es requerida
+                                            </small>
+                                        </div>
+
+                                        <!-- NRC Number -->
+                                        <div class="field-container">
+                                            <label for="nrc_number" class="input-label">Número de NRC *</label>
+                                            <input id="nrc_number" type="text" (input)="formatNrcNumber($event)"
+                                                pInputText class="centered-input" formControlName="nrc_number"
+                                                [ngClass]="{ 'p-invalid': submitted && companyForm.get('nrc_number')?.errors }">
+                                            <small *ngIf="submitted && companyForm.get('nrc_number')?.errors"
+                                                class="error-message">
+                                                <span *ngIf="companyForm.get('nrc_number')?.errors?.['required']">Número
+                                                    de NRC es requerido</span>
+                                                <span
+                                                    *ngIf="companyForm.get('nrc_number')?.errors?.['pattern']">Formato:
+                                                    123456-7 (6 dígitos, guión, 1 dígito)</span>
+                                            </small>
+                                        </div>
+
                                     </div>
 
                                     <!-- Columna 2 -->
                                     <div class="form-column">
+
+                                                                                <div class="field-container">
+                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña
+                                                *</label>
+                                            <div class="password-input-container">
+                                                <p-password id="confirmPassword" [(ngModel)]="confirmPassword"
+                                                    [feedback]="false" [toggleMask]="false"
+                                                    [style]="{'width':'100%'}"
+                                                    [ngModelOptions]="{standalone: true}" class="full-width-password"
+                                                    [ngClass]="{'p-invalid': submitted && !passwordMatchValidator()}">
+                                                </p-password>
+                                            </div>
+                                            <small *ngIf="submitted && !passwordMatchValidator()" class="error-message">
+                                                Las contraseñas no coinciden
+                                            </small>
+                                        </div>
+
                                         <!-- Phone -->
                                         <div class="field-container">
                                             <label for="phone" class="input-label">Teléfono *</label>
@@ -290,45 +310,6 @@
                                             </small>
                                         </div>
 
-                                        <!-- Business Type -->
-                                        <div class="field-container">
-                                            <label for="business_type" class="input-label">Tipo de Negocio (Giro
-                                                Empresarial) *</label>
-                                            <div class="chips-container">
-                                                <p-chips id="business_type" [(ngModel)]="businessTypeTags"
-                                                    [ngModelOptions]="{standalone: true}"
-                                                    placeholder="Agrega tipos de negocio"
-                                                    (onAdd)="onBusinessTypeAdd($event)"
-                                                    (onRemove)="onBusinessTypeRemove($event)" [max]="1"
-                                                    [allowDuplicate]="false" [addOnBlur]="true"
-                                                    [ngClass]="{ 'p-invalid': submitted && companyForm.get('business_type')?.errors }">
-                                                    <ng-template let-item pTemplate="item">
-                                                        <p-tag [value]="item" [rounded]="true"></p-tag>
-                                                    </ng-template>
-                                                </p-chips>
-                                            </div>
-                                            <small *ngIf="submitted && companyForm.get('business_type')?.errors"
-                                                class="error-message">
-                                                <span *ngIf="companyForm.get('business_type')?.errors?.['required']">Al
-                                                    menos un tipo de negocio es requerido</span>
-                                            </small>
-                                        </div>
-
-                                        <div class="field-container">
-                                            <label for="confirmPassword" class="input-label">Confirmar Contraseña
-                                                *</label>
-                                            <div class="password-input-container">
-                                                <p-password id="confirmPassword" [(ngModel)]="confirmPassword"
-                                                    [feedback]="false" [toggleMask]="false"
-                                                    [ngModelOptions]="{standalone: true}" class="full-width-password"
-                                                    [ngClass]="{'p-invalid': submitted && !passwordMatchValidator()}">
-                                                </p-password>
-                                            </div>
-                                            <small *ngIf="submitted && !passwordMatchValidator()" class="error-message">
-                                                Las contraseñas no coinciden
-                                            </small>
-                                        </div>
-
                                         <!-- Website -->
                                         <div class="field-container">
                                             <label for="web_site" class="input-label">Sitio Web</label>
@@ -338,6 +319,33 @@
                                             <small *ngIf="submitted && companyForm.get('web_site')?.errors"
                                                 class="error-message">
                                                 Sitio web es requerido
+                                            </small>
+                                        </div>
+
+                                                                                <!-- Business Type -->
+                                        <div class="field-container">
+                                            <label for="business_type" class="input-label">Tipo de Negocio (Giro
+                                                Empresarial) *</label>
+                                            <p-dropdown id="business_type" [options]="filteredGiros"
+                                                [(ngModel)]="selectedGiro" optionLabel="nombre" [filter]="true"
+                                                [showClear]="true" placeholder="Seleccione un giro empresarial"
+                                                [style]="{'width':'100%'}"
+                                                [ngClass]="{'ng-invalid ng-dirty': submitted && !selectedGiro}">
+                                                <ng-template pTemplate="selectedItem">
+                                                    <div *ngIf="selectedGiro">
+                                                        {{selectedGiro.nombre}}
+                                                    </div>
+                                                </ng-template>
+                                                <ng-template let-giro pTemplate="item">
+                                                    <div>
+                                                        <strong>{{giro.codigo}}</strong> - {{truncateText(giro.nombre, 40)}}
+                                                    </div>
+                                                </ng-template>
+                                            </p-dropdown>
+                                            <small *ngIf="submitted && companyForm.get('business_type')?.errors"
+                                                class="error-message">
+                                                <span *ngIf="companyForm.get('business_type')?.errors?.['required']">Al
+                                                    menos un tipo de negocio es requerido</span>
                                             </small>
                                         </div>
 
@@ -583,7 +591,7 @@
                     <tr>
                         <td>{{project.project_name}}</td>
                         <td>{{project.budget | currency}}</td>
-                        <td>{{project.days_available}}</td>
+                        <td>{{project.days_remaining}}</td>
                         <td>
                             <span [class]="'status-badge status-' + project.status">
                                 {{getStatusText(project.status)}}
