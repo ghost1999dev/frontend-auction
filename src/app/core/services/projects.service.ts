@@ -122,4 +122,16 @@ export class ProjectsService {
         catchError((err) => this.HandlerErrorSrv.handlerError(err))
       );
   }
+
+  uploadProjectDocuments(id: number, files: File[]): Observable<any> {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+
+    return this.http.put<any>(
+      `${environment.server_url}projects/upload-documents/${id}`,
+      formData
+    ).pipe(
+      catchError((err) => this.HandlerErrorSrv.handlerError(err))
+    );
+  }
 }

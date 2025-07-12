@@ -65,6 +65,12 @@
               class="p-button-rounded p-button-warning mr-2" (click)="deleteProject(project)"></button>
             <button [disabled]="project.status !== 0 || projects.length >= 5" pButton pRipple
               icon="pi pi-replay" class="p-button-rounded p-button-info" (click)="rePublishProject(project)"></button>
+            <button pButton pRipple icon="pi pi-file" 
+              class="p-button-rounded p-button-help ml-2" 
+              [disabled]="!project.documents || project.documents.length === 0"
+              (click)="viewDocuments(project)"
+              pTooltip="Ver documentos adjuntos"
+              tooltipPosition="top"></button>
           </div>
         </td>
       </tr>
@@ -98,6 +104,34 @@
             (click)="deleteProjectDialog = false" class="p-button-text"></button>
     <button pButton pRipple label="Sí, desactivar" icon="pi pi-check" 
             (click)="confirmDelete(project.status)" class="p-button-danger"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Diálogo para visualizar documentos -->
+<p-dialog header="Documentos del Proyecto" [(visible)]="displayDocumentsDialog" [style]="{width: '90vw', maxWidth: '1200px'}" 
+          [modal]="true" [dismissableMask]="true">
+  <div class="documents-grid">
+    <div *ngFor="let doc of selectedProject?.documents" class="document-card">
+      <div class="document-icon">
+        <i *ngIf="doc.type.includes('pdf')" class="pi pi-file-pdf" style="font-size: 2.5rem; color: #e74c3c"></i>
+        <i *ngIf="doc.type.includes('image')" class="pi pi-image" style="font-size: 2.5rem; color: #3498db"></i>
+      </div>
+      <div class="document-info">
+        <h4>{{doc.name}}</h4>
+        <p>{{formatSize(doc.size)}} • {{doc.type}}</p>
+      </div>
+      <div class="document-actions">
+        <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                (click)="viewDocument(doc.url)" pTooltip="Ver documento"></button>
+        <button pButton pRipple icon="pi pi-download" class="p-button-rounded p-button-text" 
+                (click)="downloadDocument(doc)" pTooltip="Descargar"></button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayDocumentsDialog = false" 
+            class="p-button-text"></button>
   </ng-template>
 </p-dialog>
 

@@ -68,6 +68,7 @@ export class ProjectComponent implements OnInit {
 
   showAddEditDialog: boolean = false;
   currentProjectId?: number;
+  displayDocumentsDialog = false;
 
   page: number = 1;
   pageSize: number = 6;
@@ -188,6 +189,35 @@ export class ProjectComponent implements OnInit {
       minute: "2-digit",
     }).format(date);
   }
+
+  viewDocuments(project: any): void {
+  if (project.documents && project.documents.length > 0) {
+    this.selectedProject = project;
+    this.displayDocumentsDialog = true;
+  }
+}
+
+viewDocument(url: string): void {
+  window.open(url, '_blank');
+}
+
+downloadDocument(doc: any): void {
+  const link = document.createElement('a');
+  link.href = doc.url;
+  link.download = doc.name;
+  link.target = '_blank';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+formatSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
 
   confirmApply(): void {
     if (!this.selectedProject || !this.developer) return;
