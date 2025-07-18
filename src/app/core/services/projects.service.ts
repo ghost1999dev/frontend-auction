@@ -11,6 +11,7 @@ import {
   ProjectFilter,
   ProjectHistoryResponse,
   ProjectHistory,
+  DeleteDocumentsResponse,
 } from "../models/projects";
 import { environment } from "src/environments/environment";
 import { NotificationService } from "./notification.service";
@@ -133,5 +134,21 @@ export class ProjectsService {
     ).pipe(
       catchError((err) => this.HandlerErrorSrv.handlerError(err))
     );
+  }
+
+  // Add this method to the ProjectsService class in projects.service.ts
+  deleteDocuments(id: number, documentKeys: string[]): Observable<DeleteDocumentsResponse> {
+    return this.http
+      .request<DeleteDocumentsResponse>(
+        "delete",
+        `${environment.server_url}projects/delete-documents/${id}`,
+        {
+          body: { documentKeys },
+          headers: new HttpHeaders({
+            "Content-Type": "application/json",
+          }),
+        }
+      )
+      .pipe(catchError((err) => this.HandlerErrorSrv.handlerError(err)));
   }
 }

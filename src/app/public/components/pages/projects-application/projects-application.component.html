@@ -305,6 +305,33 @@
           </div>
           <div class="prose border-round p-3" [innerHTML]="sanitizedLongDescription"></div>
         </div>
+
+      <div class="detail-card" *ngIf="selectedProject.documents && selectedProject.documents.length > 0">
+        <div class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-paperclip text-primary"></i>
+          <span class="detail-label font-medium text-600">Documentos Adjuntos</span>
+        </div>
+        <div class="documents-grid">
+          <div *ngFor="let doc of selectedProject.documents" class="document-card">
+            <div class="document-icon">
+              <i *ngIf="doc.type.includes('pdf')" class="pi pi-file-pdf" style="font-size: 2rem; color: #e74c3c"></i>
+              <i *ngIf="doc.type.includes('image')" class="pi pi-image" style="font-size: 2rem; color: #3498db"></i>
+              <i *ngIf="!doc.type.includes('pdf') && !doc.type.includes('image')" class="pi pi-file" 
+                 style="font-size: 2rem; color: #7f8c8d"></i>
+            </div>
+            <div class="document-info">
+              <h4>{{doc.name}}</h4>
+              <p>{{formatSize(doc.size)}} • {{doc.type}}</p>
+            </div>
+            <div class="document-actions">
+              <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                      (click)="viewDocument(doc.signedUrl)" pTooltip="Ver documento"></button>
+              <button pButton pRipple icon="pi pi-download" class="p-button-rounded p-button-text" 
+                      (click)="downloadDocument(doc)" pTooltip="Descargar"></button>
+            </div>
+          </div>
+        </div>
+      </div>
         
         <!-- Sección de acciones (opcional) -->
        <!--  <div class="flex justify-content-end gap-2 mt-5 pt-3 border-top-1 surface-border">

@@ -30,12 +30,15 @@ export class ProjectComponent implements OnInit {
 
   applyDialogVisible: boolean = false;
   selectedProject: any = null;
+  displayDeleteDocumentDialog: boolean = false;
+  documentToDelete: any = null;
+
 
   projects: any[] = [];
   selectedProjects: Project[] = [];
   applications: any[] = [];
   rejectedApplications: any[] = []; // New array for rejected applications
-  project: Project = {} as Project;
+  project: any = {} as Project;
   public isRepublishing: any;
 
   displayCompanyRatingsDialog = false;
@@ -142,6 +145,40 @@ export class ProjectComponent implements OnInit {
       },
     });
   }
+
+  confirmDeleteDocument(doc: any): void {
+    this.documentToDelete = doc;
+    this.displayDeleteDocumentDialog = true;
+  }
+
+deleteDocument(): void {
+  if (!this.documentToDelete) {
+    return;
+  }
+  
+  this.projectsService.deleteDocuments(this.selectedProject.id, [this.documentToDelete.s3Key]).subscribe({
+    next: (response: any) => {
+      this.notificationServices.showSuccessCustom('Documento eliminado con éxito');
+
+      if(response){
+        this.displayDeleteDocumentDialog = false;
+        
+        // Actualizar los documentos del proyecto seleccionado
+        this.selectedProject.documents = this.selectedProject.documents.filter(
+          (doc: any) => doc.s3Key !== this.documentToDelete.s3Key
+        );
+        
+        // Cerrar el diálogo solo si no quedan documentos
+        if (this.selectedProject.documents.length === 0) {
+          this.displayDocumentsDialog = false;
+        }
+      }
+    },
+    error: (error) => {
+      this.notificationServices.showErrorCustom('Error al eliminar el documento: ' + error.message);
+    }
+  });
+}
 
   showApplyDialog(project: any): void {
     this.selectedProject = project;

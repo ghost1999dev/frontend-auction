@@ -25,6 +25,8 @@ export class AddEditProjectComponent implements OnInit {
   attachmentsToDelete: number[] = []; // Para manejar eliminaciones en edición
   displayDocumentsDialog: boolean = false;
 
+  displayDeleteDocumentDialog: boolean = false;
+  documentToDelete: any = null;
   categories: Category[] = []; // Add this property
 
   termsAccepted: boolean = false;
@@ -118,6 +120,11 @@ export class AddEditProjectComponent implements OnInit {
     if (this.themeSubscription) {
       this.themeSubscription.unsubscribe();
     }
+  }
+
+  confirmDeleteDocument(doc: any): void {
+    this.documentToDelete = doc;
+    this.displayDeleteDocumentDialog = true;
   }
 
   onFileSelect(event: any) {

@@ -65,6 +65,8 @@ import { ProjectDetailComponent } from './project/project-detail/project-detail.
 import { HistoryBidsComponent } from './bids/history-bids/history-bids.component';
 import { WinnerBidsComponent } from './bids/winner-bids/winner-bids.component';
 import { RatingModule } from 'primeng/rating';
+import { CurrentProjectsComponent } from './current-projects/current-projects.component';
+import { UserInformationComponent } from './user-information/user-information.component';
 
 const routes: Routes = [
   {
@@ -159,7 +161,19 @@ const routes: Routes = [
         component: WinnerBidsComponent,
         canActivate: [RoleGuard],
         data: { allowedRoles: [1] } 
-      }
+      },
+      {
+        path: 'current-projects', 
+        component: CurrentProjectsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [2] } 
+      },
+            {
+        path: 'user-information/:id', 
+        component: UserInformationComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
+      },
     ]
   },
 ]
@@ -185,7 +199,9 @@ const routes: Routes = [
     HistoryProjectsComponent,
     ProjectDetailComponent,
     HistoryBidsComponent,
-    WinnerBidsComponent
+    CurrentProjectsComponent,
+    WinnerBidsComponent,
+    UserInformationComponent
   ],
   imports: [
     CommonModule,

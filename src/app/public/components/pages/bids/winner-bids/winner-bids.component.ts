@@ -25,6 +25,7 @@ interface RatingDialogConfig {
   isVisible?: boolean;
 }
 
+type ProjectStatus = 'not_assigned' | 'assigned' | 'in_progress' | 'review' | 'completed';
 
 @Component({
   selector: 'app-winner-bids',
@@ -56,7 +57,6 @@ export class WinnerBidsComponent implements OnInit {
   };
 
   displayDialog: boolean = false;
-
   private storageKey: string;
 
   constructor(
@@ -65,15 +65,79 @@ export class WinnerBidsComponent implements OnInit {
     this.storageKey = `selectedWinner_${this.auctionId}`;
   }
 
+  projectStatus: any;
+  projectDates = {
+    assigned: new Date(),
+    started: new Date(),
+    delivered: new Date(),
+    completed: new Date()
+  };
+
+  // Actualiza el método ngOnInit para cargar el estado del proyecto
   ngOnInit(): void {
     this.auctionId = this.route.snapshot.params['id'] || 1;
     this.storageKey = `selectedWinner_${this.auctionId}`;
     this.loadMockData();
     this.fireConfetti();
     this.loadSelectedWinner();
+    this.loadProjectStatus();
   }
 
-   fireConfetti() {
+private loadProjectStatus(): void {
+  const savedStatus = localStorage.getItem(`projectStatus_${this.auctionId}`);
+  if (savedStatus && this.isValidProjectStatus(savedStatus)) {
+    this.projectStatus = savedStatus as ProjectStatus;
+  } else if (this.selectedWinner) {
+    this.saveProjectStatus();
+  }
+  
+  // Actualiza fechas (esto es solo para demostración)
+  const now = new Date();
+  this.projectDates = {
+    assigned: new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000)), // 15 días atrás
+    started: new Date(now.getTime() - (10 * 24 * 60 * 60 * 1000)),  // 10 días atrás
+    delivered: new Date(now.getTime() - (3 * 24 * 60 * 60 * 1000)), // 3 días atrás
+    completed: new Date()
+  };
+}
+
+// Add this helper method to validate the status
+private isValidProjectStatus(status: string): status is ProjectStatus {
+  return ['not_assigned', 'assigned', 'in_progress', 'review', 'completed'].includes(status);
+}
+
+updateProjectStatus(newStatus: ProjectStatus): void {
+  // Only allow status updates to specific values
+  if (newStatus === 'not_assigned') return; // Can't go back to not assigned
+  
+  this.projectStatus = newStatus;
+  this.saveProjectStatus();
+  
+  // Mostrar mensaje de confirmación
+  let message = '';
+  switch(newStatus) {
+    case 'assigned':
+      message = 'El proyecto ha sido asignado al desarrollador';
+      break;
+    case 'in_progress':
+      message = 'El proyecto ha sido marcado como "En Progreso"';
+      break;
+    case 'review':
+      message = 'El proyecto ha sido marcado como "En Revisión"';
+      break;
+    case 'completed':
+      message = '¡Felicidades! El proyecto ha sido completado';
+      break;
+  }
+  
+  this.showSuccessMessage('Estado actualizado', message);
+}
+
+private saveProjectStatus(): void {
+  localStorage.setItem(`projectStatus_${this.auctionId}`, this.projectStatus);
+}
+
+  fireConfetti() {
   // Configuración base con tipos correctos
   const count = 400;
   const defaults: confetti.Options = {
@@ -278,6 +342,7 @@ submitRating(): void {
           this.selectedWinner = this.dialogConfig.winner;
           localStorage.setItem(this.storageKey, JSON.stringify(this.selectedWinner));
           this.showSuccessMessage('Ganador seleccionado', `${this.selectedWinner.name} ha sido seleccionado como ganador`);
+          this.projectStatus = 'assigned';
         } else {
           // Confirm clear selection
           this.selectedWinner = null;

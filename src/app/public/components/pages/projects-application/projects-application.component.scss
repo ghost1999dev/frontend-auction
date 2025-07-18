@@ -1565,3 +1565,74 @@ $dark-colors: (
     }
   }
 }
+
+/* Agrega estos estilos a tu archivo SCSS */
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.document-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--surface-card);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--surface-border);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.document-icon {
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.document-info {
+  flex-grow: 1;
+  min-width: 0;
+  
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  p {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-color-secondary);
+  }
+}
+
+.document-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+/* Dark theme styles */
+.dark-theme {
+  .document-card {
+    background-color: #3e4858;
+    border-color: #4a4a4a;
+    
+    h4 {
+      color: #f5f5f5;
+    }
+    
+    p {
+      color: #b0b0b0;
+    }
+  }
+}

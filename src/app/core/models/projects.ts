@@ -7,6 +7,17 @@ export interface ProjectResponse {
     message: string;
     project: Project;
   }
+
+  // Add this to projects.ts
+  export interface DeleteDocumentsRequest {
+    documentKeys: string[];
+  }
+
+  export interface DeleteDocumentsResponse {
+    message: string;
+    status: number;
+  }
+
   
   export interface Project {
     id: number;

@@ -1,0 +1,141 @@
+<div class="user-information-container">
+  <!-- Estado de carga -->
+  <p-card *ngIf="loading" class="user-card">
+    <div class="flex flex-column gap-3">
+      <div class="flex align-items-center gap-3">
+        <p-skeleton shape="circle" size="5rem"></p-skeleton>
+        <div class="flex flex-column gap-2">
+          <p-skeleton width="10rem" height="1.5rem"></p-skeleton>
+          <p-skeleton width="8rem" height="1rem"></p-skeleton>
+        </div>
+      </div>
+      <div class="flex flex-column gap-2">
+        <p-skeleton width="100%" height="1rem"></p-skeleton>
+        <p-skeleton width="100%" height="1rem"></p-skeleton>
+        <p-skeleton width="100%" height="1rem"></p-skeleton>
+        <p-skeleton width="100%" height="1rem"></p-skeleton>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- Información del usuario -->
+  <div *ngIf="!loading && user" class="user-content">
+    <!-- Sección de Perfil -->
+    <p-card class="profile-card">
+      <div class="profile-header">
+        <div class="avatar-container">
+          <p-avatar 
+            [image]="user.account_type === 1 ? user.image : ''"
+            [label]="user.account_type !== 1 ? user.name[0] : ''" 
+            size="xlarge" 
+            shape="circle" 
+            [style]="{
+              'background-color': user.account_type === 2 ? '#24292e' : 
+                                (user.account_type === 3 ? '#4285F4' : 'var(--primary-color)'),
+              'color': 'white'
+            }">
+            <i *ngIf="user.account_type === 2" class="pi pi-github" style="font-size: 2rem"></i>
+            <i *ngIf="user.account_type === 3" class="pi pi-google" style="font-size: 2rem"></i>
+          </p-avatar>
+          <p-badge *ngIf="user.status" value="Activo" severity="success" class="status-badge"></p-badge>
+        </div>
+
+        <div class="profile-info">
+          <h2>{{ user.name }}</h2>
+          <p-tag [value]="getRoleName(user.role_id)" severity="info"></p-tag>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="profile-details">
+        <div class="detail-item">
+          <i class="pi pi-envelope"></i>
+          <div>
+            <span class="detail-label">Correo electrónico</span>
+            <span class="detail-value">{{ user.email }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <i class="pi pi-home"></i>
+          <div>
+            <span class="detail-label">Dirección</span>
+            <span class="detail-value">{{ user.address || 'No especificada' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <i class="pi pi-phone"></i>
+          <div>
+            <span class="detail-label">Teléfono</span>
+            <span class="detail-value">{{ user.phone || 'No especificado' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <i class="pi pi-calendar"></i>
+          <div>
+            <span class="detail-label">Último inicio de sesión</span>
+            <span class="detail-value">{{ formatDate(user.last_login) }}</span>
+          </div>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Sección de Valoraciones -->
+    <p-card class="ratings-card" header="Calificaciones">
+      <div class="ratings-summary">
+        <div class="average-rating">
+          <span class="average-score">{{ ratingSummary.averageScore.toFixed(1) || '0.0' }}</span>
+          <div class="stars">
+            <span *ngFor="let star of getRatingStars(ratingSummary?.averageScore || 0).full">
+              <i class="pi pi-star-fill"></i>
+            </span>
+            <span *ngFor="let star of getRatingStars(ratingSummary?.averageScore || 0).half">
+              <i class="pi pi-star-half"></i>
+            </span>
+            <span *ngFor="let star of getRatingStars(ratingSummary?.averageScore || 0).empty">
+              <i class="pi pi-star"></i>
+            </span>
+          </div>
+          <span class="total-ratings">Basado en {{ ratingSummary.totalRatings || 0 }} reseñas</span>
+        </div>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="recent-ratings">
+        <h4>Reseñas recientes</h4>
+        <div *ngIf="recentRatings?.length === 0" class="no-ratings">
+          <p>Aún no hay reseñas</p>
+        </div>
+        <div *ngFor="let rating of recentRatings" class="rating-item">
+          <div class="rating-header">
+            <div class="reviewer-info">
+              <p-avatar 
+                [label]="rating.reviewer?.name ? rating.reviewer.name[0] : ''" 
+                size="normal" 
+                shape="circle"
+                styleClass="mr-2">
+              </p-avatar>
+              <span>{{ rating.author_name }}</span>
+            </div>
+            <div class="rating-score">
+              <span *ngFor="let star of getRatingStars(rating.score).full">
+                <i class="pi pi-star-fill"></i>
+              </span>
+              <span *ngFor="let star of getRatingStars(rating.score).empty">
+                <i class="pi pi-star"></i>
+              </span>
+            </div>
+          </div>
+          <div class="rating-content">
+            <p class="rating-comment">{{ rating.comment || 'No se proporcionó comentario' }}</p>
+            <p class="rating-date">{{ formatDate(rating.createdAt) }}</p>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div>
