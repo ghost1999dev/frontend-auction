@@ -1,0 +1,121 @@
+:host {
+  display: block;
+  padding: 2rem;
+}
+
+.project-progress-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.project-title {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.project-info-card, .description-card {
+  height: 100%;
+  
+  .p-fieldset-legend {
+    font-weight: 600;
+    color: var(--surface-700);
+  }
+}
+
+.project-detail {
+  margin: 0.75rem 0;
+  color: var(--surface-700);
+  line-height: 1.5;
+}
+
+.project-description {
+  line-height: 1.6;
+  color: var(--surface-700);
+}
+
+.steps-container {
+  margin: 2rem 0;
+  padding: 1rem;
+  background-color: var(--surface-50);
+  border-radius: 8px;
+  
+  .custom-steps {
+    .p-steps-item {
+      .p-steps-number {
+        background-color: var(--primary-color);
+        color: white;
+      }
+      
+      &.p-highlight {
+        .p-steps-number {
+          background-color: var(--primary-600);
+        }
+      }
+    }
+  }
+}
+
+.step-content-container {
+  background-color: var(--surface-50);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.current-step-title {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.step-description {
+  color: var(--surface-600);
+  margin-bottom: 1.5rem;
+}
+
+.step-actions {
+  .p-button {
+    min-width: 150px;
+  }
+}
+
+.completion-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  
+  .completed-tag {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+.completion-message {
+  color: var(--green-600);
+  font-weight: 500;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .project-title {
+    font-size: 1.5rem;
+  }
+  
+  .step-actions {
+    flex-direction: column;
+    gap: 1rem;
+    
+    .p-button {
+      width: 100%;
+    }
+  }
+}

@@ -67,6 +67,10 @@ import { WinnerBidsComponent } from './bids/winner-bids/winner-bids.component';
 import { RatingModule } from 'primeng/rating';
 import { CurrentProjectsComponent } from './current-projects/current-projects.component';
 import { UserInformationComponent } from './user-information/user-information.component';
+import { ProjectProgressComponent } from './current-projects/project-progress/project-progress.component';
+import { StepperModule } from 'primeng/stepper';
+import { FieldsetModule } from 'primeng/fieldset';
+import { StepsModule } from 'primeng/steps';
 
 const routes: Routes = [
   {
@@ -168,11 +172,17 @@ const routes: Routes = [
         canActivate: [RoleGuard],
         data: { allowedRoles: [2] } 
       },
-            {
+      {
         path: 'user-information/:id', 
         component: UserInformationComponent,
         canActivate: [RoleGuard],
         data: { allowedRoles: [1] } 
+      },
+      {
+        path: 'project-progress/:id', 
+        component: ProjectProgressComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [2] } 
       },
     ]
   },
@@ -201,10 +211,12 @@ const routes: Routes = [
     HistoryBidsComponent,
     CurrentProjectsComponent,
     WinnerBidsComponent,
-    UserInformationComponent
+    UserInformationComponent,
+    ProjectProgressComponent
   ],
   imports: [
     CommonModule,
+    StepperModule,
     SharedModule,
     RouterModule,
     TableModule,
@@ -235,6 +247,7 @@ const routes: Routes = [
     RadioButtonModule,
     InputSwitchModule,
     RippleModule,
+    StepsModule,
     ReactiveFormsModule,
     NgxMaskDirective,
     NgxMaskPipe,    
@@ -248,6 +261,7 @@ const routes: Routes = [
     TooltipModule,
     DynamicDialogModule,
     SkeletonModule,
+    FieldsetModule,
     FormsModule,
     ProgressSpinnerModule,
     RouterModule.forChild(routes)

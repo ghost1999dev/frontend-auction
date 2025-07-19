@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  padding: 2rem;
+}
+
+.card {
+  background: var(--surface-card);
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
