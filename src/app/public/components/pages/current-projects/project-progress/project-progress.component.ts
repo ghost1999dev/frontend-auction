@@ -16,11 +16,10 @@ export class ProjectProgressComponent implements OnInit {
   project!: Project;
   activeIndex: number = 0;
   steps: any[] = [
-    { label: 'Análisis', icon: 'pi pi-search' },
-    { label: 'Desarrollo', icon: 'pi pi-code' },
-    { label: 'Pruebas', icon: 'pi pi-check' },
-    { label: 'Revisión', icon: 'pi pi-eye' },
-    { label: 'Entrega', icon: 'pi pi-check-circle' }
+    { label: 'Proyecto Asignado', icon: 'pi pi-search' },
+    { label: 'En Progreso', icon: 'pi pi-code' },
+    { label: 'En Revisión', icon: 'pi pi-eye' },
+    { label: 'Completado', icon: 'pi pi-check-circle' }
   ];
   isCompleted: boolean = false;
   

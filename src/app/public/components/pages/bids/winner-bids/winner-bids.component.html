@@ -16,75 +16,87 @@
   </div>
 
 <div class="winners-podium">
-    <!-- Segundo lugar -->
-    <div class="podium-step silver">
-      <div class="podium-spot">
-        <div class="podium-rank">2</div>
-        <div class="winner-avatar">
-          <img [src]="'assets/images/1.avif'" alt="{{winners[1].name}}">
-        </div>
-        <div class="winner-info">
-          <h3>{{winners[1].name}}</h3>
-          <div class="winner-amount">
-            {{winners[1].amount | currency:'USD':'symbol':'1.2-2'}}
-          </div>
-          <small>{{winners[1].time}}</small>
-          <button *ngIf="!selectedWinner" pButton pRipple icon="pi pi-check" label="Aceptar propuesta"
-            class="p-button-rounded buttom-dark mt-3" (click)="selectWinner(winners[1])"></button>
-          <div *ngIf="selectedWinner?.name === winners[1].name" class="selected-badge mt-3 ">
-            <i class="pi pi-check-circle"></i> Seleccionado para el proyecto
-          </div>
-        </div>
-        <a class="mt-3" style="cursor: pointer;" [routerLink]="['/main/user-information',6]">Ver Perfil</a>
+  <!-- Segundo lugar -->
+  <div class="podium-step silver" [class.selected-winner]="selectedWinner?.name === winners[1].name" 
+       [class.not-selected]="selectedWinner && selectedWinner?.name !== winners[1].name">
+    <div class="podium-spot">
+      <div class="podium-rank">2</div>
+      <div *ngIf="selectedWinner?.name === winners[1].name" class="winner-trophy">
+        <img src="assets/images/trofeo.svg" alt="Trofeo" class="trophy-img">
       </div>
-    </div>
-
-    <!-- Primer lugar -->
-    <div class="podium-step gold">
-      <div class="podium-spot">
-        <div class="podium-rank">1</div>
-        <div class="winner-avatar">
-          <img [src]="'assets/images/2.jpeg'" alt="{{winners[0].name}}">
-        </div>
-        <div class="winner-info">
-          <h3>{{winners[0].name}}</h3>
-          <div class="winner-amount">
-            {{winners[0].amount | currency:'USD':'symbol':'1.2-2'}}
-          </div>
-          <small>{{winners[0].time}}</small>
-          <button *ngIf="!selectedWinner" pButton pRipple icon="pi pi-check" label="Aceptar propuesta"
-            class="p-button-rounded buttom-dark mt-3" (click)="selectWinner(winners[0])"></button>
-          <div *ngIf="selectedWinner?.name === winners[0].name" class="selected-badge mt-3">
-            <i class="pi pi-check-circle"></i> Seleccionado para el proyecto
-          </div>
-        </div>
-        <a class="mt-3" style="cursor: pointer;" [routerLink]="['/main/user-information',6]">Ver Perfil</a>
+      <div class="winner-avatar">
+        <img [src]="'assets/images/1.avif'" alt="{{winners[1].name}}">
       </div>
-    </div>
-
-    <!-- Tercer lugar -->
-    <div class="podium-step bronze">
-      <div class="podium-spot">
-        <div class="podium-rank">3</div>
-        <div class="winner-avatar">
-          <img [src]="'assets/images/3.avif'" alt="{{winners[2].name}}">
+      <div class="winner-info">
+        <h3>{{winners[1].name}}</h3>
+        <div class="winner-amount">
+          {{winners[1].amount | currency:'USD':'symbol':'1.2-2'}}
         </div>
-        <div class="winner-info">
-          <h3>{{winners[2].name}}</h3>
-          <div class="winner-amount">
-            {{winners[2].amount | currency:'USD':'symbol':'1.2-2'}}
-          </div>
-          <small>{{winners[2].time}}</small>
-          <button *ngIf="!selectedWinner" pButton pRipple icon="pi pi-check" label="Aceptar propuesta"
-            class="p-button-rounded buttom-dark mt-3" (click)="selectWinner(winners[2])"></button>
-          <div *ngIf="selectedWinner?.name === winners[2].name" class="selected-badge mt-3">
-            <i class="pi pi-check-circle"></i> Seleccionado para el proyecto
-          </div>
+        <small>{{winners[1].time}}</small>
+        <button *ngIf="!selectedWinner" pButton pRipple icon="pi pi-check" label="Aceptar propuesta"
+          class="p-button-rounded buttom-dark mt-3" (click)="selectWinner(winners[1])"></button>
+        <div *ngIf="selectedWinner?.name === winners[1].name" class="selected-badge mt-3">
+          <i class="pi pi-check-circle"></i> Seleccionado para el proyecto
         </div>
-        <a class="mt-3" style="cursor: pointer;" [routerLink]="['/main/user-information', 6]">Ver Perfil</a>
       </div>
+      <a class="mt-3" style="cursor: pointer;" [routerLink]="['/main/user-information',6]">Ver Perfil</a>
     </div>
   </div>
+
+  <!-- Primer lugar -->
+  <div class="podium-step gold" [class.selected-winner]="selectedWinner?.name === winners[0].name" 
+       [class.not-selected]="selectedWinner && selectedWinner?.name !== winners[0].name">
+    <div class="podium-spot">
+      <div class="podium-rank">1</div>
+      <div *ngIf="selectedWinner?.name === winners[0].name" class="winner-trophy">
+        <img src="assets/images/trofeo.svg" alt="Trofeo" class="trophy-img">
+      </div>
+      <div class="winner-avatar">
+        <img [src]="'assets/images/2.jpeg'" alt="{{winners[0].name}}">
+      </div>
+      <div class="winner-info">
+        <h3>{{winners[0].name}}</h3>
+        <div class="winner-amount">
+          {{winners[0].amount | currency:'USD':'symbol':'1.2-2'}}
+        </div>
+        <small>{{winners[0].time}}</small>
+        <button *ngIf="!selectedWinner" pButton pRipple icon="pi pi-check" label="Aceptar propuesta"
+          class="p-button-rounded buttom-dark mt-3" (click)="selectWinner(winners[0])"></button>
+        <div *ngIf="selectedWinner?.name === winners[0].name" class="selected-badge mt-3">
+          <i class="pi pi-check-circle"></i> Seleccionado para el proyecto
+        </div>
+      </div>
+      <a class="mt-3" style="cursor: pointer;" [routerLink]="['/main/user-information',6]">Ver Perfil</a>
+    </div>
+  </div>
+
+  <!-- Tercer lugar -->
+  <div class="podium-step bronze" [class.selected-winner]="selectedWinner?.name === winners[2].name" 
+       [class.not-selected]="selectedWinner && selectedWinner?.name !== winners[2].name">
+    <div class="podium-spot">
+      <div class="podium-rank">3</div>
+      <div *ngIf="selectedWinner?.name === winners[2].name" class="winner-trophy">
+        <img src="assets/images/trofeo.svg" alt="Trofeo" class="trophy-img">
+      </div>
+      <div class="winner-avatar">
+        <img [src]="'assets/images/3.avif'" alt="{{winners[2].name}}">
+      </div>
+      <div class="winner-info">
+        <h3>{{winners[2].name}}</h3>
+        <div class="winner-amount">
+          {{winners[2].amount | currency:'USD':'symbol':'1.2-2'}}
+        </div>
+        <small>{{winners[2].time}}</small>
+        <button *ngIf="!selectedWinner" pButton pRipple icon="pi pi-check" label="Aceptar propuesta"
+          class="p-button-rounded buttom-dark mt-3" (click)="selectWinner(winners[2])"></button>
+        <div *ngIf="selectedWinner?.name === winners[2].name" class="selected-badge mt-3">
+          <i class="pi pi-check-circle"></i> Seleccionado para el proyecto
+        </div>
+      </div>
+      <a class="mt-3" style="cursor: pointer;" [routerLink]="['/main/user-information',6]">Ver Perfil</a>
+    </div>
+  </div>
+</div>
 
   <div class="action-buttons">
     <button pButton pRipple icon="pi pi-history" label="Historial completo de Ofertas"
@@ -237,6 +249,11 @@
            'margin-right': '0.5rem'
          }"></i>
       <span>{{dialogConfig.message}}</span>
+    </div>
+    <div class="field mt-3" *ngIf="dialogConfig.type !== 'rating' && dialogConfig.type !== 'confirm'">
+      <label for="comment">Comentario*:</label>
+      <textarea id="comment" pInputTextarea [(ngModel)]="comment" rows="3"
+        placeholder="Comentario al desarrollador..." class="w-full"></textarea>
     </div>
 
     <div *ngIf="dialogConfig.type === 'rating'">
