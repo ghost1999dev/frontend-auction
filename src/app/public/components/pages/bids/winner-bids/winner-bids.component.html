@@ -18,7 +18,7 @@
 <div class="winners-podium">
   <!-- Segundo lugar -->
   <div class="podium-step silver" [class.selected-winner]="selectedWinner?.name === winners[1].name" 
-       [class.not-selected]="selectedWinner && selectedWinner?.name !== winners[1].name">
+       [class.not-selected]="selectedWinner && selectedWinner.name !== winners[1].name">
     <div class="podium-spot">
       <div class="podium-rank">2</div>
       <div *ngIf="selectedWinner?.name === winners[1].name" class="winner-trophy">
@@ -45,7 +45,7 @@
 
   <!-- Primer lugar -->
   <div class="podium-step gold" [class.selected-winner]="selectedWinner?.name === winners[0].name" 
-       [class.not-selected]="selectedWinner && selectedWinner?.name !== winners[0].name">
+       [class.not-selected]="selectedWinner && selectedWinner.name !== winners[0].name">
     <div class="podium-spot">
       <div class="podium-rank">1</div>
       <div *ngIf="selectedWinner?.name === winners[0].name" class="winner-trophy">
@@ -72,7 +72,7 @@
 
   <!-- Tercer lugar -->
   <div class="podium-step bronze" [class.selected-winner]="selectedWinner?.name === winners[2].name" 
-       [class.not-selected]="selectedWinner && selectedWinner?.name !== winners[2].name">
+       [class.not-selected]="selectedWinner && selectedWinner.name !== winners[2].name">
     <div class="podium-spot">
       <div class="podium-rank">3</div>
       <div *ngIf="selectedWinner?.name === winners[2].name" class="winner-trophy">
