@@ -1,0 +1,102 @@
+<div class="card project-progress-container">
+  <h2 class="project-title">Progreso del Proyecto: {{project.project_name}}</h2>
+  
+  <div class="grid mb-5">
+    <div class="col-12 md:col-6">
+      <p-fieldset legend="Información del Proyecto" [toggleable]="true" [collapsed]="true" class="project-info-card">
+        <div class="grid">
+          <div class="col-6">
+            <p class="project-detail"><strong>Cliente:</strong> {{project.company[0].name}}</p>
+            <p class="project-detail"><strong>Categoría:</strong> {{project.category[0].name}}</p>
+          </div>
+          <div class="col-6">
+            <p class="project-detail"><strong>Presupuesto:</strong> {{project.budget | currency:'USD':'symbol':'1.2-2'}}</p>
+          </div>
+        </div>
+      </p-fieldset>
+    </div>
+    <div class="col-12 md:col-6">
+      <p-fieldset legend="Descripción" [toggleable]="true" [collapsed]="true" class="description-card">
+        <p class="project-description">{{project.description}}</p>
+      </p-fieldset>
+    </div>
+  </div>
+
+  <div class="steps-container">
+    <p-steps [model]="steps" [readonly]="isCompleted" [activeIndex]="activeIndex" class="custom-steps"></p-steps>
+  </div>
+
+  <div class="step-content-container p-4">
+    <div class="step-header">
+      <h3 class="current-step-title">{{steps[activeIndex].label}}</h3>
+      <p class="step-description">Contenido específico para la etapa {{steps[activeIndex].label.toLowerCase()}}</p>
+    </div>
+
+    <div class="step-actions flex justify-content-between mt-5">
+        <button pButton pRipple 
+                label="Anterior" 
+                icon="pi pi-arrow-left" 
+                class="p-button-outlined p-button-secondary" 
+                (click)="confirmPrevStep()"
+                [disabled]="activeIndex === 0 || isCompleted"></button>
+        
+        @if (activeIndex < steps.length - 1 && !isCompleted) {
+        <button pButton pRipple 
+                label="Siguiente" 
+                icon="pi pi-arrow-right" 
+                iconPos="right" 
+                class="p-button-raised"
+                (click)="confirmNextStep()"></button>
+        }
+        
+        @if (activeIndex === steps.length - 1 && !isCompleted) {
+        <button pButton pRipple 
+                label="Completar Proyecto" 
+                icon="pi pi-check-circle" 
+                iconPos="right" 
+                class="p-button-raised p-button-success" 
+                (click)="confirmNextStep()"></button>
+        }
+        
+        @if (isCompleted) {
+        <div class="completion-badge">
+            <p-tag severity="success" icon="pi pi-check" value="PROYECTO COMPLETADO" class="completed-tag"></p-tag>
+            <p class="completion-message">¡Felicidades! Has completado todas las etapas del proyecto.</p>
+        </div>
+        }
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Dialog -->
+<p-dialog header="Confirmar" [(visible)]="displayConfirmDialog" [style]="{width: '450px'}" [modal]="true">
+  <div class="confirmation-content">
+    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+    <span>¿Estás seguro de que deseas continuar?</span>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="No" icon="pi pi-times" class="p-button-text" (click)="displayConfirmDialog = false"></button>
+    <button pButton pRipple label="Sí" icon="pi pi-check" class="p-button-raised" (click)="nextAction(); displayConfirmDialog = false"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Rating Dialog -->
+<p-dialog header="Calificar Cliente" [(visible)]="displayRatingDialog" [style]="{width: '500px'}" [modal]="true" [closable]="false">
+  <div class="rating-content">
+    <div class="field mb-4">
+      <label for="ratingScore" class="block mb-2">Puntuación (1-5)</label>
+      <p-rating [(ngModel)]="ratingScore" [cancel]="false" [stars]="5" [style]="{'font-size': '1.5rem'}"></p-rating>
+    </div>
+    
+    <div class="field">
+      <label for="ratingComment" class="block mb-2">Comentario</label>
+      <textarea id="ratingComment" pInputTextarea [(ngModel)]="ratingComment" rows="3" class="w-full"></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Enviar Calificación" icon="pi pi-star" class="p-button-success" 
+            (click)="submitRating()" [loading]="isRating"></button>
+  </ng-template>
+</p-dialog>
+
+<p-toast position="top-center"></p-toast>

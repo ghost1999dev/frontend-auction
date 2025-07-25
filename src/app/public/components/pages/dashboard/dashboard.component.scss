@@ -1,5 +1,4 @@
 /* Estructura principal del diálogo */
-
 .logo {
     margin-bottom: 1.5rem;
     width: 6rem;
@@ -15,6 +14,34 @@
     display: flex;
     overflow: hidden;
 }
+
+  .password-checklist {
+    background-color: var(--surface-50);
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    border: 1px solid var(--surface-200);
+    
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.5rem;
+    }
+    
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+    
+    .pi {
+      font-size: 1rem;
+    }
+  }
 
 .field-container {
   margin-bottom: 1rem;
@@ -380,8 +407,8 @@
 /* Estilos para el footer del diálogo */
 ::ng-deep .p-dialog .p-dialog-footer {
     padding: 1rem;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
+    //border-top: 1px solid #e5e7eb;
+    //background: #f9fafb;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
 }
@@ -405,8 +432,7 @@
 /* Botón Atrás */
 .footer-buttons .p-button-outlined.p-button-secondary {
     border: 1px solid #6b7280;
-    color: #6b7280;
-    background: transparent;
+    //color: #fff;
 }
 
 .footer-buttons .p-button-outlined.p-button-secondary:hover {
@@ -446,7 +472,7 @@
 
 :host {
   display: block;
-  background-color: var(--surface-0);
+  //background-color: var(--surface-0);
 }
 
 .card-container {
@@ -717,4 +743,115 @@
             }
         }
     }
+}
+
+// Añadir al final del archivo existente
+
+// Estilos para los badges de estado
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  
+  &.status-0 {
+    background-color: var(--yellow-100);
+    color: var(--yellow-800);
+  }
+  
+  &.status-1 {
+    background-color: var(--green-100);
+    color: var(--green-800);
+  }
+  
+  &.status-2 {
+    background-color: var(--red-100);
+    color: var(--red-800);
+  }
+  
+  &.status-3 {
+    background-color: var(--pink-100);
+    color: var(--pink-800);
+  }
+  
+  &.status-4 {
+    background-color: var(--blue-100);
+    color: var(--blue-800);
+  }
+}
+
+// Estilos para las tarjetas de resumen
+.summary-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .summary-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    
+    i {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+// Loader
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+/* Añade esto al final del archivo SCSS */
+
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  h5 {
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+  }
+}
+
+.chart-wrapper {
+  flex: 1;
+  min-height: 0; // Esto es importante para el flexbox en algunos navegadores
+  padding: 0 1rem 1rem;
+  
+  ::ng-deep canvas {
+    max-width: 100%;
+    height: auto !important;
+  }
+}
+
+// Asegurar que el contenedor del gráfico tenga un tamaño adecuado
+:host ::ng-deep .p-chart {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+// Opcional: ajustar el tamaño del texto en los gráficos para dispositivos móviles
+@media screen and (max-width: 768px) {
+  :host ::ng-deep .p-chart {
+    font-size: 12px;
+  }
 }

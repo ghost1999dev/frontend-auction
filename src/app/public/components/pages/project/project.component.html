@@ -30,7 +30,7 @@
         <th pSortableColumn="budget">Presupuesto <p-sortIcon field="budget"></p-sortIcon></th>
         <th pSortableColumn="days_available">Días Disponibles <p-sortIcon field="days_available"></p-sortIcon></th>
         <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
-        <th></th>
+        <th>Acciones</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-project>
@@ -58,47 +58,97 @@
         </td>
         <td>
           <div class="flex">
-            <button [disabled]="project.status != 0" pButton pRipple icon="pi pi-pencil"
+            <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info ml-2 mr-2" [routerLink]="['/main/view/projects/', project.id]"></button>
+            <button [disabled]="project.status !== 0" pButton pRipple icon="pi pi-pencil"
               class="p-button-rounded p-button-success mr-2" (click)="editProject(project)"></button>
-            <button [disabled]="project.status === 1" pButton pRipple icon="pi pi-trash"
+            <button [disabled]="project.status !== 0 && project.status !== 1" pButton pRipple icon="pi pi-trash"
               class="p-button-rounded p-button-warning mr-2" (click)="deleteProject(project)"></button>
-            <button [disabled]="project.status != 0 || projects.length >= 5" pButton pRipple
+            <button [disabled]="project.status !== 0 || projects.length >= 5" pButton pRipple
               icon="pi pi-replay" class="p-button-rounded p-button-info" (click)="rePublishProject(project)"></button>
+            <button pButton pRipple icon="pi pi-file" 
+              class="p-button-rounded p-button-help ml-2" 
+              [disabled]="!project.documents || project.documents.length === 0"
+              (click)="viewDocuments(project)"
+              pTooltip="Ver documentos adjuntos"
+              tooltipPosition="top"></button>
           </div>
         </td>
       </tr>
     </ng-template>
   </p-table>
 </div>
+
 <app-add-edit-project *ngIf="showAddEditDialog" [projectId]="currentProjectId" [companyId]="company?.id"
   [isRepublishing]="isRepublishing" (saved)="onProjectSaved()"
   (cancelled)="showAddEditDialog = false; isRepublishing = false">
 </app-add-edit-project>
 
-<p-dialog [(visible)]="deleteProjectDialog" header="Confirmar" [modal]="true" [style]="{width:'450px'}">
-  <div class="flex align-items-center justify-content-center">
-    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-    <span *ngIf="project">¿Estás seguro que deseas desactivar <b>{{project.project_name}}</b>?</span>
+
+<p-dialog [(visible)]="deleteProjectDialog" [modal]="true" [style]="{width: '450px'}" 
+          [draggable]="false" [resizable]="false" header="Confirmar">
+  <div class="confirmation-content">
+    <div class="flex align-items-center gap-3 mb-3">
+      <i class="pi pi-exclamation-triangle text-2xl text-yellow-500"></i>
+    <span *ngIf="project">¿Estás seguro que deseas desactivar el Proyecto: <b>{{project.project_name}}</b>?</span>
+    </div>
+    
+    <div class="field mt-4" *ngIf="project.status === 1">
+      <label for="withdrawReason" class="block mb-2">Razón del retiro:</label>
+      <textarea id="withdrawReason" [(ngModel)]="withdrawReason" rows="3" 
+                pInputTextarea class="w-full" [autoResize]="true"
+                placeholder="Por favor explica por qué retiras tu proyecto..."></textarea>
+    </div>
   </div>
   <ng-template pTemplate="footer">
-    <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
-      (click)="deleteProjectDialog = false"></button>
-    <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Sí" (click)="confirmDelete()"></button>
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" 
+            (click)="deleteProjectDialog = false" class="p-button-text"></button>
+    <button pButton pRipple label="Sí, desactivar" icon="pi pi-check" 
+            (click)="confirmDelete(project.status)" class="p-button-danger"></button>
   </ng-template>
 </p-dialog>
 
-<p-dialog [(visible)]="deleteProjectsDialog" header="Confirmar" [modal]="true" [style]="{width:'450px'}">
-  <div class="flex align-items-center justify-content-center">
-    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-    <span>¿Estás seguro que deseas desactivar los proyectos seleccionados?</span>
+<!-- Diálogo para visualizar documentos -->
+<p-dialog header="Documentos del Proyecto" [(visible)]="displayDocumentsDialog" [style]="{width: '90vw', maxWidth: '1200px'}" 
+          [modal]="true" [dismissableMask]="true">
+  <div class="documents-grid">
+    <div *ngFor="let doc of selectedProject?.documents" class="document-card">
+      <div class="document-icon">
+        <i *ngIf="doc.type.includes('pdf')" class="pi pi-file-pdf" style="font-size: 2.5rem; color: #e74c3c"></i>
+        <i *ngIf="doc.type.includes('image')" class="pi pi-image" style="font-size: 2.5rem; color: #3498db"></i>
+      </div>
+      <div class="document-info">
+        <h4>{{doc.name}}</h4>
+        <p>{{formatSize(doc.size)}} • {{doc.type}}</p>
+      </div>
+      <div class="document-actions">
+        <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                (click)="viewDocument(doc.url)" pTooltip="Ver documento"></button>
+        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-text" 
+                (click)="confirmDeleteDocument(doc)" pTooltip="Eliminar"></button>
+      </div>
+    </div>
   </div>
+
   <ng-template pTemplate="footer">
-    <button pButton pRipple icon="pi pi-times" class="p-button-text" label="No"
-      (click)="deleteProjectsDialog = false"></button>
-    <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Sí"
-      (click)="confirmDeleteSelected()"></button>
+    <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayDocumentsDialog = false" 
+            class="p-button-text"></button>
   </ng-template>
 </p-dialog>
+
+<p-dialog header="Confirmar eliminación" [(visible)]="displayDeleteDocumentDialog" [style]="{width: '450px'}" 
+          [modal]="true" [dismissableMask]="true">
+  <div class="confirmation-content">
+    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+    <span>¿Estás seguro de que deseas eliminar el documento <b>{{documentToDelete?.name}}</b>?</span>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" 
+            (click)="displayDeleteDocumentDialog = false"></button>
+    <button pButton pRipple label="Eliminar" icon="pi pi-trash" class="p-button-danger" 
+            (click)="deleteDocument()"></button>
+  </ng-template>
+</p-dialog>
+
 }@else if (this.developer) {
 <div class="grid">
   <div class="col-12">
@@ -110,10 +160,11 @@
           <span class="text-600 text-2xl">Explora y haz ofertas en proyectos de programación</span>
         </div>
 
+
         <div *ngIf="applications.length > 0 && filteredProjects.length === 0" class="col-12 text-center mt-5">
           <p class="text-600 text-xl">Ya has aplicado a todos los proyectos disponibles</p>
           <button pButton pRipple type="button" label="Ver mis aplicaciones" icon="pi pi-list"
-            class="p-button-outlined mt-3" routerLink="/projects/applications"></button>
+            class="p-button-outlined mt-3" routerLink="/main/projects-application"></button>
         </div>
 
         <!-- Barra de búsqueda y filtros -->
@@ -129,6 +180,15 @@
           </div>
 
           <div class="flex mt-3 gap-2">
+            <p-dropdown [options]="categories" [(ngModel)]="selectedCategory" 
+              optionLabel="name" optionValue="id" placeholder="Todas las categorías"
+              (onChange)="filterProjects()" [showClear]="true">
+              <ng-template let-category pTemplate="item">
+                <div class="flex align-items-center">
+                  <span>{{category.name}}</span>
+                </div>
+              </ng-template>
+            </p-dropdown>
             <!--<p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatus" 
                              optionLabel="label" optionValue="value" placeholder="Estado"
                              (onChange)="filterProjects()" [showClear]="true"></p-dropdown>-->
@@ -157,7 +217,12 @@
               <div class="flex justify-content-between align-items-center">
                 <div class="flex align-items-center">
                   <i class="pi pi-building text-600 mr-2"></i>
-                  <span class="text-sm text-600">{{project.company?.name || 'Empresa'}}</span>
+                  <span class="text-sm text-600">{{project.company?.user?.name || 'Empresa'}}</span>
+
+                  <div class="ml-2">
+                    <i class="pi pi-clock text-600 mr-1"></i>
+                    <span class="text-sm text-600">{{project.days_remaining || '0'}} días</span>
+                  </div>
                 </div>
                 <span class="text-sm font-bold"
                   [ngClass]="{'text-green-500': project.status === 1, 'text-red-500': project.status === 0}">
@@ -169,26 +234,23 @@
                 <div class="flex align-items-center gap-3">
                   <!-- Días disponibles -->
                   <div class="flex align-items-center">
-                    <i class="pi pi-clock text-600 mr-1"></i>
-                    <span class="text-sm text-600">{{project.days_remaining || '0'}} días</span>
+                    <i class="pi pi-bookmark text-600 mr-1"></i>
+                    <span class="text-sm text-600" style="cursor: pointer" (click)="saveToFavorites(project.id)">Guardar</span>
                   </div>
+
 
                   <!-- Ratings -->
                   <div class="flex align-items-center">
                     <i class="pi pi-star text-600 mr-1"></i>
-                    <a class="text-sm text-600 p-button-text" (click)="showCompanyRatings(project.company)" style="cursor: pointer">Ver Raitings</a>
+                    <a class="text-sm text-600 p-button-text" (click)="showCompanyRatings(project.company)" style="cursor: pointer">Calificaciones</a>
                   </div>
                 </div>
 
-                <button *ngIf="project.status === 1 && !hasApplied(project.id) && applications.length < 5" pButton
-                  pRipple type="button" label="Aplicar a este Proyecto" icon="pi pi-arrow-right" iconPos="right"
+                <button *ngIf="project.status === 1 && !hasApplied(project.id) && countValidApplications() < 5" pButton
+                  pRipple type="button" label="Aplica a este Proyecto" icon="pi pi-arrow-right" iconPos="right"
                   class="p-button-sm p-button-text" (click)="showApplyDialog(project)"></button>
-
-                <span *ngIf="hasApplied(project.id)" class="text-sm font-medium text-green-500">
-                  <i class="pi pi-check-circle"></i> Ya aplicaste
-                </span>
-                <h6 *ngIf="project.status === 1 && applications.length >= 5" class="text-700 font-normal"
-                  style="color: red !important; margin-top: 03px;">Aplicar a 5 Proyectos Maximo</h6>
+                <h6 *ngIf="project.status === 1 && countValidApplications() >= 5" class="text-700 font-normal"
+                  style="color: red !important; margin-top: 03px;">Aplica a 5 Proyectos Maximo</h6>
               </div>
             </div>
           </div>
@@ -213,7 +275,7 @@
 </div>
 
 <p-dialog [(visible)]="displayCompanyRatingsDialog" [modal]="true" [style]="{width: '1200px'}" 
-          [draggable]="false" [resizable]="false" header="Ratings de la Compañía"
+          [draggable]="false" [resizable]="false" header="Calificaciones de la Compañía"
           [styleClass]="'ratings-dialog'" [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
           [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
     <div *ngIf="loadingRatings; else ratingContent">
@@ -247,7 +309,7 @@
                 </div>
                 
                 <div class="chart-container">
-                    <h4>Distribución de Ratings</h4>
+                    <h4>Distribución de Calificaciones</h4>
                     <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions" 
                             width="100%" height="300px"></p-chart>
                 </div>
@@ -296,7 +358,7 @@
                         <i class="pi pi-star"></i>
                     </div>
                     <h4>No hay evaluaciones aún</h4>
-                    <p>Esta compañía no ha recibido ratings de desarrolladores.</p>
+                    <p>Esta compañía no ha recibido Calificaciones de desarrolladores.</p>
                 </div>
             </ng-template>
         </div>
@@ -308,7 +370,6 @@
     </ng-template>
 </p-dialog>
 
-<!-- Dentro del @else if (this.developer), después del p-dialog de confirmación de aplicación -->
 <p-dialog [(visible)]="displayProjectDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '1200px'}"
   [draggable]="false" [resizable]="false" [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
   header="Detalles del Proyecto" styleClass="project-dialog">
@@ -368,7 +429,7 @@
               <i class="pi pi-clock text-primary"></i>
               <span class="detail-label font-medium text-600">Fecha de creación</span>
             </div>
-            <p class="text-900 m-0">{{formatDate(selectedProject.createdAt) }}</p>
+            <p class="text-900 m-0">{{selectedProject.createProject | date:'medium':'UTC'}}</p>
           </div>
         </div>
       </div>
@@ -390,22 +451,47 @@
         </div>
         <div class="prose border-round p-3" [innerHTML]="sanitizedLongDescription"></div>
       </div>
+
+       <div class="detail-card" *ngIf="selectedProject.documents && selectedProject.documents.length > 0">
+        <div class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-paperclip text-primary"></i>
+          <span class="detail-label font-medium text-600">Documentos Adjuntos</span>
+        </div>
+        <div class="documents-grid">
+          <div *ngFor="let doc of selectedProject.documents" class="document-card">
+            <div class="document-icon">
+              <i *ngIf="doc.type.includes('pdf')" class="pi pi-file-pdf" style="font-size: 2rem; color: #e74c3c"></i>
+              <i *ngIf="doc.type.includes('image')" class="pi pi-image" style="font-size: 2rem; color: #3498db"></i>
+              <i *ngIf="!doc.type.includes('pdf') && !doc.type.includes('image')" class="pi pi-file" 
+                 style="font-size: 2rem; color: #7f8c8d"></i>
+            </div>
+            <div class="document-info">
+              <h4>{{doc.name}}</h4>
+              <p>{{formatSize(doc.size)}} • {{doc.type}}</p>
+            </div>
+            <div class="document-actions">
+              <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                      (click)="viewDocument(doc.signedUrl)" pTooltip="Ver documento"></button>
+              <button pButton pRipple icon="pi pi-download" class="p-button-rounded p-button-text" 
+                      (click)="downloadDocument(doc)" pTooltip="Descargar"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
     }
   </div>
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayProjectDialog = false"
       class="p-button-outlined p-button-secondary"></button>
-    <button *ngIf="selectedProject?.status === 1 && !hasApplied(selectedProject.id) && applications.length < 5" pButton
-      pRipple label="Aplicar a este proyecto" icon="pi pi-check"
-      (click)="showApplyDialog(selectedProject); displayProjectDialog = false" class="p-button-success"></button>
   </ng-template>
 </p-dialog>
 
 <p-dialog [(visible)]="applyDialogVisible" [style]="{width: '450px'}" header="Confirmar Aplicación" [modal]="true">
   <div class="flex align-items-center justify-content-center">
     <i class="pi pi-exclamation-circle mr-3" style="font-size: 2rem"></i>
-    <span>¿Estás seguro que deseas aplicar al proyecto <b>{{selectedProject?.project_name}}</b>?</span>
+    <span>¿Estás seguro que deseas Aplica al proyecto <b>{{selectedProject?.project_name}}</b>?</span>
   </div>
   <ng-template pTemplate="footer">
     <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Cancelar"

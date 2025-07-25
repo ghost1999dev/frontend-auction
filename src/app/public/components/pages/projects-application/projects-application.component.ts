@@ -70,6 +70,7 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
   loadingRatings = false;
   chartData: any;
   chartOptions: any;
+  withdrawReason: string = '';
 
   // Project dialog properties
   displayProjectDialog = false;
@@ -115,6 +116,29 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
     });
   }
 
+    viewDocument(url: string): void {
+  window.open(url, '_blank');
+}
+
+downloadDocument(doc: any): void {
+  const link = document.createElement('a');
+  link.href = doc.signedUrl;
+  link.download = doc.name;
+  link.target = '_blank';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+formatSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+
   showDeveloperRatings(developer: any): void {
     if (!developer || !developer.id) {
         this.notificationService.showErrorCustom('Desarrollador no válido');
@@ -141,8 +165,6 @@ export class ProjectsApplicationComponent implements OnInit, OnDestroy {
                         company_name: rating.author_name
                     }))
                 };
-
-                console.log(this.developerRatingData)
                 
                 this.updateChartData();
                 this.loadingRatings = false;
@@ -173,7 +195,7 @@ saveToFavorites(projectId: number): void {
 
   const requestData = {
     project_id: projectId,
-    developer_id: this.id
+    developer_id: this.developer.id
   };
 
   this.favoritesService.addToFavorites(requestData).subscribe({
@@ -229,6 +251,39 @@ private getDefaultRatings(): any {
     );
   }
 
+  confirmWithdraw(): void {
+  if (
+    !this.selectedApplicationId 
+    //|| !this.developer || !this.withdrawReason.trim()
+  ) {
+    //this.notificationService.showErrorCustom('Por favor ingresa una razón para retirar tu aplicación');
+    return;
+  }
+  
+  this.withdrawLoading = true;
+  
+  // Aquí puedes usar this.withdrawReason para enviar la razón al servicio
+  console.log('Razón de retiro:', this.withdrawReason); // Esto es temporal
+  
+  this.subscriptions.add(
+    this.applicationsService.deleteApplication(this.selectedApplicationId).pipe(
+      finalize(() => {
+        this.withdrawLoading = false;
+        this.withdrawReason = ''; // Limpiar el textarea después
+      })
+    ).subscribe({
+      next: () => {
+        this.notificationService.showSuccessCustom('Aplicación retirada correctamente');
+        this.loadApplications(Number(this.developer.id));
+        this.displayWithdrawDialog = false;
+      },
+      error: (error) => {
+        this.notificationService.showErrorCustom('Error al retirar la aplicación');
+      }
+    })
+  );
+}
+
   private loadCompanyData(userId: number): void {
     this.loading = true;
     this.subscriptions.add(
@@ -260,47 +315,49 @@ private getDefaultRatings(): any {
     );
   }
 
-  private loadProjectsAndApplications(companyId: number): void {
-    this.loading = true;
-    this.subscriptions.add(
-      forkJoin([
-        this.projectsService.getProjectsByCompany(companyId),
-        this.applicationsService.getAllApplications()
-      ]).pipe(
-        finalize(() => this.loading = false)
-      ).subscribe({
-        next: ([projects, applications]) => {
-          this.projects = projects;
-          this.projectOptions = [
-            { label: 'Todos los proyectos', value: null },
-            ...projects.map((project: Project) => ({
-              label: project.project_name,
-              value: project.id
-            }))
-          ];
-          
-          this.applications = applications.filter((app: any) => 
-            this.projects.some(project => project.id === app.project_id)
-          );
-          this.filteredApplications = [...this.applications];
-        }
-      })
-    );
-  }
+private loadProjectsAndApplications(companyId: number): void {
+  this.loading = true;
+  this.subscriptions.add(
+    forkJoin([
+      this.projectsService.getProjectsByCompany(companyId),
+      this.applicationsService.getAllApplications()
+    ]).pipe(
+      finalize(() => this.loading = false)
+    ).subscribe({
+      next: ([projects, applications]) => {
+        this.projects = projects;
+        this.projectOptions = [
+          { label: 'Todos los proyectos', value: null },
+          ...projects.map((project: Project) => ({
+            label: project.project_name,
+            value: project.id
+          }))
+        ];
+        
+        // Filtrar aplicaciones con estado diferente de 3 (Rechazado)
+        this.applications = applications.filter((app: any) => 
+          this.projects.some(project => project.id === app.project_id) && app.status !== 3
+        );
+        this.filteredApplications = [...this.applications];
+      }
+    })
+  );
+}
 
-  private loadApplications(developerId: number): void {
-    this.loading = true;
-    this.subscriptions.add(
-      this.applicationsService.getApplicationsByDeveloper(developerId).pipe(
-        finalize(() => this.loading = false)
-      ).subscribe({
-        next: (apps) => {
-          this.applications = apps;
-          this.filteredApplications = [...this.applications];
-        }
-      })
-    );
-  }
+private loadApplications(developerId: number): void {
+  this.loading = true;
+  this.subscriptions.add(
+    this.applicationsService.getApplicationsByDeveloper(developerId).pipe(
+      finalize(() => this.loading = false)
+    ).subscribe({
+      next: (apps) => {
+        // Filtrar aplicaciones con estado diferente de 3 (Rechazado)
+        this.applications = apps.filter((app: any) => app.status !== 3);
+        this.filteredApplications = [...this.applications];
+      }
+    })
+  );
+}
 
   private updateChartData(): void {
     if (!this.developerRatingData) {
@@ -313,7 +370,7 @@ private getDefaultRatings(): any {
     this.chartData = {
         labels: ['1 estrella', '2 estrellas', '3 estrellas', '4 estrellas', '5 estrellas'],
         datasets: [{
-            label: 'Distribución de Ratings',
+            label: 'Distribución de Calificaciones',
             backgroundColor: isDark ? [
                 'rgba(110, 142, 251, 0.7)',
                 'rgba(110, 142, 251, 0.8)',
@@ -426,23 +483,6 @@ private getDefaultRatings(): any {
     this.displayWithdrawDialog = true;
   }
 
-  confirmWithdraw(): void {
-    if (!this.selectedApplicationId || !this.developer) return;
-    
-    this.withdrawLoading = true;
-    this.subscriptions.add(
-      this.applicationsService.deleteApplication(this.selectedApplicationId).pipe(
-        finalize(() => this.withdrawLoading = false)
-      ).subscribe({
-        next: () => {
-          this.notificationService.showSuccessCustom('Aplicación retirada correctamente');
-          this.loadApplications(Number(this.developer.id));
-          this.displayWithdrawDialog = false;
-        }
-      })
-    );
-  }
-
   onProjectFilterChange(): void {
     if (!this.selectedProjectFilter) {
       this.filteredApplications = [...this.applications];
@@ -466,7 +506,8 @@ private getDefaultRatings(): any {
     const statusTexts: Record<number, string> = {
       0: 'Activo',
       1: 'Ganado',
-      2: 'Rechazado'
+      2: 'Rechazado',
+      3: 'Eliminado'
     };
     return statusTexts[status] || 'Desconocido';
   }
@@ -475,7 +516,8 @@ private getDefaultRatings(): any {
     const severityMap: Record<number, string> = {
       0: 'success',
       1: 'warning',
-      2: 'danger'
+      2: 'danger',
+      3: 'danger'
     };
     return severityMap[status] || 'info';
   }

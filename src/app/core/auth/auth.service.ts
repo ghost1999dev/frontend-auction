@@ -24,12 +24,12 @@ export class AuthService {
 
   constructor(
     private http: HttpClient, 
-    private router: Router, 
     private userService: UserService,
     private companiesService: CompaniesService,
     private developerService: DeveloperService,
     private HandlerErrorSrv: HandlerErrorService,
     private notificationServices: NotificationService,
+    private router: Router, 
     ) {
     this.checkToken();
   }
@@ -67,9 +67,8 @@ export class AuthService {
     localStorage.removeItem('login-token');
     localStorage.removeItem('isLoggedin');
     localStorage.removeItem('lenght_projects');
-
     this.loggedIn.next(false);
-    this.router.navigate(['auth/login']);
+    this.router.navigate(['auth/login'])
   }
 
   private checkToken(): void{

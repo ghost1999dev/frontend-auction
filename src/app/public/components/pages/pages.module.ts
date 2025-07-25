@@ -41,6 +41,8 @@ import { MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
 import { ToolbarModule } from 'primeng/toolbar';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { MessageModule } from 'primeng/message';
 
 import { ChipsModule } from 'primeng/chips';
 
@@ -58,6 +60,17 @@ import { PublicAuctionViewComponent } from './auctions/public-auction-view/publi
 import { BidsComponent } from './bids/bids.component';
 import { AddEditBidComponent } from './bids/add-edit-bid/add-edit-bid.component';
 import { HistoryProjectsComponent } from './history-projects/history-projects.component';
+import { FileUploadModule } from 'primeng/fileupload';
+import { ProjectDetailComponent } from './project/project-detail/project-detail.component';
+import { HistoryBidsComponent } from './bids/history-bids/history-bids.component';
+import { WinnerBidsComponent } from './bids/winner-bids/winner-bids.component';
+import { RatingModule } from 'primeng/rating';
+import { CurrentProjectsComponent } from './current-projects/current-projects.component';
+import { UserInformationComponent } from './user-information/user-information.component';
+import { ProjectProgressComponent } from './current-projects/project-progress/project-progress.component';
+import { StepperModule } from 'primeng/stepper';
+import { FieldsetModule } from 'primeng/fieldset';
+import { StepsModule } from 'primeng/steps';
 
 const routes: Routes = [
   {
@@ -94,6 +107,12 @@ const routes: Routes = [
         data: { allowedRoles: [1, 2] } 
       },
       {
+        path: 'view/projects/:id',
+        component: ProjectDetailComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
+      },
+      {
         path: 'favorites',
         component: FavoritesComponent,
         canActivate: [RoleGuard],
@@ -121,14 +140,50 @@ const routes: Routes = [
         path: 'bids', 
         component: BidsComponent,
         canActivate: [RoleGuard],
-        data: { allowedRoles: [1, 2] } 
+        data: { allowedRoles: [2] } 
       },
       {
         path: 'history-application', 
         component: HistoryProjectsComponent,
         canActivate: [RoleGuard],
         data: { allowedRoles: [2] } 
-      }
+      },
+      {
+        path: 'bidding-room/:id', 
+        component: AddEditBidComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1, 2] } 
+      },
+      {
+        path: 'history-bid/auction/:id', 
+        component: HistoryBidsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
+      },
+      {
+        path: 'winner-bid/auction/:id', 
+        component: WinnerBidsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
+      },
+      {
+        path: 'current-projects', 
+        component: CurrentProjectsComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [2] } 
+      },
+      {
+        path: 'user-information/:id', 
+        component: UserInformationComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [1] } 
+      },
+      {
+        path: 'project-progress/:id', 
+        component: ProjectProgressComponent,
+        canActivate: [RoleGuard],
+        data: { allowedRoles: [2] } 
+      },
     ]
   },
 ]
@@ -151,10 +206,17 @@ const routes: Routes = [
     PublicAuctionViewComponent,
     BidsComponent,
     AddEditBidComponent,
-    HistoryProjectsComponent
+    HistoryProjectsComponent,
+    ProjectDetailComponent,
+    HistoryBidsComponent,
+    CurrentProjectsComponent,
+    WinnerBidsComponent,
+    UserInformationComponent,
+    ProjectProgressComponent
   ],
   imports: [
     CommonModule,
+    StepperModule,
     SharedModule,
     RouterModule,
     TableModule,
@@ -172,11 +234,12 @@ const routes: Routes = [
     PaginatorModule,
     AngularEditorModule,
     PdfViewerModule,
-
+    MessageModule,
     HttpClientModule,
     
     StyleClassModule,
     PanelMenuModule,
+    FileUploadModule,
 
     InputTextModule,
     SidebarModule,
@@ -184,6 +247,7 @@ const routes: Routes = [
     RadioButtonModule,
     InputSwitchModule,
     RippleModule,
+    StepsModule,
     ReactiveFormsModule,
     NgxMaskDirective,
     NgxMaskPipe,    
@@ -191,10 +255,13 @@ const routes: Routes = [
     BadgeModule,
     ButtonModule,
     CardModule,
+    RatingModule,
     DividerModule,
     TagModule,
     TooltipModule,
+    DynamicDialogModule,
     SkeletonModule,
+    FieldsetModule,
     FormsModule,
     ProgressSpinnerModule,
     RouterModule.forChild(routes)

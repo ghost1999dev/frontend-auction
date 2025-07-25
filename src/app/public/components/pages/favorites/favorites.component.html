@@ -43,9 +43,17 @@
       </div>
       
       <div class="application-actions p-card-footer">
-        <div class="flex justify-content-end gap-2"><!-- 
+        <div class="flex justify-content-end gap-2">
+          <button *ngIf="favorite?.project.status === 1 && !hasApplied(favorite.project?.id) && applications.length < 5" 
+                  pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success p-button-sm" 
+                  (click)="showApplyDialog(favorite.project)" pTooltip="Aplica a Este Proyecto" tooltipPosition="top"></button>
+          <span *ngIf="hasApplied(favorite.project?.id) && applications.length < 5" class="text-sm font-medium text-green-500 mt-2">
+            <i class="pi pi-check-circle"></i> Ya aplicaste
+          </span>
+          <h6 *ngIf="favorite?.project.status === 1 && applications.length >= 5" class="text-700 font-normal mt-2"
+              style="color: red !important; margin-top: 03px;">Aplica a 5 Proyectos Máximo</h6>
           <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-info p-button-sm" 
-                  (click)="showProjectDetails(favorite.project_id)" pTooltip="Ver proyecto" tooltipPosition="top"></button> -->
+                  (click)="showProjectDetails(favorite.project)" pTooltip="Ver proyecto" tooltipPosition="top"></button>
           <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm" 
                   (click)="removeFromFavorites(favorite.id)" pTooltip="Eliminar de favoritos" tooltipPosition="top"></button>
         </div>
@@ -53,3 +61,135 @@
     </div>
   </div>
 </div>
+
+
+<p-dialog [(visible)]="displayProjectDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '1200px'}"
+  [draggable]="false" [resizable]="false" [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
+  header="Detalles del Proyecto" styleClass="project-dialog">
+  <div class="project-dialog-content">
+    @if (loadingProject) {
+    <div class="text-center p-5 flex flex-column align-items-center gap-3">
+      <p-progressSpinner strokeWidth="4" animationDuration=".5s"></p-progressSpinner>
+      <p class="text-600">Cargando detalles del proyecto...</p>
+    </div>
+    } @else if (selectedProject) {
+    <div class="project-details">
+      <div class="project-header mb-5">
+        <div class="flex align-items-center gap-3 mb-2">
+          <i class="pi pi-folder-open text-primary" style="font-size: 1.5rem"></i>
+          <h3 class="text-3xl font-semibold m-0 text-900">{{selectedProject.project_name}}</h3>
+        </div>
+        <p-tag [severity]="selectedProject.status === 1 ? 'success' : 'danger'"
+          [value]="selectedProject.status === 1 ? 'Activo' : 'Inactivo'" icon="pi pi-circle-fill" iconPos="left"
+          styleClass="mr-2"></p-tag>
+        <p-tag value="{{selectedProject.category?.name || 'Sin categoría'}}" icon="pi pi-tag" iconPos="left"
+          severity="info"></p-tag>
+      </div>
+
+      <div class="grid">
+        <!-- Columna izquierda -->
+        <div class="col-12 md:col-6">
+          <div class="detail-card mb-4">
+            <div class="flex align-items-center gap-2 mb-2">
+              <i class="pi pi-building text-primary"></i>
+              <span class="detail-label font-medium text-600">Empresa</span>
+            </div>
+            <p class="text-900 m-0">{{selectedProject.company?.name || 'No especificada'}}</p>
+          </div>
+
+          <div class="detail-card mb-4">
+            <div class="flex align-items-center gap-2 mb-2">
+              <i class="pi pi-wallet text-primary"></i>
+              <span class="detail-label font-medium text-600">Presupuesto</span>
+            </div>
+            <p class="text-900 m-0">{{selectedProject.budget ? (selectedProject.budget | currency) : 'No especificado'}}
+            </p>
+          </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="col-12 md:col-6">
+          <div class="detail-card mb-4">
+            <div class="flex align-items-center gap-2 mb-2">
+              <i class="pi pi-calendar text-primary"></i>
+              <span class="detail-label font-medium text-600">Días disponibles</span>
+            </div>
+            <p class="text-900 m-0">{{selectedProject.days_available || 'No especificados'}} días</p>
+          </div>
+
+          <div class="detail-card mb-4">
+            <div class="flex align-items-center gap-2 mb-2">
+              <i class="pi pi-clock text-primary"></i>
+              <span class="detail-label font-medium text-600">Fecha de creación</span>
+            </div>
+            <p class="text-900 m-0">{{selectedProject.createProject | date:'medium':'UTC'}}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descripción corta -->
+      <div class="detail-card mb-4">
+        <div class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-comment text-primary"></i>
+          <span class="detail-label font-medium text-600">Descripción corta</span>
+        </div>
+        <p class="text-900 m-0">{{selectedProject.description || 'No disponible'}}</p>
+      </div>
+
+      <!-- Descripción completa -->
+      <div class="detail-card">
+        <div class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-file text-primary"></i>
+          <span class="detail-label font-medium text-600">Descripción completa</span>
+        </div>
+        <div class="prose border-round p-3" [innerHTML]="sanitizedLongDescription"></div>
+      </div>
+
+       <div class="detail-card" *ngIf="selectedProject.documents && selectedProject.documents.length > 0">
+        <div class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-paperclip text-primary"></i>
+          <span class="detail-label font-medium text-600">Documentos Adjuntos</span>
+        </div>
+        <div class="documents-grid">
+          <div *ngFor="let doc of selectedProject.documents" class="document-card">
+            <div class="document-icon">
+              <i *ngIf="doc.type.includes('pdf')" class="pi pi-file-pdf" style="font-size: 2rem; color: #e74c3c"></i>
+              <i *ngIf="doc.type.includes('image')" class="pi pi-image" style="font-size: 2rem; color: #3498db"></i>
+              <i *ngIf="!doc.type.includes('pdf') && !doc.type.includes('image')" class="pi pi-file" 
+                 style="font-size: 2rem; color: #7f8c8d"></i>
+            </div>
+            <div class="document-info">
+              <h4>{{doc.name}}</h4>
+              <p>{{formatSize(doc.size)}} • {{doc.type}}</p>
+            </div>
+            <div class="document-actions">
+              <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                      (click)="viewDocument(doc.signedUrl)" pTooltip="Ver documento"></button>
+              <button pButton pRipple icon="pi pi-download" class="p-button-rounded p-button-text" 
+                      (click)="downloadDocument(doc)" pTooltip="Descargar"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    }
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayProjectDialog = false"
+      class="p-button-outlined p-button-secondary"></button>
+    </ng-template>
+</p-dialog>
+
+<!-- Añadir al final de favorites.component.html -->
+<p-dialog [(visible)]="applyDialogVisible" [style]="{width: '450px'}" header="Confirmar Aplicación" [modal]="true">
+  <div class="flex align-items-center justify-content-center">
+    <i class="pi pi-exclamation-circle mr-3" style="font-size: 2rem"></i>
+    <span>¿Estás seguro que deseas Aplica al proyecto <b>{{selectedProject?.project_name}}</b>?</span>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple icon="pi pi-times" class="p-button-text" label="Cancelar"
+      (click)="applyDialogVisible = false"></button>
+    <button pButton pRipple icon="pi pi-check" class="p-button-text" label="Aplicar" (click)="confirmApply()"></button>
+  </ng-template>
+</p-dialog>

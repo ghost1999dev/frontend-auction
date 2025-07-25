@@ -23,10 +23,10 @@ export class LandingComponent {
   first: number = 0;
   
   // Options
-  statusOptions: any[] = [
+  /* statusOptions: any[] = [
     { label: 'Activo', value: 1 },
     { label: 'Inactivo', value: 0 }
-  ];
+  ]; */
   
   sortOptions: any[] = [
     { label: 'Más nuevo primero', value: 'newest' },
@@ -50,14 +50,14 @@ export class LandingComponent {
   }
 
   loadProjects(): void {
-    this.projectsService.getAllProjects().subscribe({
-      next: (data) => {
-        this.projects = data;
-        this.clearFilters()
-      },
-      error: (error) => {
-        console.error("Error: ", error)
-      }
+    this.projectsService.getAllProjects()
+    .subscribe({
+        next: (data) => {
+            // Solo mantener proyectos activos para desarrolladores
+            this.projects = data.filter(project => project.status === 1)
+            // Aplicar filtros después de cargar
+            this.filterProjects();
+        }
     });
   }
 

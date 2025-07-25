@@ -1,0 +1,98 @@
+@if (projects.length > 0) {
+    <div class="card">
+        <div class="flex justify-content-between align-items-center mb-4">
+            <h1>Proyectos ganados</h1>
+            <div class="flex gap-2"></div>
+        </div>
+
+        <p-table #dt [value]="projects" responsiveLayout="scroll" [rows]="10" 
+                [globalFilterFields]="['project_name','company.name','category.name']" [paginator]="true" 
+                [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
+                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proyectos" 
+                [rowHover]="true" dataKey="id">
+            <ng-template pTemplate="caption">
+                <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                    <h5 class="m-0">Listado de proyectos en curso</h5>
+                    <span class="block mt-2 md:mt-0 p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" 
+                            (input)="filterTable($event, dt)" 
+                            placeholder="Buscar proyectos..." 
+                            class="w-full sm:w-auto"/>
+                    </span>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="project_name">Proyecto <p-sortIcon field="project_name"></p-sortIcon></th>
+                    <th pSortableColumn="company.name">Cliente <p-sortIcon field="company.name"></p-sortIcon></th>
+                    <th pSortableColumn="category.name">Categoría <p-sortIcon field="category.name"></p-sortIcon></th>
+                    <th pSortableColumn="budget">Presupuesto <p-sortIcon field="budget"></p-sortIcon></th>
+                    <th pSortableColumn="days_available">Días restantes <p-sortIcon field="days_available"></p-sortIcon></th>
+                    <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
+                    <th>Acciones</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-project>
+                <tr>
+                    <td>
+                        <span class="p-column-title">Proyecto</span>
+                        {{project.project_name}}
+                    </td>
+                    <td>
+                        <span class="p-column-title">Cliente</span>
+                        {{project.company[0].name}}
+                    </td>
+                    <td>
+                        <span class="p-column-title">Categoría</span>
+                        {{project.category[0].name}}
+                    </td>
+                    <td>
+                        <span class="p-column-title">Presupuesto</span>
+                        {{project.budget | currency:'USD':'symbol':'1.2-2'}}
+                    </td>
+                    <td>
+                        <span class="p-column-title">Días restantes</span>
+                        <p-tag [value]="project.days_available + ' días'" 
+                               [severity]="project.days_available <= 7 ? 'danger' : project.days_available <= 14 ? 'warning' : 'success'">
+                        </p-tag>
+                    </td>
+                    <td>
+                        <span class="p-column-title">Estado</span>
+                        <p-tag [severity]="getSeverity(project.status)" 
+                               [value]="getStatusText(project.status)"></p-tag>
+                    </td>
+                    <td>
+                        <div class="flex gap-2">
+                            <button pButton pRipple icon="pi pi-eye" 
+                                    class="p-button-rounded p-button-info" 
+                                    pTooltip="Ver detalles"
+                                    (click)="viewProjectDetails(project)"></button>
+                            <button pButton pRipple icon="pi pi-file-edit" 
+                                    class="p-button-rounded p-button-warning" 
+                                    pTooltip="Editar progreso"
+                                    (click)="navigateToProgress(project)"></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7">No se encontraron proyectos activos</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+} @else {
+    <div class="card">
+        <div class="flex flex-column align-items-center justify-content-center py-6 px-3">
+            <i class="pi pi-inbox text-400 text-6xl mb-3"></i>
+            <h3>No tienes proyectos activos</h3>
+            <p class="text-500">Actualmente no tienes proyectos asignados o en curso.</p>
+            <button pButton pRipple label="Explorar proyectos disponibles" 
+                    icon="pi pi-search" class="p-button-outlined mt-3"></button>
+        </div>
+    </div>
+}
+
+<p-toast></p-toast>

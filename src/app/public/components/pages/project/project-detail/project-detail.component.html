@@ -1,0 +1,110 @@
+<div class="project-container" [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando detalles del proyecto...</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="error" class="error-state">
+        <div class="error-icon">!</div>
+        <h3>{{ error }}</h3>
+        <button class="back-button error" routerLink="/main/projects">Volver</button>
+    </div>
+
+    <!-- Project details -->
+    <div *ngIf="project && !isLoading" class="project-details" style="margin-top: 35px;">
+        <button class="back-button circle" routerLink="/main/projects">
+            <span class="icon">←</span>
+        </button>
+
+        <div class="project-header">
+            <h1>{{ project.project_name }}</h1>
+            <span class="status-badge" [class.active]="project.status === 1">
+                {{ getStatusText(project.status) }}
+            </span>
+        </div>
+
+        <hr>
+
+        <div class="project-meta">
+            <div class="meta-item">
+                <span class="icon">🏢</span>
+                <span>{{ project.company?.name || 'Empresa no especificada' }}</span>
+            </div>
+            
+            <div class="meta-item">
+                <span class="icon">📁</span>
+                <span>{{ project.category?.name || 'Categoría no especificada' }}</span>
+            </div>
+            
+            <div class="meta-item">
+                <span class="icon">💰</span>
+                <span>{{ project.budget | currency }}</span>
+            </div>
+            
+            <div class="meta-item">
+                <span class="icon">📅</span>
+                <span>{{ project.days_available }} días disponibles</span>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="project-description">
+            <h3>Descripción</h3>
+            <p>{{ project.description }}</p>
+        </div>
+
+        <hr>
+
+        <div class="project-description">
+            <h3>Descripción Completa</h3>
+            <div [innerHTML]="sanitizedLongDescription"></div>
+        </div>
+
+        <hr *ngIf="project.deactivation_reason !== null">
+
+        <div class="project-description" *ngIf="project.deactivation_reason !== null">
+            <h3>Razon por la que fue Rechazado</h3>
+            <p>{{ project.deactivation_reason }}</p>
+        </div>
+
+        <hr>
+
+         <div class="project-description" *ngIf="project.documents && project.documents.length > 0">
+            <h3>Documentos Adjuntos</h3>
+            <div class="documents-container">
+                <div class="document-item" *ngFor="let doc of project.documents">
+                    <div class="document-icon">
+                        <span *ngIf="doc.type.includes('image')">🖼️</span>
+                        <span *ngIf="doc.type.includes('pdf')">📄</span>
+                        <span *ngIf="doc.type.includes('word')">📝</span>
+                        <span *ngIf="doc.type.includes('excel')">📊</span>
+                        <span *ngIf="doc.type.includes('zip')">🗄️</span>
+                        <span *ngIf="!doc.type.includes('image') && !doc.type.includes('pdf') && 
+                                    !doc.type.includes('word') && !doc.type.includes('excel') && 
+                                    !doc.type.includes('zip')">📁</span>
+                    </div>
+                    <div class="document-info">
+                        <p class="document-name">{{ doc.name }}</p>
+                        <p class="document-meta">
+                            {{ doc.type }} • {{ (doc.size / 1024).toFixed(2) }} KB • 
+                            {{ formatDate(doc.uploadedAt) }}
+                        </p>
+                    </div>
+                    <a class="document-download" [href]="doc.signedUrl" target="_blank" download>
+                        <span class="icon">⬇️</span> Descargar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="project-timestamps">
+            <p>Creado: {{ project.createProject | date:'medium':'UTC' }}</p>
+            <p>Última actualización: {{ project.updateProject | date:'medium':'UTC' }}</p>
+        </div>
+    </div>
+</div>

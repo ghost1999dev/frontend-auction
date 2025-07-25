@@ -47,7 +47,7 @@
           <td>
             <div class="flex gap-2">
               <button pButton pRipple icon="pi pi-star" class="p-button-rounded p-button-help" 
-                      tooltip="Ver ratings" tooltipPosition="top" (click)="showDeveloperRatings(app.developer)"></button>
+                      tooltip="Calificaciones" tooltipPosition="top" (click)="showDeveloperRatings(app.developer)"></button>
               <!-- <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success" 
                       *ngIf="app.status === 0" tooltip="Aceptar" tooltipPosition="top"></button>
               <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger" 
@@ -60,7 +60,7 @@
   </div>
 
 <p-dialog [(visible)]="displayRatingsDialog" [modal]="true" [style]="{width: '1200px'}" 
-          [draggable]="false" [resizable]="false" header="Ratings del Desarrollador"
+          [draggable]="false" [resizable]="false" header="Calificaciones del Desarrollador"
           [styleClass]="'ratings-dialog'" [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
           [ngClass]="{'dark-theme': layoutService.config.colorScheme === 'dark'}">
     <div *ngIf="loadingRatings; else ratingContent">
@@ -94,7 +94,7 @@
                 </div>
                 
                 <div class="chart-container">
-                    <h4>Distribución de Ratings</h4>
+                    <h4>Distribución de Calificaciones</h4>
                     <p-chart *ngIf="chartData" type="bar" [data]="chartData" [options]="chartOptions" 
                             width="100%" height="300px"></p-chart>
                 </div>
@@ -195,14 +195,14 @@
           </div>
           <div class="detail-item">
             <span class="detail-label">Fecha de Postulación:</span>
-            <span class="detail-value">{{ app.createdAt | date:'mediumDate' }}</span>
+            <span class="detail-value">{{ app.createProject | date:'mediumDate' }}</span>
           </div>
         </div>
         
         <div class="detail-row">
           <div class="detail-item">
             <span class="detail-label">Última Actualización:</span>
-            <span class="detail-value">{{ app.updatedAt | date:'mediumDate' }}</span>
+            <span class="detail-value">{{ app.updateProject | date:'mediumDate' }}</span>
           </div>
           <!-- <div class="detail-item">
             <span class="detail-label">Email de Contacto:</span>
@@ -283,7 +283,7 @@
                 <i class="pi pi-clock text-primary"></i>
                 <span class="detail-label font-medium text-600">Última actualización</span>
               </div>
-              <p class="text-900 m-0">{{selectedProject.updated_at || 'No disponible'}}</p>
+              <p class="text-900 m-0">{{selectedProject.updateProject | date:'mediumDate'}}</p>
             </div>
           </div>
         </div>
@@ -305,6 +305,33 @@
           </div>
           <div class="prose border-round p-3" [innerHTML]="sanitizedLongDescription"></div>
         </div>
+
+      <div class="detail-card" *ngIf="selectedProject.documents && selectedProject.documents.length > 0">
+        <div class="flex align-items-center gap-2 mb-2">
+          <i class="pi pi-paperclip text-primary"></i>
+          <span class="detail-label font-medium text-600">Documentos Adjuntos</span>
+        </div>
+        <div class="documents-grid">
+          <div *ngFor="let doc of selectedProject.documents" class="document-card">
+            <div class="document-icon">
+              <i *ngIf="doc.type.includes('pdf')" class="pi pi-file-pdf" style="font-size: 2rem; color: #e74c3c"></i>
+              <i *ngIf="doc.type.includes('image')" class="pi pi-image" style="font-size: 2rem; color: #3498db"></i>
+              <i *ngIf="!doc.type.includes('pdf') && !doc.type.includes('image')" class="pi pi-file" 
+                 style="font-size: 2rem; color: #7f8c8d"></i>
+            </div>
+            <div class="document-info">
+              <h4>{{doc.name}}</h4>
+              <p>{{formatSize(doc.size)}} • {{doc.type}}</p>
+            </div>
+            <div class="document-actions">
+              <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                      (click)="viewDocument(doc.signedUrl)" pTooltip="Ver documento"></button>
+              <button pButton pRipple icon="pi pi-download" class="p-button-rounded p-button-text" 
+                      (click)="downloadDocument(doc)" pTooltip="Descargar"></button>
+            </div>
+          </div>
+        </div>
+      </div>
         
         <!-- Sección de acciones (opcional) -->
        <!--  <div class="flex justify-content-end gap-2 mt-5 pt-3 border-top-1 surface-border">
@@ -327,6 +354,13 @@
       <i class="pi pi-exclamation-triangle text-2xl text-yellow-500"></i>
       <span>¿Estás seguro de que quieres retirar tu aplicación?</span>
     </div>
+    
+<!--     <div class="field mt-4">
+      <label for="withdrawReason" class="block mb-2">Razón del retiro:</label>
+      <textarea id="withdrawReason" [(ngModel)]="withdrawReason" rows="3" 
+                pInputTextarea class="w-full" [autoResize]="true"
+                placeholder="Por favor explica por qué retiras tu aplicación..."></textarea>
+    </div> -->
   </div>
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cancelar" icon="pi pi-times" 

@@ -87,8 +87,21 @@ export class AuctionsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(userSub);
   }
 
+    private loadDeveloperData(userId: number): void {
+    const devSub = this.developerService.getDeveloperByIdUser(userId).subscribe({
+      next: (developer) => {
+        this.developer = developer;
+        this.loadActiveAuctions();
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+    
+    this.subscriptions.add(devSub);
+  }
+
   private loadCompanyData(userId: number): void {
-    console.log(userId)
     const companySub = this.companiesService.getCompanyByUserId(userId)
     .subscribe({
       next: (company) => {
@@ -121,19 +134,6 @@ export class AuctionsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadDeveloperData(userId: number): void {
-    const devSub = this.developerService.getDeveloperByIdUser(userId).subscribe({
-      next: (developer) => {
-        this.developer = developer;
-        this.loadActiveAuctions();
-      },
-      error: () => {
-        this.loading = false;
-      }
-    });
-    
-    this.subscriptions.add(devSub);
-  }
 
 private loadActiveAuctions(): void {
     this.loading = true;
@@ -144,7 +144,7 @@ private loadActiveAuctions(): void {
             // Filtra subastas activas (status === "1") y que no hayan vencido (bidding_deadline > ahora)
             this.auctions = auctions.filter((auction: any) => {
                 const deadline = new Date(auction.bidding_deadline);
-                return auction.status === "1" && deadline > now;
+                return auction.status === 1 && deadline > now;
             });
 
             this.filteredActiveAuctions = [...this.auctions];

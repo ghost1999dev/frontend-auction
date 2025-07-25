@@ -21,6 +21,12 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ChipsModule } from 'primeng/chips';
 import { TagModule } from 'primeng/tag';
+
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast'; // Opcional, pero recomendado para mensajes
+
 const routes: Routes = [
   {
     path: '',
@@ -89,10 +95,13 @@ const routes: Routes = [
     ChipsModule,
     TagModule,
 
-    RouterModule.forChild(routes)
+    DialogModule,
+    ConfirmDialogModule,
+    ToastModule, 
+    RouterModule.forChild(routes),
   ],
   providers: [
-  
-  ],
+    ConfirmationService // Añade esto en los providers
+  ]
 })
 export class AuthModule { }

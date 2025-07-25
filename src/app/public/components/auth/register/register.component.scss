@@ -14,6 +14,21 @@
     margin-left: 0.5rem;
 }
 
+:host ::ng-deep .p-dialog {
+  .p-dialog-content {
+    line-height: 1.5;
+    ul {
+      margin-bottom: 1rem;
+    }
+  }
+  
+  .p-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}
+
 .selected-card {
     background-color: var(--primary-color-light);
     border-radius: 20px;

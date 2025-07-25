@@ -41,12 +41,13 @@ export class SidebarComponent implements OnInit {
           label: 'Menu',
           items: [
             { label: 'Subastas', icon: 'pi pi-fw pi-id-card', routerLink: ['/main/auctions'] },
-            //{ label: `Ofertas a Subastas`, icon: 'pi pi-fw pi-dollar', routerLink: ['/main/bids'] },
+            { label: `Ofertas a Subastas`, icon: 'pi pi-fw pi-dollar', routerLink: ['/main/bids'] },
             { label: 'Proyectos', icon: 'pi pi-fw pi-folder-open', routerLink: ['/main/projects'] },
             { label: `Aplicación a Proyectos`, icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects-application'] },
             { label: 'Historial de Aplicaciones', icon: 'pi pi-fw pi-undo', routerLink: ['/main/history-application'] },
             //{ label: 'Subastas', icon: 'pi pi-fw pi-tag', routerLink: ['/main/auctions'] },
-            { label: 'Mis aplicaciones Favoritas', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
+            { label: 'Proyectos Favoritas', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
+            { label: 'Mis Proyectos en Curso', icon: 'pi pi-fw pi-book', routerLink: ['/main/current-projects'] },
             //{ label: 'Users', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/users'] }
           ]
         },
@@ -67,8 +68,6 @@ export class SidebarComponent implements OnInit {
             { label: `Proyectos`, icon: 'pi pi-fw pi-folder-open', routerLink: ['/main/projects'] },
             { label: `Aplicaciones a mis proyectos`, icon: 'pi pi-fw pi-check-square', routerLink: ['/main/projects-application'] },
             { label: 'Subastas', icon: 'pi pi-fw pi-id-card', routerLink: ['/main/auctions'] },
-            //{ label: 'Favorites', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/favorites'] },
-            //{ label: 'Users', icon: 'pi pi-fw pi-bookmark', routerLink: ['/main/users'] }
           ]
         },
       ];

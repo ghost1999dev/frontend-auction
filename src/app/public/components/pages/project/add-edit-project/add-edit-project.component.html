@@ -1,121 +1,163 @@
 <div class="grid p-4">
-    <div class="col-12">
-      <h2>{{ projectId ? (isRepublishing ? 'Republicar Proyecto - ' : 'Editar Proyecto - ') : 'Agregar Nuevo Proyecto' }} {{projectId ? project.project_name: ''}} </h2>
-      <p-toast></p-toast>
-      
-      <div class="grid">
-        <!-- Columna Izquierda -->
-        <div class="col-12 md:col-6">
-          <div class="field">
-            <label for="project_name">Nombre del Proyecto*</label>
-            <input type="text" pInputText id="project_name" [(ngModel)]="project.project_name" required 
-                   [ngClass]="{'ng-invalid ng-dirty': submitted && !project.project_name}"/>
-            <small class="p-error" *ngIf="submitted && !project.project_name">El nombre del proyecto es requerido.</small>
-          </div>
-          
-          <div class="field">
-            <label for="description">Descripción Corta</label>
-            <textarea id="description" pInputTextarea [(ngModel)]="project.description" 
-                      rows="5" class="w-full"></textarea>
-            <small class="p-error" *ngIf="submitted && !project.description">La descripción corta es requerida.</small>
-          </div>
-        </div>
-        
-        <!-- Columna Derecha -->
-        <div class="col-12 md:col-6">
+  <div class="col-12">
+    <h2>{{ projectId ? (isRepublishing ? 'Republicar Proyecto - ' : 'Editar Proyecto - ') : 'Agregar Nuevo Proyecto' }}
+      {{projectId ? project.project_name: ''}} </h2>
+    <p-toast></p-toast>
 
-          <!-- Campo Presupuesto -->
-          <div class="field">
-            <label for="budget">Presupuesto</label>
-            <input [disabled]="shouldDisableFields()" type="number" min="0" 
-                  (keypress)="keyPressNumbersWithDecimal($event)" pInputText id="budget" 
-                  [(ngModel)]="project.budget" class="w-full"/>
-            <small class="p-error" *ngIf="submitted && !project.budget">El presupuesto es requerido.</small>
-          </div>
-
-          <!-- Campo Días Disponibles -->
-          <div class="field">
-            <label for="days_available">Días Disponibles</label>
-            <input [disabled]="shouldDisableFields()" type="number" min="0" pInputText 
-                  id="days_available" [(ngModel)]="project.days_available" 
-                  class="w-full width-txt" appNumbersOnly />
-            <small class="p-error" *ngIf="submitted && !project.days_available">Los días disponibles son requeridos.</small>
-            <p class="mt-1" style="color: red; font-size: 13px;">
-                El proyecto {{project.project_name}} estará disponible por {{project.days_available}} días después de ser aprobado.            
-            </p>
-          </div>
-
-          <!-- Campo Categoría -->
-          <div class="field">
-            <label for="category">Categoría*</label>
-            <p-dropdown [options]="categories" [(ngModel)]="project.category_id" optionLabel="name" 
-                        optionValue="id" id="category" [showClear]="true" placeholder="Seleccione una categoría"
-                        [ngClass]="{'ng-invalid ng-dirty': submitted && !project.category_id}"
-                        class="category-dropdown">
-            </p-dropdown>
-            <small class="p-error" *ngIf="submitted && !project.category_id">La categoría es requerida.</small>
-          </div>
-        </div>
-
-        <!-- Descripción Completa (Ancho completo abajo) -->
-        <div class="col-12">
-          <div class="field">
-            <label for="full_description">Descripción Completa</label>
-            <angular-editor [(ngModel)]="project.long_description" [placeholder]="'Ingrese el texto aquí...'" height="15rem" class="_angular-editor" name="description" id="description"></angular-editor>
-            </div>
-          </div>
-        </div>
-      
-      <!-- Sección Términos y Condiciones -->
-      <div class="col-12" *ngIf="!projectId || isRepublishing">
+    <div class="grid">
+      <!-- Columna Izquierda -->
+      <div class="col-12 md:col-6">
         <div class="field">
-            <div class="flex align-items-center">
-                <p-checkbox [(ngModel)]="termsAccepted" [binary]="true" inputId="terms"></p-checkbox>
-                <label for="terms" class="ml-2 mt-2">
-                    Acepto los 
-                    <a (click)="showTermsDialog()" class="text-primary cursor-pointer">Términos y Condiciones</a>
-                </label>
-            </div>
-            <small class="p-error" *ngIf="submitted && !termsAccepted && (!projectId || isRepublishing)">
-                Debe aceptar los términos y condiciones
-            </small>
+          <label for="project_name">Nombre del Proyecto*</label>
+          <input type="text" pInputText id="project_name" [(ngModel)]="project.project_name" required
+            [ngClass]="{'ng-invalid ng-dirty': submitted && !project.project_name}" />
+          <small class="p-error" *ngIf="submitted && !project.project_name">El nombre del proyecto es requerido.</small>
+        </div>
+
+        <div class="field">
+          <label for="description">Descripción Corta</label>
+          <textarea id="description" pInputTextarea [(ngModel)]="project.description" rows="5"
+            class="w-full"></textarea>
+          <small class="p-error" *ngIf="submitted && !project.description">La descripción corta es requerida.</small>
+        </div>
+
+      </div>
+
+      <!-- Columna Derecha -->
+      <div class="col-12 md:col-6">
+
+        <!-- Campo Presupuesto -->
+        <div class="field">
+          <label for="budget">Presupuesto</label>
+          <input [disabled]="shouldDisableFields()" type="number" min="0"
+            (keypress)="keyPressNumbersWithDecimal($event)" pInputText id="budget" [(ngModel)]="project.budget"
+            class="w-full" />
+          <small class="p-error" *ngIf="submitted && !project.budget">El presupuesto es requerido.</small>
+        </div>
+
+        <!-- Campo Días Disponibles -->
+        <div class="field">
+          <label for="days_available">Días Disponibles</label>
+          <input [disabled]="shouldDisableFields()" type="number" min="0" pInputText id="days_available"
+            [(ngModel)]="project.days_available" class="w-full width-txt" appNumbersOnly />
+          <small class="p-error" *ngIf="submitted && !project.days_available">Los días disponibles son
+            requeridos.</small>
+          <p class="mt-1" style="color: red; font-size: 13px;">
+            El proyecto {{project.project_name}} estará disponible por {{project.days_available}} días después de ser
+            aprobado.
+          </p>
+        </div>
+
+        <!-- Campo Categoría -->
+        <div class="field">
+          <label for="category">Categoría*</label>
+          <p-dropdown [options]="categories" [(ngModel)]="project.category_id" optionLabel="name" optionValue="id"
+            id="category" [showClear]="true" placeholder="Seleccione una categoría"
+            [ngClass]="{'ng-invalid ng-dirty': submitted && !project.category_id}" class="category-dropdown">
+          </p-dropdown>
+          <small class="p-error" *ngIf="submitted && !project.category_id">La categoría es requerida.</small>
         </div>
       </div>
 
-
-      <div class="flex justify-content-end gap-2 mt-4">
-        <button pButton pRipple label="Cancelar" icon="pi pi-times" 
-                class="p-button-text" (click)="cancel()" [disabled]="loading"></button>
-        <button pButton pRipple label="Guardar" icon="pi pi-check" 
-        class="p-button-text" (click)="saveProject()" 
-        [disabled]="loading || (!termsAccepted && (isRepublishing || !projectId))">
-            <i *ngIf="loading" class="pi pi-spinner pi-spin mr-2"></i>
-        </button>
+      <!-- Descripción Completa (Ancho completo abajo) -->
+      <div class="col-12">
+        <div class="field">
+          <label for="full_description">Descripción Completa</label>
+          <angular-editor [(ngModel)]="project.long_description" [placeholder]="'Ingrese el texto aquí...'"
+            height="15rem" class="_angular-editor" name="description" id="description"></angular-editor>
+        </div>
       </div>
     </div>
+
+    <div class="col-12">
+      <div class="field">
+        <label for="attachments">Anexos (PDF/Imágenes)</label>
+        <p-fileUpload id="attachments" name="attachments" [multiple]="true" [accept]="'image/*,.pdf'"
+          [maxFileSize]="10000000" (onSelect)="onFileSelect($event)" (onRemove)="onFileRemove($event)"
+          [customUpload]="true" [showUploadButton]="false" [showCancelButton]="false" [auto]="true"
+          chooseLabel="Seleccionar archivos">
+        </p-fileUpload>
+        <small class="p-text-secondary">Formatos aceptados: PDF, JPG, PNG. Tamaño máximo: 10MB por archivo.</small>
+      </div>
+    </div>
+
+    <!-- Sección Términos y Condiciones -->
+    <div class="col-12" *ngIf="!projectId || isRepublishing">
+      <div class="field">
+        <div class="flex align-items-center">
+          <p-checkbox [(ngModel)]="termsAccepted" [binary]="true" inputId="terms"></p-checkbox>
+          <label for="terms" class="ml-2 mt-2">
+            Acepto los
+            <a (click)="showTermsDialog()" class="text-primary cursor-pointer">Términos y Condiciones</a>
+          </label>
+        </div>
+        <small class="p-error" *ngIf="submitted && !termsAccepted && (!projectId || isRepublishing)">
+          Debe aceptar los términos y condiciones
+        </small>
+      </div>
+    </div>
+
+
+    <div class="flex justify-content-end gap-2 mt-4">
+      <div *ngIf="project?.documents?.length > 0">
+  <button pButton pRipple label="Ver Documentos Subidos" icon="pi pi-file-pdf" 
+          class="p-button-text" (click)="openDocumentsDialog()"></button>
+</div>
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="cancel()"
+        [disabled]="loading"></button>
+      <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveProject()"
+        [disabled]="loading || (!termsAccepted && (isRepublishing || !projectId))">
+        <i *ngIf="loading" class="pi pi-spinner pi-spin mr-2"></i>
+      </button>
+    </div>
   </div>
+</div>
 
 <!-- Diálogo de Términos y Condiciones -->
 
-<p-dialog header="Términos y Condiciones" [(visible)]="displayTermsDialog" [style]="{width: '80vw'}" [maximizable]="true" [modal]="true">
+<p-dialog header="Términos y Condiciones" [(visible)]="displayTermsDialog" [style]="{width: '80vw'}"
+  [maximizable]="true" [modal]="true">
   <div class="pdf-container">
-    <pdf-viewer [src]="termsPdfUrl"
-                [render-text]="true"
-                [original-size]="false"
-                [show-all]="true"
-                style="width: 100%; height: 70vh;"
-                (error)="onPdfError($event)">
+    <pdf-viewer [src]="termsPdfUrl" [render-text]="true" [original-size]="false" [show-all]="true"
+      style="width: 100%; height: 70vh;" (error)="onPdfError($event)">
     </pdf-viewer>
 
     <!-- Mostrar mensaje si hay error al cargar PDF -->
     <div *ngIf="pdfLoadError" class="p-4 text-center">
       <p class="text-red-500">No se pudo cargar el PDF. Por favor intente más tarde.</p>
-      <p>Alternativamente, puede <a [href]="termsPdfUrl" target="_blank" class="text-primary">ver los términos en una nueva pestaña</a>.</p>
+      <p>Alternativamente, puede <a [href]="termsPdfUrl" target="_blank" class="text-primary">ver los términos en una
+          nueva pestaña</a>.</p>
     </div>
   </div>
 
   <ng-template pTemplate="footer">
     <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="closeDialog()" class="p-button-text"></button>
-    <button pButton pRipple label="Aceptar" icon="pi pi-check" (click)="acceptTerms()" [disabled]="pdfLoadError" class="p-button-text"></button>
+    <button pButton pRipple label="Aceptar" icon="pi pi-check" (click)="acceptTerms()" [disabled]="pdfLoadError"
+      class="p-button-text"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Diálogo para visualizar documentos -->
+<p-dialog header="Documentos del Proyecto" [(visible)]="displayDocumentsDialog" [style]="{width: '90vw', maxWidth: '1200px'}" 
+          [modal]="true" [dismissableMask]="true">
+  <div class="documents-grid">
+    <div *ngFor="let doc of project.documents" class="document-card">
+      <div class="document-icon">
+        <i class="pi pi-file-pdf" style="font-size: 2.5rem; color: #e74c3c"></i>
+      </div>
+      <div class="document-info">
+        <h4>{{doc.name}}</h4>
+        <p>{{formatSize(doc.size)}} • {{doc.type}}</p>
+      </div>
+      <div class="document-actions">
+        <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-text" 
+                (click)="viewDocument(doc.signedUrl)" pTooltip="Ver documento"></button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cerrar" icon="pi pi-times" (click)="displayDocumentsDialog = false" 
+            class="p-button-text"></button>
   </ng-template>
 </p-dialog>
