@@ -32,7 +32,7 @@ export class AddEditProjectComponent implements OnInit {
   termsAccepted: boolean = false;
   displayTermsDialog: boolean = false;
 
-  termsPdfUrl = "assets/docs/test.pdf";
+  termsPdfUrl = "assets/docs/term.pdf";
   pdfLoadError = false;
 
   project: any = {} as any;
