@@ -66,12 +66,6 @@ export class PublicAuctionViewComponent implements OnInit, OnDestroy {
           hour12: false,
         });
 
-      console.group("Timer Debug (Hora Local)");
-      console.log("Ahora:", formatLocal(now));
-      console.log("Inicio:", formatLocal(startedAt));
-      console.log("Fin:", formatLocal(deadline));
-      console.groupEnd();
-
       if (now >= deadline) {
         this.timeDifference = "✅ Subasta finalizada";
       } else if (now < startedAt) {
@@ -138,57 +132,6 @@ export class PublicAuctionViewComponent implements OnInit, OnDestroy {
       },
     });
   }
-
-  /*   startTimer(): void {
-    // Primero calculamos el tiempo restante
-    this.updateTimeRemaining();
-
-    // Luego actualizamos cada segundo
-    this.timerSubscription = interval(1000).subscribe(() => {
-      this.updateTimeRemaining();
-    });
-  }
-
-updateTimeRemaining(): void {
-  try {
-    // 1. Obtener la hora actual en El Salvador (GMT-6)
-    const now = new Date();
-    
-    // 2. Parsear fechas UTC del servidor
-    const startedAtUTC = new Date(this.auction.bidding_started_at);
-    const deadlineUTC = new Date(this.auction.bidding_deadline);
-    
-    // 3. Convertir a hora local (El Salvador) - método preciso
-    const options = { timeZone: 'America/El_Salvador' };
-    const startedAtLocal = new Date(startedAtUTC.toLocaleString('en-US', options));
-    const deadlineLocal = new Date(deadlineUTC.toLocaleString('en-US', options));
-
-    // 4. Depuración avanzada
-    console.log('Hora actual (CST):', now.toString());
-    console.log('Inicio UTC:', this.auction.bidding_started_at, '→ Local:', startedAtLocal.toString());
-    console.log('Fin UTC:', this.auction.bidding_deadline, '→ Local:', deadlineLocal.toString());
-    console.log('Diferencia UTC:', (deadlineUTC.getTime() - startedAtUTC.getTime()) / 3600000 + ' horas');
-    console.log('Diferencia Local:', (deadlineLocal.getTime() - startedAtLocal.getTime()) / 3600000 + ' horas');
-
-    // 5. Calcular tiempo restante
-    const diff = deadlineLocal.getTime() - now.getTime();
-    
-    // 6. Mostrar resultados
-    if (diff <= 0) {
-      this.timeRemaining = 'Finalizada';
-    } else {
-      const hours = Math.floor(diff / 3600000);
-      const minutes = Math.floor((diff % 3600000) / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-      
-      // Mostrar en formato 24h
-      this.timeRemaining = `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-    }
-  } catch (error) {
-    console.error('Error en timer:', error);
-    this.timeRemaining = '--:--:--';
-  }
-} */
 
   // Añade esta función a tu componente
   calculateTimeDifference(): string {

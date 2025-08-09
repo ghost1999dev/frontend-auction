@@ -189,12 +189,10 @@ export class AddEditProjectComponent implements OnInit {
   onUpload(event: any) {
     const files = event.files;
     this.filesOnUpload = files;
-    console.log(this.filesOnUpload);
   }
 
   onBeforeUpload(event: any) {
     // You can add validation here if needed
-    console.log("Before upload:", event);
   }
 
   onError(event: any) {
@@ -329,12 +327,32 @@ openDocumentsDialog(): void {
         // Clonar el proyecto existente
         this.projectsService.createProject(projectData).subscribe({
           next: (data: any) => {
-            console.log(this.uploadedFiles);
-            if (this.uploadedFiles) {
-              console.log("testing create", data);
+            const filesToUpload = this.uploadedFiles
+              .filter((file) => file.file instanceof File)
+              .map((file) => file.file);
+
+            if (filesToUpload.length > 0) {
+              this.projectsService
+                .uploadProjectDocuments(data.id, filesToUpload)
+                .subscribe({
+                  next: () => {
+                    this.notificationServices.showSuccessCustom(
+                      "Proyecto actualizado con éxito"
+                    );
+                    this.saved.emit();
+                    this.loading = false;
+                  },
+                  error: (err) => {
+                    this.loading = false;
+                    this.notificationServices.showErrorCustom(
+                      "Error al crear archivos: " +
+                        (err.error?.message || "Error desconocido")
+                    );
+                  },
+                });
             } else {
               this.notificationServices.showSuccessCustom(
-                "Proyecto publicado con éxito"
+                "Proyecto creado con éxito"
               );
               this.saved.emit();
               this.loading = false;
@@ -347,12 +365,32 @@ openDocumentsDialog(): void {
       } else {
         this.projectsService.createProject(projectData).subscribe({
           next: (data: any) => {
-            console.log(this.uploadedFiles);
-            if (this.uploadedFiles) {
-              console.log("testing create", data);
+            const filesToUpload = this.uploadedFiles
+              .filter((file) => file.file instanceof File)
+              .map((file) => file.file);
+
+            if (filesToUpload.length > 0) {
+              this.projectsService
+                .uploadProjectDocuments(data.id, filesToUpload)
+                .subscribe({
+                  next: () => {
+                    this.notificationServices.showSuccessCustom(
+                      "Proyecto actualizado con éxito"
+                    );
+                    this.saved.emit();
+                    this.loading = false;
+                  },
+                  error: (err) => {
+                    this.loading = false;
+                    this.notificationServices.showErrorCustom(
+                      "Error al crear archivos: " +
+                        (err.error?.message || "Error desconocido")
+                    );
+                  },
+                });
             } else {
               this.notificationServices.showSuccessCustom(
-                "Proyecto publicado con éxito"
+                "Proyecto creado con éxito"
               );
               this.saved.emit();
               this.loading = false;

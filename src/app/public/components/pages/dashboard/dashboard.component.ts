@@ -189,7 +189,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         this.updateCompanyCharts();
         this.loading = false;
-        console.log(this.myProjectsWithApplicants);
       },
       error: (err) => {
         console.error("Error loading company dashboard:", err);
@@ -385,7 +384,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.usersService.getUsersById(id).subscribe((next: any) => {
       if (next) {
         this.user = next;
-        console.log(next.role_id);
         if (next.role_id === 2) {
           // Developer
           this.loadDeveloperDashboard();

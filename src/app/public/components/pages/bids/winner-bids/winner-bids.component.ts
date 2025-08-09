@@ -302,13 +302,6 @@ onRatingDialogClose(): void {
 
 submitRating(): void {
   if (this.ratingDialogConfig.score > 0 && this.selectedWinner) {
-    // Aquí iría la lógica para guardar la calificación y comentario
-    console.log('Rating submitted:', {
-      developer: this.selectedWinner.name,
-      score: this.ratingDialogConfig.score,
-      comment: this.ratingDialogConfig.comment
-    });
-
     this.showSuccessMessage(
       'Calificación enviada',
       `Has calificado a ${this.selectedWinner.name} con ${this.ratingDialogConfig.score} estrellas`

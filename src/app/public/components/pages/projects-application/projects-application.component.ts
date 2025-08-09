@@ -261,10 +261,7 @@ private getDefaultRatings(): any {
   }
   
   this.withdrawLoading = true;
-  
-  // Aquí puedes usar this.withdrawReason para enviar la razón al servicio
-  console.log('Razón de retiro:', this.withdrawReason); // Esto es temporal
-  
+    
   this.subscriptions.add(
     this.applicationsService.deleteApplication(this.selectedApplicationId).pipe(
       finalize(() => {

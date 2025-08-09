@@ -75,7 +75,6 @@ formatSize(bytes: number): string {
       next: (response) => {
         this.favoriteProjects = response.favoriteProjects || [];
         this.loading = false;
-        console.log(response)
       },
       error: (error) => {
         this.loading = false;

@@ -307,7 +307,6 @@ formatSize(bytes: number): string {
   loadAllAplicationProjects() {
     this.projectApplicationsService.getAllApplications().subscribe({
       next: (apps: any) => {
-        console.log(apps);
       },
       error: (err) => {
         console.error("Error de carga del application Projects:", err);
@@ -632,8 +631,6 @@ formatSize(bytes: number): string {
             },
             {}
           );
-
-          console.log(this.applicationCounts)
 
           this.filterProjects();
         },
