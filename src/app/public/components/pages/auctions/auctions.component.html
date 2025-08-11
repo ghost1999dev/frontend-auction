@@ -58,7 +58,7 @@
                                 pTooltip="Ganadores de la subasta"></button> 
                         <button pButton pRipple icon="pi pi-dollar" 
                                 class="p-button-rounded p-button-info" 
-                                [routerLink]="['/main/bidding-room', 1]"
+                                [routerLink]="['/main/bidding-room', auction.id]"
                                 pTooltip="Ver sala de ofertas" tooltipPosition="top"></button>
                         <!-- <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-danger" 
                                 (click)="deleteAuction(auction)"></button> -->
@@ -134,7 +134,7 @@
                                     pTooltip="Ver detalles" tooltipPosition="top"></button>
                             <button pButton pRipple icon="pi pi-dollar" 
                                     class="p-button-rounded p-button-success" 
-                                    [routerLink]="['/main/bidding-room', 1]"
+                                    [routerLink]="['/main/bidding-room', auction.id]"
                                     pTooltip="Hacer oferta" tooltipPosition="top"></button>
                         </div>
                     </ng-template>

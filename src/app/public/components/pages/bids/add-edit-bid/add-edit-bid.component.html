@@ -13,7 +13,12 @@
                         routerLink="/main/auctions"></button>
             </div>
         </div>
-        <div class="grid-container">
+        
+        <div *ngIf="loading" class="flex justify-content-center align-items-center" style="height: 300px;">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+
+        <div class="grid-container" *ngIf="!loading">
             <div class="grid">
                 <!-- Columna izquierda - Lista de subastas activas -->
                 <div class="col-3">
@@ -23,13 +28,11 @@
                             <div *ngFor="let auction of activeAuctions" class="auction-item"
                                 [ngClass]="{'selected': selectedAuction?.id === auction.id}"
                                 (click)="selectAuction(auction)">
-                                <h4>{{auction.project.project_name}}</h4>
-                                <p class="text-sm">Empresa: {{auction.user.name}} </p>
-                                <p class="text-sm">Descripción: {{auction.project.description}} </p>
-                                <p class="text-sm">Presupuesto Inicial: {{auction.project.budget |
-                                    currency:'USD':'symbol':'1.2-2'}}</p>
-                                <p class="text-sm">Mínimo permitido: {{auction.project.budget * 0.5 |
-                                    currency:'USD':'symbol':'1.2-2'}}</p>
+                                <h4>{{auction.project?.project_name}}</h4>
+                                <p class="text-sm">Empresa: {{this.company?.user?.name}}</p>
+                                <p class="text-sm">Descripción: {{auction.project?.description}}</p>
+                                <p class="text-sm">Presupuesto Inicial: {{auction.project?.budget | currency:'USD':'symbol':'1.2-2'}}</p>
+                                <p class="text-sm">Mínimo permitido: {{(auction.project?.budget || 0) * 0.5 | currency:'USD':'symbol':'1.2-2'}}</p>
                                 <div class="flex justify-content-between align-items-center mt-2">
                                     <p-tag [severity]="getStatusSeverity(auction.status)"
                                         [value]="getStatusLabel(auction.status)"></p-tag>
@@ -46,8 +49,7 @@
                         <div *ngIf="selectedAuction; else noAuctionSelected" class="flex flex-column h-full">
                             <!-- Información del proyecto -->
                             <div class="text-center mb-4">
-                                <h1 class="text-3xl">{{selectedAuction.project.project_name}}</h1>
-                                <p class="text-lg">{{selectedAuction.project.description}}</p>
+                                <h1 class="text-3xl">{{selectedAuction.project?.project_name}}</h1>
                             </div>
 
                             <!-- Precio actual y temporizador -->
@@ -64,49 +66,54 @@
                                 </div>
                             </div>
 
-                            <!-- Botones de oferta rápida -->
-                            <div class="quick-bid-buttons mb-4 text-center" *ngIf="this.developer">
+                            <!-- Botones de oferta rápida (solo para developers) -->
+                            <div class="quick-bid-buttons mb-4 text-center" *ngIf="developer">
                                 <h4 class="mb-3">Ofertar:</h4>
                                 <div *ngIf="getValidQuickBidAmounts().length > 0; else noQuickBids"
                                     class="flex justify-content-center gap-2 flex-wrap">
                                     <button *ngFor="let amount of quickBidAmounts" pButton pRipple
                                         label="{{amount | currency:'USD':'symbol':'1.2-2'}}" class="p-button-outlined"
-                                        (click)="placeBid(amount)" [disabled]="auctionEnded || amount < (selectedAuction.project.budget * 0.5)"></button>
+                                        (click)="placeBid(amount)" 
+                                        [disabled]="auctionEnded || amount < ((selectedAuction.project?.budget || 0) * 0.5)">
+                                    </button>
                                 </div>
                                 <ng-template #noQuickBids>
                                     <p class="text-500">No hay ofertas rápidas disponibles</p>
                                 </ng-template>
                             </div>
 
-                            <div class="bid-input mb-5" *ngIf="this.developer">
+                            <!-- Input de oferta (solo para developers) -->
+                            <div class="bid-input mb-5" *ngIf="developer">
                                 <div class="p-inputgroup">
                                     <span class="p-inputgroup-addon">$</span>
                                     <input type="number" pInputText [(ngModel)]="bidAmount"
                                         placeholder="Otra cantidad" class="w-full" [disabled]="auctionEnded"
-                                        [min]="selectedAuction.project.budget * 0.5">
+                                        [min]="(selectedAuction.project?.budget || 0) * 0.5">
                                     <button pButton pRipple icon="pi pi-send" (click)="placeBid(bidAmount || 0)"
-                                        [disabled]="auctionEnded || (bidAmount && bidAmount < (selectedAuction.project.budget * 0.5))"></button>
+                                        [disabled]="auctionEnded || (bidAmount && bidAmount < ((selectedAuction.project?.budget || 0) * 0.5))"></button>
                                 </div>
                                 <small *ngIf="selectedAuction" class="text-500 block text-center mt-2">
-                                    El monto mínimo permitido es {{selectedAuction.project.budget * 0.5 | currency:'USD':'symbol':'1.2-2'}}
+                                    El monto mínimo permitido es {{(selectedAuction.project?.budget || 0) * 0.5 | currency:'USD':'symbol':'1.2-2'}}
                                 </small>
                             </div>
 
-                            <!-- Área de chat/ofetas -->
+                            <!-- Área de ofertas -->
                             <div class="chat-area">
                                 <div class="messages-container">
                                     <div *ngFor="let bid of auctionBids" class="bid-message mb-3">
                                         <div class="flex align-items-center gap-2">
-                                            <span class="font-bold">{{bid.developer.user.name}}</span>
-                                            <small class="text-500 ml-auto">{{bid.createdAt | date:'shortTime'}}</small>
+                                            <span class="font-bold">{{bid.developer_profile.user.name || 'Anónimo'}}</span>
+                                            <small class="text-500 ml-auto">{{bid.createdAt | date:'shortTime':'UTC'}}</small>
                                         </div>
                                         <div class="bid-amount mt-1">
                                             {{bid.amount | currency:'USD':'symbol':'1.2-2'}}
-                                            <span *ngIf="bid.amount === currentLowestBid"
+                                            <span *ngIf="(bid.amount | number:'1.2-2') === (currentLowestBid | number:'1.2-2')"
                                                 class="current-bid-tag ml-2">OFERTA ACTUAL</span>
-                                            <span *ngIf="bid.developer_id === currentUserId" class="my-bid-tag ml-2">MI
-                                                OFERTA</span>
+                                            <span *ngIf="bid.developer_id === this.id" class="my-bid-tag ml-2">MI OFERTA</span>
                                         </div>
+                                    </div>
+                                    <div *ngIf="auctionBids.length === 0" class="text-center p-4 text-500">
+                                        No hay ofertas aún
                                     </div>
                                 </div>
                             </div>
@@ -120,21 +127,20 @@
                     </div>
                 </div>
 
-                <!-- Columna derecha - MI Historial de Ofertas -->
-                <div class="col-3" *ngIf="this.developer">
+                <!-- Columna derecha - MI Historial de Ofertas (solo para developers) -->
+                <div class="col-3" *ngIf="developer">
                     <div class="card">
                         <h3 class="mb-3">Mis Ofertas</h3>
                         <div class="bid-history">
-                            <div *ngFor="let bid of filterUserBids(bidHistory)" class="bid-card mb-2">
-                                <div class="flex justify-content-between align-items-center">
+                            <div *ngFor="let bid of filterUserBids(bidHistory);" class="bid-card mb-2">
+                                <div class="flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h4 class="mb-1">{{bid.auction.project.project_name}}</h4>
+                                        <span class="font-bold">{{bid.amount | currency:'USD':'symbol':'1.2-2'}}</span>
                                     </div>
-                                    <span class="font-bold">{{bid.amount | currency:'USD':'symbol':'1.2-2'}}</span>
+                                        <span class="font-bold">{{bid.createdAt  | date:'shortTime':'UTC'}}</span>
                                 </div>
-                                <p class="text-xs text-500 mt-2">{{bid.createdAt | date:'short'}}</p>
-                                <p-tag *ngIf="bid.amount === currentLowestBid && bid.auction_id === selectedAuction?.id"
-                                    severity="success" value="Actual" class="mt-1"></p-tag>
+                                <p-tag *ngIf="(bid.amount | number:'1.2-2') === (currentLowestBid | number:'1.2-2')"
+                                    severity="success" value="Actual" class="mt-2"></p-tag>
                             </div>
 
                             <div *ngIf="filterUserBids(bidHistory).length === 0" class="text-center p-4 text-500">
