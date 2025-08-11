@@ -1,9 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
 import { UserService } from 'src/app/core/services/user.service';
-import { CompaniesService } from 'src/app/core/services/companies.service';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { Router } from '@angular/router';
+import { NotificationService } from 'src/app/core/services/notification.service';
+import { BidService } from 'src/app/core/services/bids.service';
+import { ProjectsService } from 'src/app/core/services/projects.service';
 
 interface Bid {
     id: number;
@@ -13,17 +15,23 @@ interface Bid {
     createdAt: string;
     updatedAt: string;
     auction: Auction;
-    developer: Developer;
+    developer_profile: {
+        id: number;
+        user: {
+            id: number;
+            name: string;
+            email: string;
+        };
+    };
 }
 
 interface Auction {
     id: number;
     project_id: number;
-    company_id: number;
+    status: number;
     bidding_started_at: string;
     bidding_deadline: string;
-    status: number;
-    project?: Project;
+    project: Project;
 }
 
 interface Project {
@@ -31,31 +39,6 @@ interface Project {
     project_name: string;
     description: string;
     budget: number;
-    company_id: number;
-}
-
-interface Developer {
-    id: number;
-    bio: string;
-    user_id: number;
-    linkedin: string;
-    occupation: string;
-    portfolio: string;
-    user: UserRelations;
-}
-
-interface UserRelations {
-    role_id: number;
-    name: string;
-    email: string;
-    address: string;
-    phone: string;
-    image: string;
-    role: UserRoleRelations;
-}
-
-interface UserRoleRelations {
-    role_name: string;
 }
 
 @Component({
@@ -67,11 +50,10 @@ export class BidsComponent implements OnInit {
   @ViewChild('dt') dt: Table | undefined;
   
   // Datos del usuario
-  company: any = null;
   developer: any = null;
-  userId: string = this.getUserInfo();
+  userId: number;
   
-  // Datos de la aplicación
+  // Datos de las ofertas
   bids: Bid[] = [];
   filteredBids: Bid[] = [];
   selectedBids: Bid[] = [];
@@ -94,161 +76,80 @@ export class BidsComponent implements OnInit {
   constructor(
     private router: Router,
     private userService: UserService,
-    private companiesService: CompaniesService,
-    private developerService: DeveloperService
-  ) {}
+    private developerService: DeveloperService,
+    private bidService: BidService,
+    private notificationService: NotificationService
+  ) {
+    this.userId = this.getUserIdFromToken();
+  }
 
   ngOnInit(): void {
-    this.loadUserData();
+    this.loadDeveloperData();
   }
 
-  private loadUserData(): void {
-    this.loading = true;
-    this.userService.getUsersById(this.userId).subscribe({
-      next: (user: any) => {
-        if (!user) return;
-        
-        if (user.role_id === 1) { // Company
-          this.loadCompanyData(user.id);
-        } else if (user.role_id === 2) { // Developer
-          this.loadDeveloperData(user.id);
-        }
-      },
-      error: () => {
-        this.loading = false;
-      }
-    });
-  }
-
-  private loadCompanyData(userId: number): void {
-    this.companiesService.getCompanyByUserId(userId).subscribe({
-      next: (company) => {
-        this.company = company;
-        this.loadProjectsAndBids(company.id);
-      },
-      error: () => {
-        this.loading = false;
-      }
-    });
-  }
-
-  private loadDeveloperData(userId: number): void {
-    this.developerService.getDeveloperByIdUser(userId).subscribe({
-      next: (developer) => {
-        this.developer = developer;
-        this.loadDeveloperBids(developer.id);
-      },
-      error: () => {
-        this.loading = false;
-      }
-    });
-  }
-
-  private loadProjectsAndBids(companyId: number): void {
-    setTimeout(() => {
-      // Datos mock para compañías
-      this.projects = [
-        { id: 1, project_name: 'Sistema de Gestión', description: 'Sistema para gestión de inventarios', budget: 15000, company_id: companyId },
-        { id: 2, project_name: 'E-commerce', description: 'Tienda online para venta de productos', budget: 25000, company_id: companyId }
-      ];
-
-      this.bids = this.generateMockBids().filter(bid => 
-        bid.auction.company_id === companyId
-      );
-      
-      this.filteredBids = [...this.bids];
-      this.loading = false;
-    }, 500);
-  }
-
-  private loadDeveloperBids(developerId: number): void {
-    setTimeout(() => {
-      // Datos mock para desarrolladores
-      this.projects = [
-        { id: 1, project_name: 'Sistema de Gestión', description: 'Sistema para gestión de inventarios', budget: 15000, company_id: 1 },
-        { id: 2, project_name: 'E-commerce', description: 'Tienda online para venta de productos', budget: 25000, company_id: 1 },
-        { id: 3, project_name: 'App Móvil', description: 'Aplicación móvil para reservas', budget: 18000, company_id: 2 }
-      ];
-
-      this.bids = this.generateMockBids().filter(bid => 
-        bid.developer_id === developerId
-      );
-      
-      this.filteredBids = [...this.bids];
-      this.loading = false;
-    }, 500);
-  }
-
-  private generateMockBids(): Bid[] {
-    const mockBids: Bid[] = [];
-    const statuses = [0, 1, 2, 3]; // Pendiente, Activa, Completada, Cancelada
+  private getUserIdFromToken(): number {
+    const token = localStorage.getItem('login-token');
+    if (!token) return 0;
     
-    const developers = [
-      {
-        id: this.developer?.id || 1,
-        bio: 'Desarrollador fullstack con 5 años de experiencia',
-        user_id: 2,
-        linkedin: 'linkedin.com/dev1',
-        occupation: 'Fullstack Developer',
-        portfolio: 'dev1portfolio.com',
-        user: {
-          role_id: 2,
-          name: 'Alberto Turcios',
-          email: 'dev@example.com',
-          address: 'Calle 123, Ciudad',
-          phone: '555-1234',
-          image: 'https://randomuser.me/api/portraits/men/1.jpg',
-          role: { role_name: 'Developer' }
-        }
-      },
-      {
-        id: 2,
-        bio: 'Especialista en frontend con React',
-        user_id: 3,
-        linkedin: 'linkedin.com/dev2',
-        occupation: 'Frontend Developer',
-        portfolio: 'dev2portfolio.com',
-        user: {
-          role_id: 2,
-          name: 'María García',
-          email: 'maria@example.com',
-          address: 'Avenida 456, Ciudad',
-          phone: '555-5678',
-          image: 'https://randomuser.me/api/portraits/women/1.jpg',
-          role: { role_name: 'Developer' }
-        }
-      }
-    ];
-
-    // Generar 10 ofertas de ejemplo
-    for (let i = 1; i <= 10; i++) {
-      const project = this.projects[Math.floor(Math.random() * this.projects.length)];
-      const developer = developers[Math.floor(Math.random() * developers.length)];
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
-      
-      const bid: Bid = {
-        id: i,
-        auction_id: i,
-        developer_id: developer.id,
-        amount: Math.floor(Math.random() * 10000) + 5000,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        auction: {
-          id: i,
-          project_id: project.id,
-          company_id: project.company_id,
-          bidding_started_at: new Date().toISOString(),
-          bidding_deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          status: status,
-          project: project
-        },
-        developer: developer
-      };
-
-      mockBids.push(bid);
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.id || 0;
+    } catch (e) {
+      console.error('Error parsing token:', e);
+      return 0;
     }
+  }
 
-    return mockBids;
+  private loadDeveloperData(): void {
+    this.loading = true;
+    
+    this.userService.getUsersById(this.userId.toString()).subscribe({
+      next: (user: any) => {
+        if (!user || user.role_id !== 2) {
+          this.notificationService.showErrorCustom('Acceso solo para desarrolladores');
+          this.router.navigate(['/main/auctions']);
+          return;
+        }
+
+        this.developerService.getDeveloperByIdUser(user.id).subscribe({
+          next: (developer) => {
+            this.developer = developer;
+            this.loadDeveloperBids();
+          },
+          error: (err) => {
+            this.loading = false;
+            this.notificationService.showErrorCustom('Error al cargar datos del desarrollador');
+          }
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+        this.notificationService.showErrorCustom('Error al cargar datos de usuario');
+      }
+    });
+  }
+
+  private loadDeveloperBids(): void {
+    this.bidService.listBids({ developer_id: this.userId }).subscribe({
+      next: (response: any) => {
+        if (response.success && response.data) {
+          this.bids = Array.isArray(response.data) ? response.data : [response.data];
+          this.filteredBids = [...this.bids];
+          
+          // Extraer proyectos únicos para los filtros
+          this.projects = this.bids
+            .map(bid => bid.auction.project)
+            .filter((project, index, self) => 
+              index === self.findIndex(p => p.id === project.id)
+            );
+        }
+        this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.notificationService.showErrorCustom('Error al cargar las ofertas');
+      }
+    });
   }
 
   filterBids(): void {
@@ -264,7 +165,7 @@ export class BidsComponent implements OnInit {
     table.filterGlobal(value, 'contains');
   }
 
-  getStatusLabel(status: any): string {
+  getStatusLabel(status: any): any {
     const statusMap: Record<string, string> = {
       '0': 'Pendiente',
       '1': 'Activa',
@@ -290,18 +191,5 @@ export class BidsComponent implements OnInit {
 
   viewPublicAuction(auction: any): void {
     this.router.navigate(['/main/auctions/public', auction.id]);
-  }
-
-  private getUserInfo(): string {
-    const token = localStorage.getItem("login-token");
-    if (!token) return '';
-    
-    try {
-      const payload = token.split(".")[1];
-      return JSON.parse(window.atob(payload))['id'] || '';
-    } catch (e) {
-      console.error('Error parsing token:', e);
-      return '';
-    }
   }
 }

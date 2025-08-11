@@ -13,12 +13,8 @@
                         routerLink="/main/auctions"></button>
             </div>
         </div>
-        
-        <div *ngIf="loading" class="flex justify-content-center align-items-center" style="height: 300px;">
-            <p-progressSpinner></p-progressSpinner>
-        </div>
 
-        <div class="grid-container" *ngIf="!loading">
+        <div class="grid-container">
             <div class="grid">
                 <!-- Columna izquierda - Lista de subastas activas -->
                 <div class="col-3">
@@ -29,7 +25,7 @@
                                 [ngClass]="{'selected': selectedAuction?.id === auction.id}"
                                 (click)="selectAuction(auction)">
                                 <h4>{{auction.project?.project_name}}</h4>
-                                <p class="text-sm">Empresa: {{this.company?.user?.name}}</p>
+                                <p class="text-sm">Empresa: {{this.selectedProject.company.name}}</p>
                                 <p class="text-sm">Descripción: {{auction.project?.description}}</p>
                                 <p class="text-sm">Presupuesto Inicial: {{auction.project?.budget | currency:'USD':'symbol':'1.2-2'}}</p>
                                 <p class="text-sm">Mínimo permitido: {{(auction.project?.budget || 0) * 0.5 | currency:'USD':'symbol':'1.2-2'}}</p>

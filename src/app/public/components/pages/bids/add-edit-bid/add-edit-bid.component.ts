@@ -9,6 +9,7 @@ import { Bid } from 'src/app/core/models/bids';
 import { DeveloperService } from 'src/app/core/services/developer.service';
 import { CompaniesService } from 'src/app/core/services/companies.service';
 import { BidService } from 'src/app/core/services/bids.service';
+import { ProjectsService } from 'src/app/core/services/projects.service';
 
 @Component({
   selector: 'app-add-edit-bid',
@@ -25,11 +26,11 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
   quickBidAmounts: number[] = [];
   bidAmount: number | null = null;
   minAllowedBid: any;
+  selectedProject: any | null = null;
 
   // Estado y temporizador
   auctionEnded: boolean = false;
   timeLeft: string = "";
-  loading: boolean = true;
   private timerSubscription!: Subscription;
 
   // Roles y usuario
@@ -42,6 +43,7 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
     private auctionService: AuctionService,
     private bidService: BidService,
     private userService: UserService,
+    private ProjectSrv: ProjectsService,
     private developerService: DeveloperService,
     private companiesService: CompaniesService,
     private notificationService: NotificationService
@@ -102,11 +104,9 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
   }
 
   private loadAuctions(): void {
-    this.loading = true;
     this.auctionService.getAuctions().subscribe({
       next: (auctions) => {
         this.activeAuctions = auctions;
-        this.loading = false;
         
         // Seleccionar subasta de la ruta si existe
         const auctionId = this.route.snapshot.params['id'];
@@ -122,9 +122,17 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.notificationService.showErrorCustom('Error al cargar las subastas');
-        this.loading = false;
       }
     });
+  }
+
+  loadProjectById(id: any){
+    this.ProjectSrv.getProjectById(id)
+    .subscribe({
+      next: (data: any) => {
+        this.selectedProject = data
+      }
+    })
   }
 
   selectAuction(auction: Auction): void {
@@ -134,6 +142,7 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
     
     this.loadAuctionBids(auction.id);
     this.startTimer();
+    this.loadProjectById(auction.project_id)
   }
 
   private loadAuctionBids(auctionId: number): void {
@@ -306,7 +315,6 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
       user_id: this.id
     };
 
-    this.loading = true;
     this.bidService.createBid(bidData).subscribe({
       next: (response) => {
         if (response.success) {
@@ -315,11 +323,9 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
           this.loadBidHistory();
           this.bidAmount = null;
         }
-        this.loading = false;
       },
       error: (err) => {
         this.notificationService.showErrorCustom('Error al realizar la oferta');
-        this.loading = false;
       }
     });
   }
