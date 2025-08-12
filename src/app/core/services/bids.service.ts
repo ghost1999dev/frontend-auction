@@ -5,7 +5,12 @@ import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { HandlerErrorService } from './handler-error.service';
 import { NotificationService } from './notification.service';
-import { BidCreate, BidResponse, BidUpdate } from '../models/bids';
+import { 
+  BidCreate, 
+  BidResponse, 
+  BidUpdate, 
+  AuctionResultsResponse 
+} from '../models/bids';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +28,7 @@ export class BidService {
    * @param data Datos de la puja
    * @returns Observable con la respuesta
    */
-  createBid(data: any): Observable<BidResponse> {
+  createBid(data: BidCreate): Observable<BidResponse> {
     return this.http.post<BidResponse>(`${environment.server_url}bids/create`, data)
       .pipe(
         map((res: BidResponse) => {
@@ -41,6 +46,22 @@ export class BidService {
    */
   listBids(filters?: { auction_id?: number, developer_id?: number }): Observable<BidResponse> {
     return this.http.get<BidResponse>(`${environment.server_url}bids/show/all`, { params: filters as any })
+      .pipe(
+        catchError((err) => this.handlerErrorService.handlerError(err))
+      );
+  }
+
+  /**
+   * Obtiene pujas por subasta
+   * @param auctionId ID de la subasta
+   * @param developerId (Opcional) ID del desarrollador
+   * @returns Observable con la lista de pujas
+   */
+  listBidsByAuction(auctionId: number, developerId?: number): Observable<BidResponse> {
+    const params: any = {};
+    if (developerId) params.developer_id = developerId.toString();
+    
+    return this.http.get<BidResponse>(`${environment.server_url}bids/show/by-auction/${auctionId}`, { params })
       .pipe(
         catchError((err) => this.handlerErrorService.handlerError(err))
       );
@@ -87,6 +108,34 @@ export class BidService {
           this.notificationService.showSuccessCustom(res.message || 'Puja eliminada exitosamente');
           return res;
         }),
+        catchError((err) => this.handlerErrorService.handlerError(err))
+      );
+  }
+
+  /**
+   * Finaliza una subasta y determina los ganadores
+   * @param auctionId ID de la subasta
+   * @returns Observable con la respuesta
+   */
+  finalizeAuction(auctionId: number): Observable<BidResponse> {
+    return this.http.post<BidResponse>(`${environment.server_url}bids/finalize`, { auction_id: auctionId })
+      .pipe(
+        map((res: BidResponse) => {
+          this.notificationService.showSuccessCustom(res.message || 'Subasta finalizada exitosamente');
+          return res;
+        }),
+        catchError((err) => this.handlerErrorService.handlerError(err))
+      );
+  }
+
+  /**
+   * Obtiene los resultados de una subasta finalizada
+   * @param auctionId ID de la subasta
+   * @returns Observable con los resultados
+   */
+  getAuctionResults(auctionId: number): Observable<AuctionResultsResponse> {
+    return this.http.get<AuctionResultsResponse>(`${environment.server_url}bids/resultados/${auctionId}`)
+      .pipe(
         catchError((err) => this.handlerErrorService.handlerError(err))
       );
   }

@@ -243,6 +243,8 @@ selectAuction(auction: Auction): void {
       const msPerHour = 60 * msPerMinute;
       const msPerDay = 24 * msPerHour;
 
+      this.auctionEnded = now >= deadline;
+
       const formatLocal = (date: Date) =>
         date.toLocaleString("es-SV", {
           timeZone: "America/El_Salvador",
@@ -270,7 +272,7 @@ selectAuction(auction: Auction): void {
         const seconds = Math.floor((diff % msPerMinute) / msPerSecond);
 
         if (days > 0) {
-          this.timeLeft = `⏱️ ${days}d ${hours}h ${minutes}m ${seconds}s`;
+          this.timeLeft = `Finalizara en: ⏱️ ${days}d ${hours}h ${minutes}m ${seconds}s`;
         } else {
           let timeParts = [];
 
@@ -286,7 +288,7 @@ selectAuction(auction: Auction): void {
           // Siempre mostramos segundos
           timeParts.push(`${seconds.toString().padStart(2, "0")}s`);
 
-          this.timeLeft = "⏱️ " + timeParts.join(" ");
+          this.timeLeft = "Finalizara en: ⏱️ " + timeParts.join(" ");
         }
       }
     } catch (error) {
@@ -294,6 +296,24 @@ selectAuction(auction: Auction): void {
       this.timeLeft = "⚠️ Error en cálculo";
     }
   }
+
+  finalizeAuction(): void {
+    if (!this.selectedAuction) return;
+
+    this.bidService.finalizeAuction(this.selectedAuction.id).subscribe({
+        next: (response) => {
+            if (response.success) {
+                this.notificationService.showSuccessCustom('Subasta finalizada con éxito');
+                // Actualizar el estado de la subasta
+                this.selectedAuction.status = 2;
+                // Obtener los resultados actualizados
+            }
+        },
+        error: (err) => {
+            this.notificationService.showErrorCustom('Error al finalizar la subasta');
+        }
+    });
+}
 
   private generateQuickBidButtons(): void {
     this.quickBidAmounts = [];

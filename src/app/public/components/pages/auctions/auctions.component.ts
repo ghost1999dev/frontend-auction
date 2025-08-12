@@ -139,23 +139,77 @@ private loadActiveAuctions(): void {
     this.loading = true;
     const auctionsSub = this.auctionService.getAuctions().subscribe({
         next: (auctions) => {
-            const now = new Date(); // Fecha y hora actual
+            // Función para convertir UTC a hora local
+            const toLocalTime = (utcDate: string) => {
+                const date = new Date(utcDate);
+                return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+            };
+
+            const now = new Date(); // Fecha y hora actual local
             
-            // Filtra subastas activas (status === "1") y que no hayan vencido (bidding_deadline > ahora)
+            // Filtra subastas activas (status === 1) y que no hayan vencido
             this.auctions = auctions.filter((auction: any) => {
-                const deadline = new Date(auction.bidding_deadline);
-                return auction.status === 1 && deadline > now;
+                try {
+                    // Convertir fechas UTC a local
+                    const startedAt = auction.bidding_started_at ? toLocalTime(auction.bidding_started_at) : null;
+                    const deadline = auction.bidding_deadline ? toLocalTime(auction.bidding_deadline) : null;
+
+                    // Validar estado y fechas
+                    const isActive = auction.status === 1;
+                    const isNotStarted = startedAt ? now < startedAt : false;
+                    const isNotEnded = deadline ? now < deadline : false;
+
+                    // La subasta es válida si:
+                    // 1. Está activa (status === 1)
+                    // 2. Ya ha comenzado (si tiene fecha de inicio)
+                    // 3. No ha terminado (si tiene fecha de fin)
+                    return isActive && 
+                           (startedAt ? !isNotStarted : true) && 
+                           (deadline ? isNotEnded : true);
+                } catch (error) {
+                    console.error('Error al procesar fechas de subasta:', auction.id, error);
+                    return false; // Si hay error, excluir la subasta
+                }
             });
 
             this.filteredActiveAuctions = [...this.auctions];
             this.loading = false;
         },
-        error: () => {
+        error: (err) => {
+            console.error('Error al cargar subastas:', err);
             this.loading = false;
         }
     });
     
     this.subscriptions.add(auctionsSub);
+}
+
+calculateTimeLeft(auction: any): string {
+    if (!auction.bidding_deadline) return 'Sin fecha límite';
+    
+    const now = new Date();
+    const deadline = new Date(auction.bidding_deadline);
+    
+    if (deadline < now) return 'Finalizada';
+    
+    const diff = deadline.getTime() - now.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (days > 0) {
+        return `${days}d ${hours}h`;
+    } else if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+    } else {
+        return `${minutes}m`;
+    }
+}
+
+isAuctionEnded(auction: any): boolean {
+    if (!auction.bidding_deadline) return false;
+    const deadline = new Date(auction.bidding_deadline);
+    return deadline < new Date();
 }
 
   // Métodos de UI y utilidades

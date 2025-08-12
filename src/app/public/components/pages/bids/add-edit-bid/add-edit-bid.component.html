@@ -34,6 +34,12 @@
                                         [value]="getStatusLabel(auction.status)"></p-tag>
                                     <small class="text-500">{{auction.bidding_deadline | date:'shortDate'}}</small>
                                 </div>
+                                <div class="flex justify-content-center mt-3" *ngIf="auctionEnded && company && selectedAuction?.id === auction.id">
+                                    <button pButton pRipple 
+                                            label="Enviar Resultados" 
+                                            class="p-button-sm"
+                                            (click)="finalizeAuction()"></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -54,9 +60,8 @@
                                     {{currentLowestBid | currency:'USD':'symbol':'1.2-2'}}
                                 </div>
                                 <div class="timer mb-4 mt-4">
-                                    <p-tag *ngIf="auctionEnded" severity="danger" value="SUBASTA FINALIZADA"></p-tag>
-                                    <p-tag *ngIf="!auctionEnded" severity="info" 
-                                        [value]="'Tiempo restante: ' + timeLeft"
+                                    <p-tag severity="info" 
+                                        [value]="timeLeft"
                                         styleClass="custom-tag-font">
                                     </p-tag>
                                 </div>
