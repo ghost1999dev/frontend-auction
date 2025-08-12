@@ -28,6 +28,8 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
   minAllowedBid: any;
   selectedProject: any | null = null;
 
+  private pollingInterval = 4000; // 4 segundos
+  private pollingSubscription!: Subscription;
   // Estado y temporizador
   auctionEnded: boolean = false;
   timeLeft: string = "";
@@ -54,11 +56,40 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
     this.loadInitialData();
   }
 
-  ngOnDestroy(): void {
-    if (this.timerSubscription) {
-      this.timerSubscription.unsubscribe();
+// Agrega este método para iniciar el polling
+private startPolling(): void {
+  this.stopPolling();
+  
+  console.log('Iniciando polling...'); // Log de inicio
+  
+  this.pollingSubscription = interval(this.pollingInterval).subscribe(() => {
+    console.log('Ejecutando polling...', new Date().toLocaleTimeString()); // Log de cada ejecución
+    
+    if (this.selectedAuction) {
+      console.log('Actualizando bids para subasta:', this.selectedAuction.id);
+      this.loadAuctionBids(this.selectedAuction.id);
+      if (this.developer) {
+        this.loadBidHistory();
+      }
     }
+  });
+}
+
+
+// Método para detener el polling
+private stopPolling(): void {
+  if (this.pollingSubscription) {
+    this.pollingSubscription.unsubscribe();
   }
+}
+
+// Modifica el método ngOnDestroy para detener el polling también
+ngOnDestroy(): void {
+  if (this.timerSubscription) {
+    this.timerSubscription.unsubscribe();
+  }
+  this.stopPolling();
+}
 
   private loadInitialData(): void {
     this.userService.getUsersById(this.id).subscribe({
@@ -135,15 +166,16 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
     })
   }
 
-  selectAuction(auction: Auction): void {
-    this.selectedAuction = auction;
-    this.minAllowedBid = auction.project?.budget ? auction.project.budget * 0.5 : 0;
-    this.auctionEnded = new Date(auction.bidding_deadline) < new Date();
-    
-    this.loadAuctionBids(auction.id);
-    this.startTimer();
-    this.loadProjectById(auction.project_id)
-  }
+selectAuction(auction: Auction): void {
+  this.selectedAuction = auction;
+  this.minAllowedBid = auction.project?.budget ? auction.project.budget * 0.5 : 0;
+  this.auctionEnded = new Date(auction.bidding_deadline) < new Date();
+  
+  this.loadAuctionBids(auction.id);
+  this.startTimer();
+  this.loadProjectById(auction.project_id);
+  this.startPolling(); // <-- Iniciar polling cuando se selecciona una subasta
+}
 
   private loadAuctionBids(auctionId: number): void {
     this.bidService.listBids({ auction_id: auctionId }).subscribe({

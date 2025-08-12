@@ -38,6 +38,8 @@
     "primeng": "^17.4.0",
     "quill": "^2.0.3",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "tslib": "^2.6.2",
     "web-animations-js": "^2.3.2",
     "zone.js": "0.14.10"
