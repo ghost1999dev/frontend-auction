@@ -53,7 +53,7 @@
                                 pTooltip="Información de la subasta" (click)="viewPublicAuction(auction)"></button>
                         <!--[disabled]="auction.status !== 2"-->
                         <button 
-                         [routerLink]="['/main/winner-bid/auction', 1]"
+                         [routerLink]="['/main/winner-bid/auction', auction.id]"
                          pButton pRipple icon="pi pi-chart-bar" class="p-button-rounded p-button-success mr-2" 
                                 pTooltip="Ganadores de la subasta"></button> 
                         <button pButton pRipple icon="pi pi-dollar" 

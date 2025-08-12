@@ -86,3 +86,36 @@ export interface AuctionResultsResponse {
   count: number;
   data: AuctionResults[];
 }
+
+export interface WinnerSelection {
+  auction_id: number;
+  winner_bid: number;
+}
+
+export interface WinnerResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    bid_id: number;
+    auction_id: number;
+    winner_id: number;
+    bid_amount: number;
+  };
+}
+
+export interface FinalizeAuctionResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface AuctionStatus {
+  PENDING: number;
+  ACTIVE: number;
+  CLOSED: number;
+}
+
+export interface BidStatus {
+  PENDING: number;
+  WINNER: number;
+  LOSER: number;
+}

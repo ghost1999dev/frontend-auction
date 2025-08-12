@@ -9,7 +9,11 @@ import {
   BidCreate, 
   BidResponse, 
   BidUpdate, 
-  AuctionResultsResponse 
+  AuctionResultsResponse, 
+  BidStatus,
+  AuctionStatus,
+  WinnerResponse,
+  WinnerSelection
 } from '../models/bids';
 
 @Injectable({
@@ -79,6 +83,47 @@ export class BidService {
       );
   }
 
+
+/**
+ * Selecciona el ganador de una subasta
+ * @param data Datos con auction_id y winner_bid
+ * @returns Observable con la respuesta
+ */
+chooseWinner(data: WinnerSelection): Observable<WinnerResponse> {
+  return this.http.post<WinnerResponse>(`${environment.server_url}bids/choose-winner`, data)
+    .pipe(
+      map((res: WinnerResponse) => {
+        return res;
+      }),
+      catchError((err) => this.handlerErrorService.handlerError(err))
+    );
+}
+
+/**
+ * Obtiene los estados posibles de una subasta
+ * @returns Objeto con los estados
+ */
+getAuctionStatus(): AuctionStatus {
+  return {
+    PENDING: 0,
+    ACTIVE: 1,
+    CLOSED: 2
+  };
+}
+
+/**
+ * Obtiene los estados posibles de una puja
+ * @returns Objeto con los estados
+ */
+getBidStatus(): BidStatus {
+  return {
+    PENDING: 0,
+    WINNER: 1,
+    LOSER: 2
+  };
+}
+
+
   /**
    * Actualiza el monto de una puja
    * @param id ID de la puja
@@ -134,7 +179,7 @@ export class BidService {
    * @returns Observable con los resultados
    */
   getAuctionResults(auctionId: number): Observable<AuctionResultsResponse> {
-    return this.http.get<AuctionResultsResponse>(`${environment.server_url}bids/resultados/${auctionId}`)
+    return this.http.get<AuctionResultsResponse>(`${environment.server_url}bids/resultados/resultados?auction_id=${auctionId}`)
       .pipe(
         catchError((err) => this.handlerErrorService.handlerError(err))
       );
