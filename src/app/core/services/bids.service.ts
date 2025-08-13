@@ -13,7 +13,8 @@ import {
   BidStatus,
   AuctionStatus,
   WinnerResponse,
-  WinnerSelection
+  WinnerSelection,
+  WinnerHistoryResponse
 } from '../models/bids';
 
 @Injectable({
@@ -184,4 +185,14 @@ getBidStatus(): BidStatus {
         catchError((err) => this.handlerErrorService.handlerError(err))
       );
   }
+  /**
+ * Obtiene el historial de ganadores
+ * @returns Observable con el historial de ganadores
+ */
+getWinnersHistory(): Observable<WinnerHistoryResponse> {
+  return this.http.get<WinnerHistoryResponse>(`${environment.server_url}bids/historial-ganadores`)
+    .pipe(
+      catchError((err) => this.handlerErrorService.handlerError(err))
+    );
+}
 }

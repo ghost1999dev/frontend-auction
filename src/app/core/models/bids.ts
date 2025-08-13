@@ -119,3 +119,47 @@ export interface BidStatus {
   WINNER: number;
   LOSER: number;
 }
+
+// Agregar estas nuevas interfaces al archivo bids.ts
+
+export interface WinnerHistory {
+  id: number;
+  bid_id: number;
+  auction_id: number;
+  winner_id: number;
+  bid_amount: number;
+  created_at: string;
+  bid?: {
+    id: number;
+    amount: number;
+    status: number;
+    createdAt: string;
+    developer_profile?: DeveloperProfile;
+  };
+  auction?: {
+    id: number;
+    status: number;
+    bidding_started_at?: string;
+    bidding_deadline?: string;
+    project?: {
+      id: number;
+      project_name: string;
+      description?: string;
+      budget?: number;
+    };
+  };
+  winner?: {
+    id: number;
+    name: string;
+    email?: string;
+  };
+}
+
+export interface WinnerHistoryResponse {
+  success: boolean;
+  data: WinnerHistory[];
+}
+
+export interface FinalizeAuctionRequest {
+  auction_id: number;
+}

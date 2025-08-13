@@ -306,7 +306,11 @@ selectAuction(auction: Auction): void {
                 this.notificationService.showSuccessCustom('Subasta finalizada con éxito');
                 // Actualizar el estado de la subasta
                 this.selectedAuction.status = 2;
+
                 // Obtener los resultados actualizados
+
+                this.router.navigate(['/main/winner-bid/auction', this.selectedAuction.id]);
+
             }
         },
         error: (err) => {
@@ -391,7 +395,7 @@ selectAuction(auction: Auction): void {
   getStatusLabel(status: any) {
     const statusMap: Record<any, any> = {
       0: "Pendiente",
-      1: "Activa",
+      1: "En Progreso",
       2: "Completada",
       3: "Cancelada",
     };
