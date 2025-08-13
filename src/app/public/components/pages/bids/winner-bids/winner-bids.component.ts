@@ -4,7 +4,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
 import confetti from 'canvas-confetti';
 import { finalize } from 'rxjs/operators';
-import { AuctionResultsResponse, AuctionResults, WinnerHistoryResponse, WinnerHistory } from 'src/app/core/models/bids';
+import { AuctionResultsResponse, AuctionResults } from 'src/app/core/models/bids';
 import { BidService } from 'src/app/core/services/bids.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 
@@ -18,7 +18,6 @@ interface Winner {
   developer_id: number;
   status: string;
   email?: string;
-  is_winner?: boolean;
 }
 
 interface DialogConfig {
@@ -73,6 +72,8 @@ export class WinnerBidsComponent implements OnInit {
   };
 
   displayDialog: boolean = false;
+  private storageKey: string;
+
   projectStatus: ProjectStatus = 'not_assigned';
   projectDates = {
     assigned: new Date(),
@@ -85,7 +86,9 @@ export class WinnerBidsComponent implements OnInit {
     private route: ActivatedRoute,
     private bidService: BidService,
     private notificationService: NotificationService,
-  ) {}
+  ) {
+    this.storageKey = `selectedWinner_${this.auctionId}`;
+  }
 
   ngOnInit(): void {
     this.auctionId = this.route.snapshot.params['id'] || 0;
@@ -94,8 +97,9 @@ export class WinnerBidsComponent implements OnInit {
       return;
     }
 
+    this.storageKey = `selectedWinner_${this.auctionId}`;
+    this.loadSelectedWinner();
     this.loadAuctionResults();
-    this.loadWinnerHistory();
     this.loadProjectStatus();
   }
 
@@ -116,36 +120,6 @@ export class WinnerBidsComponent implements OnInit {
           this.notificationService.showErrorCustom('No se pudieron cargar los resultados de la subasta');
         }
       });
-  }
-
-  private loadWinnerHistory(): void {
-    this.bidService.getWinnersHistory()
-      .subscribe({
-        next: (response: WinnerHistoryResponse) => {
-          const winnerForThisAuction = response.data.find(winner => winner.auction_id === this.auctionId);
-          if (winnerForThisAuction) {
-            this.markWinnerInWinnersList(winnerForThisAuction);
-            this.projectStatus = 'assigned';
-          }
-        },
-        error: (error) => {
-          console.error('Error loading winner history:', error);
-        }
-      });
-  }
-
-  private markWinnerInWinnersList(winnerHistory: WinnerHistory): void {
-    this.winners = this.winners.map(winner => {
-      if (winner.id === winnerHistory.bid_id) {
-        return {
-          ...winner,
-          is_winner: true
-        };
-      }
-      return winner;
-    });
-
-    this.selectedWinner = this.winners.find(winner => winner.is_winner) || null;
   }
 
   private loadAuctionDetails(): void {
@@ -188,8 +162,11 @@ export class WinnerBidsComponent implements OnInit {
     // Ordenar por amount (ascendente para subasta inversa)
     const sortedResults = [...results].sort((a, b) => a.amount - b.amount);
     
+    // Filtrar solo las pujas ganadoras (status = WINNER)
+    const winningBids = sortedResults.filter(bid => bid.status === 'Ganador');
+    
     // Mapear a la estructura de Winner
-    this.winners = sortedResults.slice(0, 3).map((result, index) => ({
+    this.winners = winningBids.slice(0, 3).map((result, index) => ({
       id: result.id,
       position: index + 1,
       name: result.developer_profile?.user?.name || 'Desarrollador ' + (index + 1),
@@ -198,11 +175,10 @@ export class WinnerBidsComponent implements OnInit {
       time: new Date(result.createdAt).toLocaleTimeString(),
       developer_id: result.developer_id,
       status: result.status,
-      email: result.developer_profile?.user?.email,
-      is_winner: false
+      email: result.developer_profile?.user?.email
     }));
 
-    // Si hay menos de 3 resultados, completar con placeholders
+    // Si hay menos de 3 resultados ganadores, completar con placeholders
     while (this.winners.length < 3) {
       this.winners.push({
         id: 0,
@@ -212,8 +188,7 @@ export class WinnerBidsComponent implements OnInit {
         avatar: this.getRandomAvatar(),
         time: '--:-- --',
         developer_id: 0,
-        status: 'No disponible',
-        is_winner: false
+        status: 'No disponible'
       });
     }
   }
@@ -223,22 +198,23 @@ export class WinnerBidsComponent implements OnInit {
     return `assets/images/${avatars[Math.floor(Math.random() * avatars.length)]}`;
   }
 
-  selectWinner(winner: Winner): void {
-    if (winner.status !== "Ganador") {
-      this.notificationService.showErrorCustom('Solo puedes seleccionar un ganador oficial de la subasta');
-      return;
-    }
-
-    this.selectedWinnerToConfirm = winner;
-    this.displayConfirmationDialog = true;
+selectWinner(winner: Winner): void {
+  if (winner.status !== "Ganador") {
+    this.notificationService.showErrorCustom('Solo puedes seleccionar un ganador oficial de la subasta');
+    return;
   }
 
-  confirmSelection(): void {
-    if (this.selectedWinnerToConfirm) {
-      this.assignWinner(this.selectedWinnerToConfirm);
-      this.displayConfirmationDialog = false;
-    }
+  this.selectedWinnerToConfirm = winner;
+  this.displayConfirmationDialog = true;
+}
+
+// Agrega este nuevo método
+confirmSelection(): void {
+  if (this.selectedWinnerToConfirm) {
+    this.assignWinner(this.selectedWinnerToConfirm);
+    this.displayConfirmationDialog = false;
   }
+}
 
   assignWinner(winner: Winner): void {
     this.isSelectingWinner = true;
@@ -249,15 +225,10 @@ export class WinnerBidsComponent implements OnInit {
       next: (response) => {
         this.notificationService.showSuccessCustom(response.message || 'Ganador seleccionado correctamente');
         this.selectedWinner = winner;
+        this.saveSelectedWinner();
         this.projectStatus = 'assigned';
         this.saveProjectStatus();
         this.isSelectingWinner = false;
-        
-        // Update the winners list to mark the selected winner
-        this.winners = this.winners.map(w => ({
-          ...w,
-          is_winner: w.id === winner.id
-        }));
       },
       error: (error) => {
         console.error('Error selecting winner:', error);
@@ -267,17 +238,33 @@ export class WinnerBidsComponent implements OnInit {
     });
   }
 
+  private saveSelectedWinner(): void {
+    if (this.selectedWinner) {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.selectedWinner));
+    } else {
+      localStorage.removeItem(this.storageKey);
+    }
+  }
+
+  private loadSelectedWinner(): void {
+    const savedWinner = localStorage.getItem(this.storageKey);
+    if (savedWinner) {
+      this.selectedWinner = JSON.parse(savedWinner);
+      this.projectStatus = 'assigned';
+    }
+  }
+
   private saveProjectStatus(): void {
-    // You might want to save this to backend in a real application
-    // For now, we'll keep it in memory since we're removing localStorage
+    localStorage.setItem(`projectStatus_${this.auctionId}`, this.projectStatus);
   }
 
   private loadProjectStatus(): void {
-    // In a real app, you would fetch this from the backend
-    // For now, we'll just set a default status
-    this.projectStatus = 'not_assigned';
+    const savedStatus = localStorage.getItem(`projectStatus_${this.auctionId}`);
+    if (savedStatus && this.isValidProjectStatus(savedStatus)) {
+      this.projectStatus = savedStatus as ProjectStatus;
+    }
     
-    // Update dates (just for demonstration)
+    // Actualiza fechas (esto es solo para demostración)
     const now = new Date();
     this.projectDates = {
       assigned: new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000)), // 15 días atrás
@@ -287,10 +274,15 @@ export class WinnerBidsComponent implements OnInit {
     };
   }
 
+  private isValidProjectStatus(status: string): status is ProjectStatus {
+    return ['not_assigned', 'assigned', 'in_progress', 'review', 'completed'].includes(status);
+  }
+
   updateProjectStatus(newStatus: ProjectStatus): void {
     if (newStatus === 'not_assigned') return;
     
     this.projectStatus = newStatus;
+    this.saveProjectStatus();
     
     let message = '';
     switch(newStatus) {
@@ -335,7 +327,11 @@ export class WinnerBidsComponent implements OnInit {
         `Has calificado a ${this.selectedWinner.name} con ${this.rating} estrellas`
       );
       
+      // Opcional: Limpiar selección después de calificar
+      this.selectedWinner = null;
+      this.saveSelectedWinner();
       this.projectStatus = 'completed';
+      this.saveProjectStatus();
     }
 
     this.displayDialog = false;
