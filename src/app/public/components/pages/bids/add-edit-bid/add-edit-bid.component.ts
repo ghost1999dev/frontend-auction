@@ -59,14 +59,8 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
 // Agrega este método para iniciar el polling
 private startPolling(): void {
   this.stopPolling();
-  
-  console.log('Iniciando polling...'); // Log de inicio
-  
   this.pollingSubscription = interval(this.pollingInterval).subscribe(() => {
-    console.log('Ejecutando polling...', new Date().toLocaleTimeString()); // Log de cada ejecución
-    
     if (this.selectedAuction) {
-      console.log('Actualizando bids para subasta:', this.selectedAuction.id);
       this.loadAuctionBids(this.selectedAuction.id);
       if (this.developer) {
         this.loadBidHistory();

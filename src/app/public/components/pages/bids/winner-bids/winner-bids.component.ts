@@ -123,6 +123,7 @@ export class WinnerBidsComponent implements OnInit {
     this.loadAuctionResults();
     this.loadProjectStatus();
     this.getDevByIdUser();
+    this.getPublicRating()
   }
 
   // Métodos para manejar la selección del ganador
@@ -457,6 +458,16 @@ export class WinnerBidsComponent implements OnInit {
     this.developerService.getDeveloperByIdUser(this.selectedWinner.developer_id).subscribe({
       next: (developer) => {
         this.id_developer = developer.id
+      },
+      error: (err) => {
+        this.notificationService.showErrorCustom('Error al cargar datos del desarrollador');
+      }
+    });
+  }
+
+  private getPublicRating(){
+    this.ratingService.getPublicProfile(this.selectedWinner.developer_id).subscribe({
+      next: (developer) => {
       },
       error: (err) => {
         this.notificationService.showErrorCustom('Error al cargar datos del desarrollador');
