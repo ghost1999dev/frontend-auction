@@ -111,42 +111,16 @@
     <p-card header="Detalles de la subasta">
       <p>La subasta inversa se realizó con éxito.</p>
       <p>El ganador recibirá la notificación oficial y los detalles del contrato en las próximas 24 horas.</p>
-
+      <!-- En la sección de timeline, reemplaza el contenido estático por esto: -->
       <div class="timeline">
-        <div class="timeline-event">
-          <div class="timeline-badge primary">
-            <i class="pi pi-check"></i>
+        <div class="timeline-event" *ngFor="let event of timelineEvents">
+          <div class="timeline-badge" [ngClass]="event.color">
+            <i [class]="event.icon"></i>
           </div>
           <div class="timeline-content">
-            <h5>Subasta iniciada</h5>
-            <small>Ayer, 9:00 AM</small>
-          </div>
-        </div>
-        <div class="timeline-event">
-          <div class="timeline-badge success">
-            <i class="pi pi-check"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Primera oferta recibida</h5>
-            <small>Ayer, 9:15 AM</small>
-          </div>
-        </div>
-        <div class="timeline-event">
-          <div class="timeline-badge warning">
-            <i class="pi pi-check"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Oferta más baja alcanzada</h5>
-            <small>Hoy, 10:45 AM</small>
-          </div>
-        </div>
-        <div class="timeline-event">
-          <div class="timeline-badge danger">
-            <i class="pi pi-flag"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Subasta finalizada</h5>
-            <small>Hoy, 12:00 PM</small>
+            <h5>{{event.title}}</h5>
+            <p>{{event.description}}</p>
+            <small>{{event.time}}</small>
           </div>
         </div>
       </div>
@@ -282,18 +256,59 @@
     </ng-template>
   </p-dialog>
 
-  <!-- Confirmación Dialog -->
-<p-dialog [(visible)]="displayConfirmationDialog" [style]="{width: '450px'}" header="Confirmar selección" [modal]="true">
-  <div class="flex align-items-center">
-    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem; color: var(--yellow-500)"></i>
-    <span>¿Estás seguro de seleccionar a {{selectedWinnerToConfirm?.name}} como ganador del proyecto?</span>
-  </div>
-  
-  <ng-template pTemplate="footer">
-    <button pButton pRipple label="Cancelar" icon="pi pi-times" 
-            (click)="displayConfirmationDialog = false" class="p-button-text"></button>
-    <button pButton pRipple label="Sí, seleccionar" icon="pi pi-check" 
-            (click)="confirmSelection()" class="p-button-success"></button>
-  </ng-template>
-</p-dialog>
+   <p-dialog [(visible)]="displayConfirmationDialog" [style]="{width: '450px'}" header="Confirmar selección" [modal]="true">
+    <div class="flex align-items-center">
+      <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem; color: var(--yellow-500)"></i>
+      <span>¿Estás seguro de seleccionar a {{selectedWinnerToConfirm?.name}} como ganador del proyecto?</span>
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancelar" icon="pi pi-times" 
+              (click)="displayConfirmationDialog = false" class="p-button-text"></button>
+      <button pButton pRipple label="Sí, seleccionar" icon="pi pi-check" 
+              (click)="confirmSelection()" class="p-button-success"></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Diálogo dinámico para notas y calificación -->
+  <p-dialog [(visible)]="displayDialog" [style]="{width: '450px'}" [header]="dialogConfig.header" [modal]="true"
+    [closable]="false">
+
+    <!-- Diálogo para notas -->
+    <div *ngIf="dialogConfig.type === 'notes'" class="flex flex-column">
+      <span>{{dialogConfig.message}}</span>
+      <div class="field mt-3">
+        <label for="notes">Notas:</label>
+        <textarea id="notes" pInputTextarea [(ngModel)]="comment" rows="5"
+          placeholder="Escribe tus comentarios aquí..." class="w-full"></textarea>
+      </div>
+    </div>
+
+    <!-- Diálogo para calificación -->
+    <div *ngIf="dialogConfig.type === 'rating'">
+      <div class="rating-dialog-content">
+        <p>Califica a {{selectedWinner?.name}}:</p>
+        <p-rating [(ngModel)]="rating" [cancel]="false" class="mb-3"></p-rating>
+
+        <div class="field mt-3">
+          <label for="comment">Comentario:</label>
+          <textarea id="comment" pInputTextarea [(ngModel)]="comment" rows="3"
+            placeholder="Escribe tus comentarios sobre el desarrollador..." class="w-full"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton pRipple label="Cancelar"
+        icon="pi pi-times" (click)="onDialogConfirm(false)" class="p-button-text"></button>
+
+      <button pButton pRipple 
+        [label]="dialogConfig.type === 'rating' ? 'Enviar calificación' : 'Confirmar'"
+        icon="pi pi-check" 
+        (click)="onDialogConfirm(true)" 
+        [disabled]="dialogConfig.type === 'rating' && rating === 0"
+        class="p-button-success"></button>
+    </ng-template>
+  </p-dialog>
+
 </div>
