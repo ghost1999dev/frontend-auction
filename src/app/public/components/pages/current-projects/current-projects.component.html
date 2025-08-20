@@ -1,4 +1,10 @@
-@if (projects.length > 0) {
+@if (loading) {
+    <div class="card">
+        <div class="flex justify-content-center align-items-center py-6">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+    </div>
+} @else if (projects.length > 0) {
     <div class="card">
         <div class="flex justify-content-between align-items-center mb-4">
             <h1>Proyectos ganados</h1>
@@ -6,7 +12,7 @@
         </div>
 
         <p-table #dt [value]="projects" responsiveLayout="scroll" [rows]="10" 
-                [globalFilterFields]="['project_name','company.name','category.name']" [paginator]="true" 
+                [globalFilterFields]="['auction.project.project_name','winner.name','bid_amount']" [paginator]="true" 
                 [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} proyectos" 
                 [rowHover]="true" dataKey="id">
@@ -24,12 +30,11 @@
             </ng-template>
             <ng-template pTemplate="header">
                 <tr>
-                    <th pSortableColumn="project_name">Proyecto <p-sortIcon field="project_name"></p-sortIcon></th>
-                    <th pSortableColumn="company.name">Cliente <p-sortIcon field="company.name"></p-sortIcon></th>
-                    <th pSortableColumn="category.name">Categoría <p-sortIcon field="category.name"></p-sortIcon></th>
-                    <th pSortableColumn="budget">Presupuesto <p-sortIcon field="budget"></p-sortIcon></th>
-                    <th pSortableColumn="days_available">Días restantes <p-sortIcon field="days_available"></p-sortIcon></th>
-                    <th pSortableColumn="status">Estado <p-sortIcon field="status"></p-sortIcon></th>
+                    <th pSortableColumn="auction.project.project_name">Proyecto <p-sortIcon field="auction.project.project_name"></p-sortIcon></th>
+                    <th pSortableColumn="winner.name">Cliente <p-sortIcon field="winner.name"></p-sortIcon></th>
+                    <th pSortableColumn="bid_amount">Monto de puja ganadora <p-sortIcon field="bid_amount"></p-sortIcon></th>
+                    <th pSortableColumn="auction.project.budget">Presupuesto Inicial <p-sortIcon field="auction.project.budget"></p-sortIcon></th>
+                    <th pSortableColumn="created_at">Fecha de adjudicación <p-sortIcon field="created_at"></p-sortIcon></th>
                     <th>Acciones</th>
                 </tr>
             </ng-template>
@@ -37,40 +42,29 @@
                 <tr>
                     <td>
                         <span class="p-column-title">Proyecto</span>
-                        {{project.project_name}}
+                        {{project.auction.project.project_name}}
                     </td>
                     <td>
                         <span class="p-column-title">Cliente</span>
-                        {{project.company[0].name}}
+                        {{project.winner.name}}
                     </td>
                     <td>
-                        <span class="p-column-title">Categoría</span>
-                        {{project.category[0].name}}
+                        <span class="p-column-title">Monto de puja ganadora</span>
+                        {{project.bid_amount | currency:'USD':'symbol':'1.2-2'}}
                     </td>
                     <td>
-                        <span class="p-column-title">Presupuesto</span>
-                        {{project.budget | currency:'USD':'symbol':'1.2-2'}}
+                        <span class="p-column-title">Presupuesto Inicial</span>
+                        {{project.auction.project.budget | currency:'USD':'symbol':'1.2-2'}}
                     </td>
                     <td>
-                        <span class="p-column-title">Días restantes</span>
-                        <p-tag [value]="project.days_available + ' días'" 
-                               [severity]="project.days_available <= 7 ? 'danger' : project.days_available <= 14 ? 'warning' : 'success'">
-                        </p-tag>
-                    </td>
-                    <td>
-                        <span class="p-column-title">Estado</span>
-                        <p-tag [severity]="getSeverity(project.status)" 
-                               [value]="getStatusText(project.status)"></p-tag>
+                        <span class="p-column-title">Fecha de adjudicación</span>
+                        {{project.created_at | date:'dd/MM/yyyy'}}
                     </td>
                     <td>
                         <div class="flex gap-2">
                             <button pButton pRipple icon="pi pi-eye" 
                                     class="p-button-rounded p-button-info" 
                                     pTooltip="Ver detalles"
-                                    (click)="viewProjectDetails(project)"></button>
-                            <button pButton pRipple icon="pi pi-file-edit" 
-                                    class="p-button-rounded p-button-warning" 
-                                    pTooltip="Editar progreso"
                                     (click)="navigateToProgress(project)"></button>
                         </div>
                     </td>
@@ -78,7 +72,7 @@
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="7">No se encontraron proyectos activos</td>
+                    <td colspan="6">No se encontraron proyectos activos</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -88,7 +82,7 @@
         <div class="flex flex-column align-items-center justify-content-center py-6 px-3">
             <i class="pi pi-inbox text-400 text-6xl mb-3"></i>
             <h3>No tienes proyectos activos</h3>
-            <p class="text-500">Actualmente no tienes proyectos asignados o en curso.</p>
+            <p class="text-500">Actualmente no tienes proyectos ganados o en curso.</p>
             <button pButton pRipple label="Explorar proyectos disponibles" 
                     icon="pi pi-search" class="p-button-outlined mt-3"></button>
         </div>

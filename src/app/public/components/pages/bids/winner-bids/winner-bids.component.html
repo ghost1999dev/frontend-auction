@@ -11,7 +11,7 @@
         <p-tag styleClass="custom-tag-font" severity="info" icon="pi pi-dollar" 
               [value]="'Presupuesto: ' + (initialBudget | currency:'USD':'symbol':'1.2-2')"></p-tag>
         <p-tag styleClass="custom-tag-font" severity="success" icon="pi pi-tag" 
-              [value]="'Ofertas: ' + totalBids"></p-tag>
+              [value]="'Pujas: ' + totalBids"></p-tag>
         <p-tag styleClass="custom-tag-font" severity="warning" icon="pi pi-clock" 
               [value]="'Duración: 15 mins'"></p-tag>
       </div>
@@ -198,7 +198,7 @@
                 (click)="updateProjectStatus('completed')"></button>
 
         <button pButton pRipple 
-                *ngIf="projectStatus === 'completed'"              
+                *ngIf="projectStatus === 'completed' && !this.hasExistingRating"              
                 label="Calificar desarrollador"              
                 icon="pi pi-star" 
                 class="p-button-help"

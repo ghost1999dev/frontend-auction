@@ -63,10 +63,9 @@ export class BidsComponent implements OnInit {
   selectedProject: Project | null = null;
   selectedStatus: number | null = null;
   statusOptions = [
-    { label: 'Pendiente', value: 0 },
-    { label: 'Activa', value: 1 },
-    { label: 'Completada', value: 2 },
-    { label: 'Cancelada', value: 3 }
+    { label: 'Enviada', value: 0 },
+    { label: 'Ganada', value: 1 },
+    { label: 'Perdida', value: 2 },
   ];
   
   // Estados UI
@@ -167,10 +166,9 @@ export class BidsComponent implements OnInit {
 
   getStatusLabel(status: any): any {
     const statusMap: Record<string, string> = {
-      '0': 'Pendiente',
-      '1': 'Activa',
-      '2': 'Completada',
-      '3': 'Cancelada'
+      '0': 'Enviada',
+      '1': 'Ganada',
+      '2': 'Perdida',
     };
     return statusMap[status] || 'Desconocido';
   }

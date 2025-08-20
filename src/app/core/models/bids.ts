@@ -217,3 +217,57 @@ export interface WinnerHistoryResponse {
   success: boolean;
   data: WinnerHistoryItem[];
 }
+
+export interface FinalizeAuctionRequest {
+  auction_id: number;
+}
+
+export interface AuctionResultsQuery {
+  auction_id: number;
+}
+
+export interface WinnerHistoryItem {
+  id: number;
+  bid_id: number;
+  auction_id: number;
+  winner_id: number;
+  bid_amount: number;
+  created_at: string;
+  bid?: {
+    id: number;
+    amount: number;
+    status: number;
+    createdAt: string;
+    developer_profile?: {
+      id: number;
+      user_id: number;
+      user?: {
+        id: number;
+        name: string;
+        email?: string;
+      };
+    };
+  };
+  auction?: {
+    id: number;
+    status: number;
+    bidding_started_at?: string;
+    bidding_deadline?: string;
+    project?: {
+      id: number;
+      project_name: string;
+      description?: string;
+      budget?: number;
+    };
+  };
+  winner?: {
+    id: number;
+    name: string;
+    email?: string;
+  };
+}
+
+export interface WinnerHistoryResponse {
+  success: boolean;
+  data: WinnerHistoryItem[];
+}

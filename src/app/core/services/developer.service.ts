@@ -34,6 +34,14 @@ export class DeveloperService {
       );
   }
 
+
+  getDeveloperById(id: number): Observable<DeveloperWithRelations> {
+    return this.http.get<DeveloperResponseById>(`${environment.server_url}developers/show/${id}`)
+      .pipe(
+        map(response => response.developer),
+      );
+  }
+
   getAllDevelopers(): Observable<getDeveloper[]> {  
     return this.http.get<getDeveloperResponse>(
         `${environment.server_url}developers/show/all`

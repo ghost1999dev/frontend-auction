@@ -28,7 +28,7 @@
                 <tr>
                     <th pSortableColumn="auction.project.project_name">Proyecto <p-sortIcon field="auction.project.project_name"></p-sortIcon></th>
                     <th pSortableColumn="amount">Monto <p-sortIcon field="amount"></p-sortIcon></th>
-                    <th pSortableColumn="auction.status">Estado <p-sortIcon field="auction.status"></p-sortIcon></th>
+                    <th pSortableColumn="auction.status">Estado de la Puja <p-sortIcon field="auction.status"></p-sortIcon></th>
                     <th pSortableColumn="createdAt">Fecha <p-sortIcon field="createdAt"></p-sortIcon></th>
                     <th>Acciones</th>
                 </tr>
@@ -43,8 +43,8 @@
                         <p class="text-sm text-500 mt-1">Presupuesto: {{bid.auction.project?.budget | currency:'USD':'symbol':'1.2-2'}}</p>
                     </td>
                     <td>
-                        <p-tag [severity]="getStatusSeverity(bid.auction.status)" 
-                               [value]="getStatusLabel(bid.auction.status)"></p-tag>
+                        <p-tag [severity]="getStatusSeverity(bid.status)" 
+                               [value]="getStatusLabel(bid.status)"></p-tag>
                     </td>
                     <td>
                         {{bid.createdAt | date:'shortDate'}}

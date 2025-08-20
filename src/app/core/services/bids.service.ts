@@ -85,46 +85,6 @@ export class BidService {
   }
 
 
-/**
- * Selecciona el ganador de una subasta
- * @param data Datos con auction_id y winner_bid
- * @returns Observable con la respuesta
- */
-chooseWinner(data: WinnerSelection): Observable<WinnerResponse> {
-  return this.http.post<WinnerResponse>(`${environment.server_url}bids/choose-winner`, data)
-    .pipe(
-      map((res: WinnerResponse) => {
-        return res;
-      }),
-      catchError((err) => this.handlerErrorService.handlerError(err))
-    );
-}
-
-/**
- * Obtiene los estados posibles de una subasta
- * @returns Objeto con los estados
- */
-getAuctionStatus(): AuctionStatus {
-  return {
-    PENDING: 0,
-    ACTIVE: 1,
-    CLOSED: 2
-  };
-}
-
-/**
- * Obtiene los estados posibles de una puja
- * @returns Objeto con los estados
- */
-getBidStatus(): BidStatus {
-  return {
-    PENDING: 0,
-    WINNER: 1,
-    LOSER: 2
-  };
-}
-
-
   /**
    * Actualiza el monto de una puja
    * @param id ID de la puja
@@ -174,18 +134,19 @@ getBidStatus(): BidStatus {
       );
   }
 
-  /**
-   * Obtiene los resultados de una subasta finalizada
-   * @param auctionId ID de la subasta
-   * @returns Observable con los resultados
-   */
-  getAuctionResults(auctionId: number): Observable<AuctionResultsResponse> {
-    return this.http.get<AuctionResultsResponse>(`${environment.server_url}bids/resultados/resultados?auction_id=${auctionId}`)
-      .pipe(
-        catchError((err) => this.handlerErrorService.handlerError(err))
-      );
-  }
-  /**
+/**
+ * Obtiene los resultados de una subasta finalizada
+ * @param auctionId ID de la subasta
+ * @returns Observable con los resultados
+ */
+getAuctionResults(auctionId: number): Observable<AuctionResultsResponse> {
+  return this.http.get<AuctionResultsResponse>(`${environment.server_url}bids/resultados/${auctionId}?auction_id=${auctionId}`)
+    .pipe(
+      catchError((err) => this.handlerErrorService.handlerError(err))
+    );
+}
+
+/**
  * Obtiene el historial de ganadores
  * @returns Observable con el historial de ganadores
  */
@@ -194,5 +155,45 @@ getWinnersHistory(): Observable<WinnerHistoryResponse> {
     .pipe(
       catchError((err) => this.handlerErrorService.handlerError(err))
     );
+}
+
+/**
+ * Selecciona el ganador de una subasta
+ * @param data Datos con auction_id y winner_bid
+ * @returns Observable con la respuesta
+ */
+chooseWinner(data: WinnerSelection): Observable<WinnerResponse> {
+  return this.http.post<WinnerResponse>(`${environment.server_url}bids/choose-winner`, data)
+    .pipe(
+      map((res: WinnerResponse) => {
+        this.notificationService.showSuccessCustom(res.message || 'Ganador seleccionado exitosamente');
+        return res;
+      }),
+      catchError((err) => this.handlerErrorService.handlerError(err))
+    );
+}
+
+/**
+ * Obtiene los estados posibles de una subasta
+ * @returns Objeto con los estados
+ */
+getAuctionStatus(): AuctionStatus {
+  return {
+    PENDING: 0,
+    ACTIVE: 1,
+    CLOSED: 2
+  };
+}
+
+/**
+ * Obtiene los estados posibles de una puja
+ * @returns Objeto con los estados
+ */
+getBidStatus(): BidStatus {
+  return {
+    PENDING: 0,
+    WINNER: 1,
+    LOSER: 2
+  };
 }
 }

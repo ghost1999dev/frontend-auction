@@ -9,7 +9,9 @@ import {
   ProjectTracking, 
   ProjectTrackingCreate, 
   ProjectTrackingResponse,
-  ProjectStatus
+  ProjectStatus,
+  ProjectHistoryResponse,
+  CurrentStatusResponse
 } from '../models/project-tracking';
 
 @Injectable({
@@ -48,8 +50,8 @@ export class ProjectTrackingService {
    * @param projectId ID del proyecto
    * @returns Observable con el historial
    */
-  getProjectHistory(projectId: number): Observable<ProjectTrackingResponse> {
-    return this.http.get<ProjectTrackingResponse>(
+  getProjectHistory(projectId: number): Observable<ProjectHistoryResponse> {
+    return this.http.get<ProjectHistoryResponse>(
       `${environment.server_url}project-tracking/get-history/${projectId}`
     ).pipe(
       catchError((err) => this.handlerErrorService.handlerError(err))
@@ -61,8 +63,16 @@ export class ProjectTrackingService {
    * @param projectId ID del proyecto
    * @returns Observable con el estado actual
    */
-  getCurrentStatus(projectId: number): Observable<ProjectTrackingResponse> {
-    return this.http.get<ProjectTrackingResponse>(
+  getCurrentStatus(projectId: number): Observable<CurrentStatusResponse> {
+    return this.http.get<CurrentStatusResponse>(
+      `${environment.server_url}project-tracking/get-all-status/${projectId}`
+    ).pipe(
+      catchError((err) => this.handlerErrorService.handlerError(err))
+    );
+  }
+
+  getAllStatus(projectId: number): Observable<CurrentStatusResponse> {
+    return this.http.get<CurrentStatusResponse>(
       `${environment.server_url}project-tracking/get-current-status/${projectId}`
     ).pipe(
       catchError((err) => this.handlerErrorService.handlerError(err))

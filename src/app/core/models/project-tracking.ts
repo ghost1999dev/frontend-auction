@@ -35,3 +35,14 @@ export interface ProjectStatus {
   IN_REVIEW: number;
   COMPLETED: number;
 }
+
+// Agregar estas interfaces para coincidir con el controller
+export interface ProjectHistoryResponse {
+  success: boolean;
+  history: ProjectTracking[];
+}
+
+export interface CurrentStatusResponse {
+  success: boolean;
+  current: ProjectTracking;
+}
