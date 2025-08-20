@@ -550,7 +550,6 @@ export class WinnerBidsComponent implements OnInit {
       .getDeveloperByIdUser(this.selectedWinner.developer_id)
       .subscribe({
         next: (developer) => {
-          console.log("entrooo");
           this.user_id = developer.user_id;
           this.id_developer = developer.id;
           this.getPublicRating(developer.id);

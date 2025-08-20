@@ -72,6 +72,8 @@ import { StepperModule } from 'primeng/stepper';
 import { FieldsetModule } from 'primeng/fieldset';
 import { StepsModule } from 'primeng/steps';
 
+import { TimelineModule } from 'primeng/timeline';
+
 const routes: Routes = [
   {
     path: '',
@@ -259,6 +261,7 @@ const routes: Routes = [
     DividerModule,
     TagModule,
     TooltipModule,
+    TimelineModule,
     DynamicDialogModule,
     SkeletonModule,
     FieldsetModule,

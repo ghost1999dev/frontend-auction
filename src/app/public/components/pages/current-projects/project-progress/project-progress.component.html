@@ -1,87 +1,87 @@
 <div class="card project-progress-container">
-  <h2 class="project-title">Progreso del Proyecto: {{project.project_name}}</h2>
+  <h2 class="project-title">Progreso del Proyecto: {{project?.project_name}}</h2>
   
   <div class="grid mb-5">
     <div class="col-12 md:col-6">
-      <p-fieldset legend="Información del Proyecto" [toggleable]="true" [collapsed]="true" class="project-info-card">
+      <p-fieldset legend="Información del Proyecto" [toggleable]="true" [collapsed]="false" class="project-info-card">
         <div class="grid">
           <div class="col-6">
-            <p class="project-detail"><strong>Cliente:</strong> {{project.company[0].name}}</p>
-            <p class="project-detail"><strong>Categoría:</strong> {{project.category[0].name}}</p>
+            <p class="project-detail"><strong>Cliente:</strong> {{project?.company?.name}}</p>
+            <p class="project-detail"><strong>Categoría:</strong> {{project?.category?.name}}</p>
           </div>
           <div class="col-6">
-            <p class="project-detail"><strong>Presupuesto:</strong> {{project.budget | currency:'USD':'symbol':'1.2-2'}}</p>
+            <p class="project-detail"><strong>Presupuesto:</strong> {{project?.budget | currency:'USD':'symbol':'1.2-2'}}</p>
+            <p class="project-detail"><strong>Estado:</strong> 
+              <p-tag [severity]="isCompleted ? 'success' : 'info'" 
+                     [value]="isCompleted ? 'Completado' : 'En progreso'"></p-tag>
+            </p>
           </div>
         </div>
       </p-fieldset>
     </div>
     <div class="col-12 md:col-6">
-      <p-fieldset legend="Descripción" [toggleable]="true" [collapsed]="true" class="description-card">
-        <p class="project-description">{{project.description}}</p>
+      <p-fieldset legend="Descripción" [toggleable]="true" [collapsed]="false" class="description-card">
+        <p class="project-description">{{project?.description}}</p>
       </p-fieldset>
     </div>
   </div>
 
   <div class="steps-container">
-    <p-steps [model]="steps" [readonly]="isCompleted" [activeIndex]="activeIndex" class="custom-steps"></p-steps>
+    <p-steps [model]="steps" [readonly]="true" [activeIndex]="activeIndex" class="custom-steps">
+      <ng-template pTemplate="item" let-item let-index="index">
+        <span class="p-steps-number" 
+              [ngClass]="{'p-steps-current': index === activeIndex, 'p-steps-complete': hasStatus(index + 1)}"
+              (click)="showStatusDetails(index + 1)">
+          {{index + 1}}
+        </span>
+        <div class="p-steps-title">{{item.label}}</div>
+      </ng-template>
+    </p-steps>
   </div>
 
-  <div class="step-content-container p-4">
+  <div class="step-content-container p-4 mb-4">
     <div class="step-header">
       <h3 class="current-step-title">{{steps[activeIndex].label}}</h3>
-      <p class="step-description">Contenido específico para la etapa {{steps[activeIndex].label.toLowerCase()}}</p>
+      <p class="step-description">{{getStatusNotes(activeIndex + 1)}}</p>
+      <small class="text-color-secondary" *ngIf="getStatusDate(activeIndex + 1)">
+        Aprobado el: {{getStatusDate(activeIndex + 1)}}
+      </small>
     </div>
 
-    <div class="step-actions flex justify-content-between mt-5">
+    <div class="step-actions flex justify-content-end mt-5">
+      @if (isCompleted) {
         <button pButton pRipple 
-                label="Anterior" 
-                icon="pi pi-arrow-left" 
-                class="p-button-outlined p-button-secondary" 
-                (click)="confirmPrevStep()"
-                [disabled]="activeIndex === 0 || isCompleted"></button>
-        
-        @if (activeIndex < steps.length - 1 && !isCompleted) {
-        <button pButton pRipple 
-                label="Siguiente" 
-                icon="pi pi-arrow-right" 
-                iconPos="right" 
-                class="p-button-raised"
-                (click)="confirmNextStep()"></button>
-        }
-        
-        @if (activeIndex === steps.length - 1 && !isCompleted) {
-        <button pButton pRipple 
-                label="Completar Proyecto" 
-                icon="pi pi-check-circle" 
-                iconPos="right" 
-                class="p-button-raised p-button-success" 
-                (click)="confirmNextStep()"></button>
-        }
-        
-        @if (isCompleted) {
-        <div class="completion-badge">
-            <p-tag severity="success" icon="pi pi-check" value="PROYECTO COMPLETADO" class="completed-tag"></p-tag>
-            <p class="completion-message">¡Felicidades! Has completado todas las etapas del proyecto.</p>
+        *ngIf="!hasExistingRating"
+                label="Calificar Desarrollador" 
+                icon="pi pi-star" 
+                class="p-button-success" 
+                (click)="openRatingDialog()"></button>
+      } @else {
+        <div class="waiting-approval">
+          <p-tag severity="warning" icon="pi pi-clock" value="Esperando aprobación"></p-tag>
+          <p class="waiting-message mt-2">El cliente debe aprobar esta etapa para continuar</p>
         </div>
-        }
+      }
     </div>
   </div>
+
+  <!-- Historial de estados aprobados -->
+<p-fieldset legend="Historial de Aprobaciones" [toggleable]="true" [collapsed]="true" class="mt-4">
+  <p-timeline [value]="allStatusHistory" layout="vertical" align="alternate">
+    <ng-template pTemplate="content" let-status>
+      <small class="text-color-secondary">{{status.updated_at | date:'dd/MM/yyyy HH:mm'}}</small>
+      <p>{{status.notes}}</p>
+    </ng-template>
+    <ng-template pTemplate="opposite" let-status>
+      <p-tag [severity]="getStatusSeverity(status.status)" 
+             [value]="steps[status.status - 1]?.label"></p-tag>
+    </ng-template>
+  </p-timeline>
+</p-fieldset>
 </div>
 
-<!-- Confirmation Dialog -->
-<p-dialog header="Confirmar" [(visible)]="displayConfirmDialog" [style]="{width: '450px'}" [modal]="true">
-  <div class="confirmation-content">
-    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-    <span>¿Estás seguro de que deseas continuar?</span>
-  </div>
-  <ng-template pTemplate="footer">
-    <button pButton pRipple label="No" icon="pi pi-times" class="p-button-text" (click)="displayConfirmDialog = false"></button>
-    <button pButton pRipple label="Sí" icon="pi pi-check" class="p-button-raised" (click)="nextAction(); displayConfirmDialog = false"></button>
-  </ng-template>
-</p-dialog>
-
 <!-- Rating Dialog -->
-<p-dialog header="Calificar Cliente" [(visible)]="displayRatingDialog" [style]="{width: '500px'}" [modal]="true" [closable]="false">
+<p-dialog header="Calificar Empresa" [(visible)]="displayRatingDialog" [style]="{width: '500px'}" [modal]="true" [closable]="false">
   <div class="rating-content">
     <div class="field mb-4">
       <label for="ratingScore" class="block mb-2">Puntuación (1-5)</label>
@@ -89,12 +89,15 @@
     </div>
     
     <div class="field">
-      <label for="ratingComment" class="block mb-2">Comentario</label>
-      <textarea id="ratingComment" pInputTextarea [(ngModel)]="ratingComment" rows="3" class="w-full"></textarea>
+      <label for="ratingComment" class="block mb-2">Comentario* </label>
+      <textarea id="ratingComment" pInputTextarea [(ngModel)]="ratingComment" rows="3" class="w-full" 
+                placeholder="Comparte tu experiencia trabajando con este cliente..."></textarea>
     </div>
   </div>
   <ng-template pTemplate="footer">
-    <button pButton pRipple label="Enviar Calificación" icon="pi pi-star" class="p-button-success" 
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" 
+            (click)="displayRatingDialog = false"></button>
+    <button type="button" pButton pRipple label="Enviar Calificación" icon="pi pi-star" class="p-button-success" 
             (click)="submitRating()" [loading]="isRating"></button>
   </ng-template>
 </p-dialog>

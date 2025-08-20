@@ -65,7 +65,7 @@ export class ProjectTrackingService {
    */
   getCurrentStatus(projectId: number): Observable<CurrentStatusResponse> {
     return this.http.get<CurrentStatusResponse>(
-      `${environment.server_url}project-tracking/get-all-status/${projectId}`
+      `${environment.server_url}project-tracking/get-current-status/${projectId}`
     ).pipe(
       catchError((err) => this.handlerErrorService.handlerError(err))
     );
@@ -73,7 +73,7 @@ export class ProjectTrackingService {
 
   getAllStatus(projectId: number): Observable<CurrentStatusResponse> {
     return this.http.get<CurrentStatusResponse>(
-      `${environment.server_url}project-tracking/get-current-status/${projectId}`
+      `${environment.server_url}project-tracking/get-all-status/${projectId}`
     ).pipe(
       catchError((err) => this.handlerErrorService.handlerError(err))
     );
