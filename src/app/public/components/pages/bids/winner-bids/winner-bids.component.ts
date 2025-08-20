@@ -165,6 +165,8 @@ export class WinnerBidsComponent implements OnInit {
     this.loadSelectedWinner();
     this.loadAuctionResults();
     this.loadProjectStatus();
+          this.getDevByIdUser();
+
   }
 
   // Métodos para manejar la selección del ganador
