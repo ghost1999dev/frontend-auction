@@ -53,7 +53,7 @@ export class BidsComponent implements OnInit {
   developer: any = null;
   userId: number;
   
-  // Datos de las ofertas
+  // Datos de las Pujas
   bids: Bid[] = [];
   filteredBids: Bid[] = [];
   selectedBids: Bid[] = [];
@@ -146,7 +146,7 @@ export class BidsComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.notificationService.showErrorCustom('Error al cargar las ofertas');
+        this.notificationService.showErrorCustom('Error al cargar las Pujas');
       }
     });
   }

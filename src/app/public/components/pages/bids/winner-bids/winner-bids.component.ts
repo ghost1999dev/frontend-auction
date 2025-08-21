@@ -518,21 +518,21 @@ export class WinnerBidsComponent implements OnInit {
     this.timelineEvents = [
       {
         title: "Subasta iniciada",
-        description: "La subasta fue abierta para recibir ofertas",
+        description: "La subasta fue abierta para recibir Pujas",
         time: this.formatDate(sortedBids[0].auction?.bidding_started_at),
         icon: "pi pi-check",
         color: "primary",
       },
       {
-        title: "Primera oferta recibida",
-        description: `${sortedBids[0].developer_profile?.user?.name} hizo la primera oferta`,
+        title: "Primera Puja recibida",
+        description: `${sortedBids[0].developer_profile?.user?.name} hizo la primera Puja`,
         time: this.formatDate(sortedBids[0].createdAt),
         icon: "pi pi-check",
         color: "success",
       },
       {
-        title: "Oferta más baja alcanzada",
-        description: `Oferta más baja: ${this.winners[0]?.amount} por ${this.winners[0]?.name}`,
+        title: "Puja más baja alcanzada",
+        description: `Puja más baja: ${this.winners[0]?.amount} por ${this.winners[0]?.name}`,
         time: this.formatDate(sortedBids[sortedBids.length - 1].createdAt),
         icon: "pi pi-check",
         color: "warning",

@@ -180,7 +180,7 @@ selectAuction(auction: Auction): void {
         }
       },
       error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar las ofertas');
+        this.notificationService.showErrorCustom('Error al cargar las Pujas');
       }
     });
   }
@@ -195,7 +195,7 @@ selectAuction(auction: Auction): void {
         }
       },
       error: (err) => {
-        console.error('Error al cargar historial de ofertas:', err);
+        console.error('Error al cargar historial de Pujas:', err);
       }
     });
   }
@@ -355,7 +355,7 @@ selectAuction(auction: Auction): void {
     }
 
     if (amount >= this.currentLowestBid) {
-      this.notificationService.showErrorCustom('Tu oferta debe ser menor que la oferta actual más baja');
+      this.notificationService.showErrorCustom('Tu Puja debe ser menor que la Puja actual más baja');
       return;
     }
 
@@ -368,14 +368,14 @@ selectAuction(auction: Auction): void {
     this.bidService.createBid(bidData).subscribe({
       next: (response) => {
         if (response.success) {
-          this.notificationService.showSuccessCustom('Oferta realizada con éxito');
+          this.notificationService.showSuccessCustom('Puja realizada con éxito');
           this.loadAuctionBids(this.selectedAuction!.id);
           this.loadBidHistory();
           this.bidAmount = null;
         }
       },
       error: (err) => {
-        this.notificationService.showErrorCustom('Error al realizar la oferta');
+        this.notificationService.showErrorCustom('Error al realizar la Puja');
       }
     });
   }

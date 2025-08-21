@@ -3,7 +3,7 @@
         <div class="auction-room-header">
             <div class="header-content">
                 <div class="header-title">
-                    <h1 class="auction-room-title">SALA DE OFERTAS</h1>
+                    <h1 class="auction-room-title">SALA DE Pujas</h1>
                     <p class="auction-room-subtitle">Participa en esta Subasta</p>
                 </div>
                 <button pButton pRipple 
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <!-- Columna central - Sala de ofertas -->
+                <!-- Columna central - Sala de Pujas -->
                 <div [class]="changeClass()">
                     <div class="card">
                         <div *ngIf="selectedAuction; else noAuctionSelected" class="flex flex-column h-full">
@@ -67,9 +67,9 @@
                                 </div>
                             </div>
 
-                            <!-- Botones de oferta rápida (solo para developers) -->
+                            <!-- Botones de Puja rápida (solo para developers) -->
                             <div class="quick-bid-buttons mb-4 text-center" *ngIf="developer">
-                                <h4 class="mb-3">Ofertar:</h4>
+                                <h4 class="mb-3">Pujar:</h4>
                                 <div *ngIf="getValidQuickBidAmounts().length > 0; else noQuickBids"
                                     class="flex justify-content-center gap-2 flex-wrap">
                                     <button *ngFor="let amount of quickBidAmounts" pButton pRipple
@@ -79,11 +79,11 @@
                                     </button>
                                 </div>
                                 <ng-template #noQuickBids>
-                                    <p class="text-500">No hay ofertas rápidas disponibles</p>
+                                    <p class="text-500">No hay Pujas rápidas disponibles</p>
                                 </ng-template>
                             </div>
 
-                            <!-- Input de oferta (solo para developers) -->
+                            <!-- Input de Puja (solo para developers) -->
                             <div class="bid-input mb-5" *ngIf="developer">
                                 <div class="p-inputgroup">
                                     <span class="p-inputgroup-addon">$</span>
@@ -98,7 +98,7 @@
                                 </small>
                             </div>
 
-                            <!-- Área de ofertas -->
+                            <!-- Área de Pujas -->
                             <div class="chat-area">
                                 <div class="messages-container">
                                     <div *ngFor="let bid of auctionBids" class="bid-message mb-3">
@@ -109,12 +109,12 @@
                                         <div class="bid-amount mt-1">
                                             {{bid.amount | currency:'USD':'symbol':'1.2-2'}}
                                             <span *ngIf="(bid.amount | number:'1.2-2') === (currentLowestBid | number:'1.2-2')"
-                                                class="current-bid-tag ml-2">OFERTA ACTUAL</span>
-                                            <span *ngIf="bid.developer_id === this.id" class="my-bid-tag ml-2">MI OFERTA</span>
+                                                class="current-bid-tag ml-2">Puja ACTUAL</span>
+                                            <span *ngIf="bid.developer_id === this.id" class="my-bid-tag ml-2">MI Puja</span>
                                         </div>
                                     </div>
                                     <div *ngIf="auctionBids.length === 0" class="text-center p-4 text-500">
-                                        No hay ofertas aún
+                                        No hay Pujas aún
                                     </div>
                                 </div>
                             </div>
@@ -128,10 +128,10 @@
                     </div>
                 </div>
 
-                <!-- Columna derecha - MI Historial de Ofertas (solo para developers) -->
+                <!-- Columna derecha - MI Historial de Pujas (solo para developers) -->
                 <div class="col-3" *ngIf="developer">
                     <div class="card">
-                        <h3 class="mb-3">Mis Ofertas</h3>
+                        <h3 class="mb-3">Mis Pujas</h3>
                         <div class="bid-history">
                             <div *ngFor="let bid of filterUserBids(bidHistory);" class="bid-card mb-2">
                                 <div class="flex justify-content-between align-items-center mb-2">
@@ -145,7 +145,7 @@
                             </div>
 
                             <div *ngIf="filterUserBids(bidHistory).length === 0" class="text-center p-4 text-500">
-                                No has realizado ofertas aún
+                                No has realizado Pujas aún
                             </div>
                         </div>
                     </div>
