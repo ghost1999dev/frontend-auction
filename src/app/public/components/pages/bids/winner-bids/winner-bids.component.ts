@@ -26,6 +26,7 @@ interface Winner {
   developer_id: number;
   status: string;
   email?: string;
+  user_id?: number;
 }
 
 interface ProjectDetails {
@@ -114,12 +115,12 @@ export class WinnerBidsComponent implements OnInit {
   projectDetails: any | null = null;
   allBids: Bid[] = [];
   timelineEvents: TimelineEvent[] = [];
-  id_developer: number | any;
-  user_id: number | any;
-  hasExistingRating: boolean | any = false;
+  id_developer: number | null = null;
+  user_id: number | null = null;
+  hasExistingRating: boolean = false;
 
   displayConfirmationDialog: boolean = false;
-  selectedWinnerToConfirm: any | null = null;
+  selectedWinnerToConfirm: Winner | null = null;
 
   dialogConfig: any = {
     header: "",
@@ -137,7 +138,8 @@ export class WinnerBidsComponent implements OnInit {
     delivered: new Date(),
     completed: new Date(),
   };
-  projectId: number | any;
+  projectId: number | null = null;
+  userId: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -162,10 +164,9 @@ export class WinnerBidsComponent implements OnInit {
     }
 
     this.storageKey = `selectedWinner_${this.auctionId}`;
-    this.loadSelectedWinner();
     this.loadAuctionResults();
     this.loadProjectStatus();
-    this.getDevByIdUser();
+    this.loadSelectedWinner();
   }
 
   // Métodos para manejar la selección del ganador
@@ -221,10 +222,10 @@ export class WinnerBidsComponent implements OnInit {
     this.displayDialog = false;
   }
 
-  private handleProjectTracking(): void {
+  private async handleProjectTracking(): Promise<void> {
     if (!this.dialogConfig.projectId || !this.dialogConfig.nextStatus) return;
 
-    const trackingData = {
+    const trackingData: any = {
       project_id: this.projectId,
       status: this.getStatusNumber(this.dialogConfig.nextStatus),
       notes: this.comment,
@@ -237,28 +238,41 @@ export class WinnerBidsComponent implements OnInit {
       this.dialogConfig.winner
     ) {
       this.selectedWinner = this.dialogConfig.winner;
-      this.getDevByIdUser();
-
-      // También notificar al backend sobre el ganador
-      this.bidService
-        .chooseWinner({
-          auction_id: this.auctionId,
-          winner_bid: this.selectedWinner.id,
-        })
-        .subscribe({
-          next: (bidResponse) => {
-            this.notificationService.showSuccessCustom(
-              bidResponse.message || "Ganador seleccionado correctamente"
-            );
-            this.projectStatus = "assigned";
-            this.saveProjectStatus();
-
-            this.dialogConfig.nextStatus === "assigned";
-          },
-          error: (bidError) => {
-            console.error("Error selecting winner:", bidError);
-          },
-        });
+      
+      try {
+        // Obtener información completa del desarrollador
+        await this.loadDeveloperInfo(this.selectedWinner.developer_id);
+        
+        // Notificar al backend sobre el ganador
+        this.bidService
+          .chooseWinner({
+            auction_id: this.auctionId,
+            winner_bid: this.selectedWinner.id,
+          })
+          .subscribe({
+            next: (bidResponse) => {
+              this.notificationService.showSuccessCustom(
+                bidResponse.message || "Ganador seleccionado correctamente"
+              );
+              this.projectStatus = "assigned";
+              this.saveProjectStatus();
+              this.isSelectingWinner = false;
+            },
+            error: (bidError) => {
+              console.error("Error selecting winner:", bidError);
+              this.isSelectingWinner = false;
+              this.notificationService.showErrorCustom(
+                "Error al seleccionar el ganador"
+              );
+            },
+          });
+      } catch (error) {
+        console.error("Error getting developer info:", error);
+        this.isSelectingWinner = false;
+        this.notificationService.showErrorCustom(
+          "Error al obtener información del desarrollador"
+        );
+      }
     } else {
       this.projectTrackingService.createTracking(trackingData).subscribe({
         next: (response) => {
@@ -364,7 +378,12 @@ export class WinnerBidsComponent implements OnInit {
   }
 
   private submitRating(): void {
-    if (!this.selectedWinner || !this.rating) return;
+    if (!this.selectedWinner || !this.rating || !this.id_developer) {
+      this.notificationService.showErrorCustom(
+        "Información incompleta para calificar. Intente nuevamente."
+      );
+      return;
+    }
 
     const ratingData = {
       developer_id: this.id_developer,
@@ -393,14 +412,41 @@ export class WinnerBidsComponent implements OnInit {
     });
   }
 
-
-
   private loadSelectedWinner(): void {
     this.bidService.getWinnerByIdAuction(this.auctionId)
-    .subscribe((next: any) => {
-      this.selectedWinner = next[0].winner;
-      this.projectStatus = "assigned";
-    })
+    .subscribe({
+      next: (response: any) => {
+        if (response && response.length > 0 && response[0].winner) {
+          this.selectedWinner = response[0].winner;
+          this.loadDeveloperInfo(response[0].winner.id);
+        }
+      },
+      error: (error) => {
+        console.error("Error loading selected winner:", error);
+      }
+    });
+  }
+
+  private async loadDeveloperInfo(developerId: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.developerService.getDeveloperByIdUser(developerId).subscribe({
+        next: (developer: any) => {
+          this.id_developer = developer.id;
+          this.user_id = developer.user_id;
+          
+          // Verificar si ya existe una calificación
+          this.getPublicRating(developer.id);
+          resolve();
+        },
+        error: (err) => {
+          console.error("Error loading developer info:", err);
+          this.notificationService.showErrorCustom(
+            "Error al cargar datos del desarrollador"
+          );
+          reject(err);
+        }
+      });
+    });
   }
 
   private saveProjectStatus(): void {
@@ -535,37 +581,16 @@ export class WinnerBidsComponent implements OnInit {
     ];
   }
 
-  private getDevByIdUser() {
-    this.developerService
-      .getDeveloperByIdUser(this.selectedWinner.developer_id)
-      .subscribe({
-        next: (developer) => {
-          this.user_id = developer.user_id;
-          this.id_developer = developer.id;
-          this.getPublicRating(developer.id);
-        },
-        error: (err) => {
-          this.notificationService.showErrorCustom(
-            "Error al cargar datos del desarrollador"
-          );
-        },
-      });
-  }
-
-  private getPublicRating(id: number) {
-    this.ratingService.getAllRatings({ developer_id: id }).subscribe({
-      next: (developer: any) => {
-        const hasRating = developer.data.some(
-          (rating: any) =>
-            rating.author_id === this.id && rating.developer_id === id
+  private getPublicRating(developerId: number) {
+    this.ratingService.getAllRatings({ developer_id: developerId }).subscribe({
+      next: (ratings: any) => {
+        const currentUserId = this.getUserInfo("id");
+        this.hasExistingRating = ratings.data.some(
+          (rating: any) => rating.author_id === currentUserId
         );
-
-        this.hasExistingRating = hasRating;
       },
       error: (err) => {
-        this.notificationService.showErrorCustom(
-          "Error al cargar datos del desarrollador"
-        );
+        console.error("Error loading ratings:", err);
       },
     });
   }
