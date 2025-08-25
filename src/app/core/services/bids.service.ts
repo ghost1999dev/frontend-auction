@@ -157,6 +157,13 @@ getWinnersHistory(): Observable<WinnerHistoryResponse> {
     );
 }
 
+getWinnerByIdAuction(id: any): Observable<WinnerHistoryResponse> {
+  return this.http.get<WinnerHistoryResponse>(`${environment.server_url}bids/winner/auction/${id}`)
+    .pipe(
+      catchError((err) => this.handlerErrorService.handlerError(err))
+    );
+}
+
 /**
  * Selecciona el ganador de una subasta
  * @param data Datos con auction_id y winner_bid

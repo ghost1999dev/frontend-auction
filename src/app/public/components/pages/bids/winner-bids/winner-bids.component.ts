@@ -165,8 +165,7 @@ export class WinnerBidsComponent implements OnInit {
     this.loadSelectedWinner();
     this.loadAuctionResults();
     this.loadProjectStatus();
-          this.getDevByIdUser();
-
+    this.getDevByIdUser();
   }
 
   // Métodos para manejar la selección del ganador
@@ -238,7 +237,6 @@ export class WinnerBidsComponent implements OnInit {
       this.dialogConfig.winner
     ) {
       this.selectedWinner = this.dialogConfig.winner;
-      this.saveSelectedWinner();
       this.getDevByIdUser();
 
       // También notificar al backend sobre el ganador
@@ -395,24 +393,14 @@ export class WinnerBidsComponent implements OnInit {
     });
   }
 
-  // Métodos de persistencia
-  private saveSelectedWinner(): void {
-    if (this.selectedWinner) {
-      localStorage.setItem(
-        this.storageKey,
-        JSON.stringify(this.selectedWinner)
-      );
-    } else {
-      localStorage.removeItem(this.storageKey);
-    }
-  }
+
 
   private loadSelectedWinner(): void {
-    const savedWinner = localStorage.getItem(this.storageKey);
-    if (savedWinner) {
-      this.selectedWinner = JSON.parse(savedWinner);
+    this.bidService.getWinnerByIdAuction(this.auctionId)
+    .subscribe((next: any) => {
+      this.selectedWinner = next[0].winner;
       this.projectStatus = "assigned";
-    }
+    })
   }
 
   private saveProjectStatus(): void {
