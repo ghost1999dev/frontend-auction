@@ -15,6 +15,7 @@ import { ProjectTrackingService } from "src/app/core/services/project-tracking.s
 import { RatingService } from "src/app/core/services/rating.service";
 import { DeveloperService } from "src/app/core/services/developer.service";
 import { AuctionService } from "src/app/core/services/auction.service";
+import { ReportService } from "src/app/core/services/report.service";
 
 interface Winner {
   id: number;
@@ -119,6 +120,13 @@ export class WinnerBidsComponent implements OnInit {
   user_id: number | null = null;
   hasExistingRating: boolean = false;
 
+  displayReportDialog: boolean = false;
+  reportReason: string = '';
+  reportComment: string = '';
+  existingReport: any = null;
+  userReports: any[] = [];
+  selectedDeveloperForReport: any = null;
+
   displayConfirmationDialog: boolean = false;
   selectedWinnerToConfirm: Winner | null = null;
 
@@ -150,6 +158,7 @@ export class WinnerBidsComponent implements OnInit {
     private messageService: MessageService,
     private developerService: DeveloperService,
     private AuctionSrv: AuctionService,
+    private reportService: ReportService // Agregar este servicio
   ) {
     this.storageKey = `selectedWinner_${this.auctionId}`;
   }
@@ -167,7 +176,22 @@ export class WinnerBidsComponent implements OnInit {
     this.loadAuctionResults();
     this.loadProjectStatus();
     this.loadSelectedWinner();
+    this.loadUserReports(); // Cargar reportes del usuario
   }
+
+  private loadUserReports(): void {
+  this.reportService.getAllReports().subscribe({
+    next: (response: any) => {
+      if (response.data) {
+        this.userReports = response.data;
+      }
+    },
+    error: (error) => {
+      console.error('Error loading user reports:', error);
+    }
+  });
+}
+
 
   // Métodos para manejar la selección del ganador
   selectWinner(winner: Winner): void {
@@ -221,6 +245,92 @@ export class WinnerBidsComponent implements OnInit {
 
     this.displayDialog = false;
   }
+
+  showReportDialog(developer: any): void {
+  this.selectedDeveloperForReport = developer;
+  this.reportReason = '';
+  this.reportComment = '';
+  
+  // Verificar si ya existe un reporte para este desarrollador
+  this.existingReport = this.findExistingReport(developer);
+  
+  this.displayReportDialog = true;
+}
+
+// Método para encontrar reportes existentes
+private findExistingReport(developer: any): any {
+  if (!this.userReports.length) return null;
+  
+  return this.userReports.find(report => 
+    report.user_id === developer.id && 
+    report.project_id === this.projectId
+  ) || null;
+}
+
+// Método para enviar reporte
+submitDeveloperReport(): void {
+  if (!this.reportReason.trim()) {
+    this.notificationService.showErrorCustom('Debes especificar el motivo del reporte.');
+    return;
+  }
+
+  if (!this.selectedDeveloperForReport) {
+    this.notificationService.showErrorCustom('No se ha seleccionado un desarrollador para reportar.');
+    return;
+  }
+
+  const reportData: any = {
+    user_id: this.selectedDeveloperForReport.id,
+    project_id: this.projectId,
+    reason: this.reportReason,
+    comment: this.reportComment
+  };
+
+  this.reportService.createReport(reportData).subscribe({
+    next: (response) => {
+      this.notificationService.showSuccessCustom('Tu reporte ha sido enviado exitosamente. Nos contactaremos contigo pronto.');
+      
+      // Recargar los reportes del usuario para incluir el nuevo
+      this.loadUserReports();
+      this.closeReportDialog();
+    },
+    error: (error) => {
+      console.error('Error al enviar el reporte:', error);
+      let errorMessage = 'No se pudo enviar el reporte. Inténtalo nuevamente.';
+      
+      if (error.error?.message) {
+        errorMessage = error.error.message;
+      }
+      
+      this.notificationService.showErrorCustom(errorMessage);
+    }
+  });
+}
+
+// Método para cerrar el diálogo de reporte
+closeReportDialog(): void {
+  this.displayReportDialog = false;
+  this.reportReason = '';
+  this.reportComment = '';
+  this.selectedDeveloperForReport = null;
+  this.existingReport = null;
+}
+
+// Método para obtener la severidad del estado del reporte
+getReportStatusSeverity(status: string): any {
+  switch (status.toLowerCase()) {
+    case 'pendiente':
+      return 'warning';
+    case 'resuelto':
+      return 'success';
+    case 'rechazado':
+      return 'danger';
+    case 'desactivado':
+      return 'secondary';
+    default:
+      return 'info';
+  }
+}
 
   private async handleProjectTracking(): Promise<void> {
     if (!this.dialogConfig.projectId || !this.dialogConfig.nextStatus) return;

@@ -5,7 +5,7 @@
     <p class="mt-1" *ngIf="this.projects.length >= 5" style="color: red; font-size: 13px;">
       Las empresas no pueden tener más de 5 proyectos.
     </p>
-    <button *ngIf="this.projects.length < 5" pButton pRipple label="Nueva subasta" icon="pi pi-plus"
+    <button *ngIf="this.projects.length < 5" pButton pRipple label="Nueva proyecto" icon="pi pi-plus"
       class="p-button-success" (click)="openNew()"></button>
   </div>
 

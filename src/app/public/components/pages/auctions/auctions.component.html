@@ -112,13 +112,13 @@
         <div class="grid">
             <div class="col-12 md:col-6 " *ngFor="let auction of filteredActiveAuctions">
                 <p-card [header]="auction.project?.project_name || 'N/A'" 
-                        [subheader]="'Fecha límite: ' + (auction.bidding_deadline | date:'medium')"
+                        [subheader]="'Fecha límite: ' + (auction.bidding_deadline | date:'medium':'UTC')"
                         styleClass="h-full"
                         >
                     <div class="flex flex-column gap-2">
                         <div class="flex align-items-center gap-2">
                             <i class="pi pi-calendar"></i>
-                            <span>Inicio: {{auction.bidding_started_at | date:'medium'}}</span>
+                            <span>Inicio: {{auction.bidding_started_at | date:'medium':'UTC'}}</span>
                         </div>
                         <div class="flex align-items-center gap-2">
                             <i class="pi pi-tag"></i>

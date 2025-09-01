@@ -66,6 +66,10 @@
                                     class="p-button-rounded p-button-info" 
                                     pTooltip="Ver detalles"
                                     (click)="navigateToProgress(project)"></button>
+                            <button pButton pRipple icon="pi pi-exclamation-triangle" 
+                                    class="p-button-rounded p-button-warning" 
+                                    pTooltip="Reportar problema"
+                                    (click)="showReportDialog(project)"></button>
                         </div>
                     </td>
                 </tr>
@@ -88,5 +92,77 @@
         </div>
     </div>
 }
+
+<p-dialog [header]="existingReport ? 'Reporte Existente' : 'Reportar Problema'" 
+          [(visible)]="displayReportDialog" [modal]="true" [style]="{width: '50vw'}" 
+          [breakpoints]="{'960px': '75vw', '640px': '90vw'}" class="report-dialog">
+    
+    <!-- Contenido para reporte existente -->
+    @if (existingReport) {
+        <div class="p-fluid dialog-content">
+            <div class="report-status mb-4">
+                <p-tag [value]="existingReport.status" 
+                       [severity]="getStatusSeverity(existingReport.status)"></p-tag>
+                <small class="ml-2 text-color-secondary">Creado el: {{existingReport.createdAt | date:'medium'}}</small>
+            </div>
+
+            <div class="field">
+                <label class="block mb-1 font-medium">Motivo del reporte</label>
+                <p class="p-3 border-round">{{existingReport.reason}}</p>
+            </div>
+
+            @if (existingReport.comment) {
+                <div class="field mt-4">
+                    <label class="block mb-1 font-medium">Comentarios adicionales</label>
+                    <p class="p-3 border-round">{{existingReport.comment}}</p>
+                </div>
+            }
+
+            @if (existingReport.comment) {
+                <div class="field mt-4">
+                    <label class="block mb-1 font-medium">Respuesta del administrador</label>
+                    <p class="p-3 border-round">{{existingReport.admin_response || 'N/A'}}</p>
+                </div>
+            }
+            
+            <div class="mt-4 p-3 surface-50 border-round">
+                <p class="text-sm text-color-secondary m-0">
+                    <i class="pi pi-info-circle mr-2"></i>
+                    Tu reporte ha sido registrado. Te contactaremos cuando tengamos actualizaciones.
+                </p>
+            </div>
+        </div>
+    }
+    
+    <!-- Contenido para nuevo reporte -->
+    @else {
+        <div class="p-fluid dialog-content">
+            <div class="field">
+                <label for="reason" class="block mb-2 font-medium">Motivo del reporte *</label>
+                <textarea id="reason" rows="4" pInputTextarea [(ngModel)]="reportReason" 
+                          placeholder="Describe detalladamente el motivo de tu reporte..." 
+                           class="w-full p-3 textarea-custom"></textarea>
+                <small class="text-color-secondary">Este campo es obligatorio</small>
+            </div>
+            <div class="field mt-4">
+                <label for="comment" class="block mb-2 font-medium">Comentarios adicionales</label>
+                <textarea id="comment" rows="4" pInputTextarea [(ngModel)]="reportComment" 
+                          placeholder="Agrega cualquier información adicional que pueda ser útil..." 
+                          class="w-full p-3 textarea-custom"></textarea>
+                <small class="text-color-secondary">Opcional</small>
+            </div>
+        </div>
+    }
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cerrar" icon="pi pi-times" 
+                class="p-button-text p-button-plain" (click)="closeDialog()"></button>
+        
+        @if (!existingReport) {
+            <button pButton pRipple label="Enviar Reporte" icon="pi pi-exclamation-triangle" 
+                    class="p-button-warning" (click)="submitReport()" [disabled]="!reportReason.trim()"></button>
+        }
+    </ng-template>
+</p-dialog>
 
 <p-toast></p-toast>

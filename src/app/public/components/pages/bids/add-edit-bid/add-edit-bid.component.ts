@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, interval } from 'rxjs';
+import { Subscription, interval, filter } from 'rxjs';
 import { AuctionService } from 'src/app/core/services/auction.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
@@ -27,6 +27,7 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
   bidAmount: number | null = null;
   minAllowedBid: any;
   selectedProject: any | null = null;
+  actionId: number | any;
 
   private pollingInterval = 4000; // 4 segundos
   private pollingSubscription!: Subscription;
@@ -53,6 +54,10 @@ export class AddEditBidComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.route.params.subscribe((params) => {
+      const auctionId = +params["id"];
+      this.actionId = auctionId
+    });
     this.loadInitialData();
   }
 
@@ -128,28 +133,25 @@ ngOnDestroy(): void {
     });
   }
 
-  private loadAuctions(): void {
-    this.auctionService.getAuctions().subscribe({
-      next: (auctions) => {
-        this.activeAuctions = auctions;
-        
-        // Seleccionar subasta de la ruta si existe
-        const auctionId = this.route.snapshot.params['id'];
-        if (auctionId) {
-          const auction = this.activeAuctions.find(a => a.id === +auctionId);
-          if (auction) {
-            this.selectAuction(auction);
-          } else {
-            this.notificationService.showErrorCustom('Subasta no encontrada');
-            this.router.navigate(['/main/auctions']);
-          }
-        }
-      },
-      error: (err) => {
-        this.notificationService.showErrorCustom('Error al cargar las subastas');
+private loadAuctions(): void {
+  const auctionId = this.route.snapshot.params['id'];
+
+  this.auctionService.getAuctionById(auctionId).subscribe({
+    next: (auction: any) => {
+      if (auction) {
+        // Convert single object to array
+        this.activeAuctions = [auction];
+        this.selectAuction(auction);
+      } else {
+        this.notificationService.showErrorCustom('Subasta no encontrada');
+        this.router.navigate(['/main/auctions']);
       }
-    });
-  }
+    },
+    error: (err) => {
+      this.notificationService.showErrorCustom('Error al cargar las subastas');
+    }
+  });
+}
 
   loadProjectById(id: any){
     this.ProjectSrv.getProjectById(id)

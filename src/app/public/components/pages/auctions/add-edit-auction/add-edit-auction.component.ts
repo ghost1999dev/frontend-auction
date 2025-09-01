@@ -148,12 +148,17 @@ export class AddEditAuctionComponent implements OnInit {
 
 private combineDateTimeToISO(dateStr: string, timeStr: string): string {
   const [hours, minutes] = timeStr.split(':');
-  const date = new Date(dateStr);
-  date.setHours(parseInt(hours, 10));
-  date.setMinutes(parseInt(minutes, 10));
-
-  // Formato: "YYYY-MM-DDTHH:mm" (sin Z ni conversión UTC)
-  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${(date.getDate() + 1).toString().padStart(2, '0')}T${hours}:${minutes}:00`;
+  
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(year, month - 1, day, parseInt(hours, 10), parseInt(minutes, 10));
+  
+  // Obtener offset de zona horaria en minutos
+  const timezoneOffset = date.getTimezoneOffset();
+  const offsetHours = Math.abs(Math.floor(timezoneOffset / 60)).toString().padStart(2, '0');
+  const offsetMinutes = Math.abs(timezoneOffset % 60).toString().padStart(2, '0');
+  const offsetSign = timezoneOffset > 0 ? '-' : '+';
+  
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}T${hours}:${minutes}:00.000Z`;
 }
 
   onSubmit(): void {
