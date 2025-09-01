@@ -1018,3 +1018,67 @@ body.dark {
     }
   }
 }
+
+.custom-dialog .p-dialog-header {
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-600) 100%);
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 1.2rem;
+}
+
+.custom-dialog .p-dialog-content {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    padding: 1.5rem;
+}
+
+.existing-report-container .report-header {
+    border-left: 4px solid var(--primary-color);
+}
+
+.existing-report-container .custom-tag {
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+}
+
+.existing-report-container .report-card {
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.2s ease;
+}
+
+.existing-report-container .report-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+}
+
+.existing-report-container .admin-response {
+    border-left: 4px solid var(--green-500);
+}
+
+.existing-report-container .info-banner {
+    border-left: 4px solid var(--blue-500);
+    background: linear-gradient(90deg, var(--blue-50) 0%, var(--surface-100) 100%);
+}
+
+/* Estilos responsivos */
+@media screen and (max-width: 960px) {
+    .custom-dialog .p-dialog-header {
+        padding: 1rem;
+    }
+    
+    .custom-dialog .p-dialog-content {
+        padding: 1rem;
+    }
+    
+    .existing-report-container .report-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .existing-report-container .report-header i {
+        margin-top: 0.5rem;
+        align-self: flex-end;
+    }
+}
